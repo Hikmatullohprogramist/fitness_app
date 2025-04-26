@@ -6,42 +6,33 @@ class WorkoutInfoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Mashg\'ulot haqida'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context),
-        ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            // Workout Image
-            Container(
-              height: 200,
-              width: double.infinity,
-              decoration: const BoxDecoration(
-                image: DecorationImage(
-                  image: AssetImage('assets/images/workout_example.png'),
-                  fit: BoxFit.cover,
-                ),
+      body: CustomScrollView(
+        slivers: [
+          SliverAppBar(
+            expandedHeight: 400,
+            flexibleSpace: FlexibleSpaceBar(
+              background: Image.asset(
+                'assets/workout.jpg',
+                fit: BoxFit.cover,
               ),
             ),
-            Padding(
+            leading: IconButton(
+              icon: const Icon(Icons.arrow_back),
+              onPressed: () => Navigator.pop(context),
+            ),
+            title: const Text('Mashg\'ulot haqida'),
+          ),
+          SliverToBoxAdapter(
+            child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Workout Title
                   Text(
                     'Kuch mashqlari kompleksi',
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),
-                  // Workout Duration
                   Row(
                     children: [
                       const Icon(Icons.timer_outlined),
@@ -53,22 +44,17 @@ class WorkoutInfoScreen extends StatelessWidget {
                     ],
                   ),
                   const SizedBox(height: 16),
-                  // Workout Description
                   Text(
                     'Bu mashg\'ulot kuch mashqlarini o\'z ichiga oladi. Unda quyidagi mashqlar mavjud:',
                     style: Theme.of(context).textTheme.bodyLarge,
                   ),
+                  // const SizedBox(height: 16),
+                  // _buildExerciseList(context),
                   const SizedBox(height: 16),
-                  // Exercise List
-                  _buildExerciseList(context),
-                  const SizedBox(height: 16),
-                  // Benefits Section
-                  _buildBenefitsSection(context),
-                  const SizedBox(height: 16),
-                  // Instructions Section
-                  _buildInstructionsSection(context),
-                  const SizedBox(height: 16),
-                  // Start Button
+                  // _buildBenefitsSection(context),
+                  // const SizedBox(height: 16),
+                  // _buildInstructionsSection(context),
+                  // const SizedBox(height: 16),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
@@ -84,8 +70,8 @@ class WorkoutInfoScreen extends StatelessWidget {
                 ],
               ),
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }

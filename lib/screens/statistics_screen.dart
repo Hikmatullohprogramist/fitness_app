@@ -1,147 +1,86 @@
 import 'package:flutter/material.dart';
+import 'package:fl_chart/fl_chart.dart';
+import '../models/workout.dart';
 
 class StatisticsScreen extends StatelessWidget {
-  const StatisticsScreen({super.key});
+  final List<Workout> workouts;
+
+  const StatisticsScreen({
+    Key? key,
+    required this.workouts,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          // Weekly Progress
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Haftalik progress',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 16),
-                _buildProgressCard(
-                  context,
-                  'Mashqlar soni',
-                  '28/35',
-                  0.8,
-                  Colors.blue,
-                ),
-                _buildProgressCard(
-                  context,
-                  'Kaloriya',
-                  '3500/4000',
-                  0.875,
-                  Colors.red,
-                ),
-                _buildProgressCard(
-                  context,
-                  'Vaqt',
-                  '12/15 soat',
-                  0.8,
-                  Colors.green,
-                ),
-              ],
-            ),
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Statistika'),
+      ),
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildWeeklyProgress(),
+              const SizedBox(height: 24),
+              _buildWorkoutStats(),
+              const SizedBox(height: 24),
+              _buildCaloriesChart(),
+            ],
           ),
-
-          // Monthly Overview
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Oylik ko\'rinish',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 16),
-                _buildStatCard(
-                  context,
-                  'Jami mashqlar',
-                  '120',
-                  Icons.fitness_center,
-                ),
-                _buildStatCard(
-                  context,
-                  'O\'rtacha kunlik vaqt',
-                  '45 min',
-                  Icons.timer,
-                ),
-                _buildStatCard(
-                  context,
-                  'Yakunlangan kunlar',
-                  '25/30',
-                  Icons.calendar_today,
-                ),
-              ],
-            ),
-          ),
-
-          // Achievement Stats
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Yutuqlar statistikasi',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 16),
-                _buildAchievementStat(
-                  context,
-                  'Ketma-ket kunlar',
-                  '5 kun',
-                  Icons.star,
-                ),
-                _buildAchievementStat(
-                  context,
-                  'Jami yutuqlar',
-                  '12 ta',
-                  Icons.emoji_events,
-                ),
-                _buildAchievementStat(
-                  context,
-                  'Eng yaxshi kun',
-                  '800 kaloriya',
-                  Icons.local_fire_department,
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildProgressCard(
-    BuildContext context,
-    String title,
-    String value,
-    double progress,
-    Color color,
-  ) {
+  Widget _buildWeeklyProgress() {
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
-              title,
-              style: Theme.of(context).textTheme.titleMedium,
+            const Text(
+              'Haftalik progress',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 8),
-            LinearProgressIndicator(
-              value: progress,
-              backgroundColor: color.withOpacity(0.2),
-              valueColor: AlwaysStoppedAnimation<Color>(color),
-            ),
-            const SizedBox(height: 8),
-            Text(
-              value,
-              style: Theme.of(context).textTheme.bodyLarge,
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 200,
+              child: LineChart(
+                LineChartData(
+                  gridData: const FlGridData(show: false),
+                  titlesData: const FlTitlesData(show: false),
+                  borderData: FlBorderData(show: false),
+                  lineBarsData: [
+                    LineChartBarData(
+                      spots: [
+                        const FlSpot(0, 3),
+                        const FlSpot(1, 1),
+                        const FlSpot(2, 4),
+                        const FlSpot(3, 2),
+                        const FlSpot(4, 5),
+                        const FlSpot(5, 3),
+                        const FlSpot(6, 4),
+                      ],
+                      isCurved: true,
+                      color: Colors.blue,
+                      barWidth: 3,
+                      isStrokeCapRound: true,
+                      dotData: const FlDotData(show: false),
+                      belowBarData: BarAreaData(show: false),
+                    ),
+                  ],
+                ),
+              ),
             ),
           ],
         ),
@@ -149,45 +88,135 @@ class StatisticsScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildStatCard(
-    BuildContext context,
-    String title,
-    String value,
-    IconData icon,
-  ) {
+  Widget _buildWorkoutStats() {
+    final totalWorkouts = workouts.length;
+    final totalCalories = workouts.fold<double>(
+        0, (sum, workout) => sum + workout.caloriesBurned);
+    final totalDuration = workouts.fold<double>(
+        0, (sum, workout) => sum + workout.durationMinutes);
+
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        title: Text(title),
-        trailing: Text(
-          value,
-          style: Theme.of(context).textTheme.titleMedium,
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Umumiy statistika',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildStatRow('Mashg\'ulotlar soni', '$totalWorkouts'),
+            _buildStatRow(
+                'Jami kaloriya', '${totalCalories.toStringAsFixed(0)}'),
+            _buildStatRow(
+                'Jami vaqt', '${totalDuration.toStringAsFixed(0)} min'),
+          ],
         ),
       ),
     );
   }
 
-  Widget _buildAchievementStat(
-    BuildContext context,
-    String title,
-    String value,
-    IconData icon,
-  ) {
+  Widget _buildStatRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildCaloriesChart() {
     return Card(
-      margin: const EdgeInsets.only(bottom: 16),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        title: Text(title),
-        trailing: Text(
-          value,
-          style: Theme.of(context).textTheme.titleMedium,
+      elevation: 4,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(12),
+      ),
+      child: Padding(
+        padding: const EdgeInsets.all(16.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Kaloriya sarfi',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            SizedBox(
+              height: 200,
+              child: BarChart(
+                BarChartData(
+                  alignment: BarChartAlignment.spaceAround,
+                  maxY: 1000,
+                  barTouchData: BarTouchData(enabled: false),
+                  titlesData: FlTitlesData(show: false),
+                  gridData: FlGridData(show: false),
+                  borderData: FlBorderData(show: false),
+                  barGroups: [
+                    BarChartGroupData(
+                      x: 0,
+                      barRods: [
+                        BarChartRodData(
+                          toY: 800,
+                          color: Colors.blue,
+                          width: 20,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ],
+                    ),
+                    BarChartGroupData(
+                      x: 1,
+                      barRods: [
+                        BarChartRodData(
+                          toY: 600,
+                          color: Colors.blue,
+                          width: 20,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ],
+                    ),
+                    BarChartGroupData(
+                      x: 2,
+                      barRods: [
+                        BarChartRodData(
+                          toY: 900,
+                          color: Colors.blue,
+                          width: 20,
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

@@ -1,180 +1,101 @@
 import 'package:flutter/material.dart';
+import '../models/workout.dart';
+import '../models/user.dart';
 import 'package:fitness_app/widgets/menu_card.dart';
 import 'package:fitness_app/widgets/time_progress_bar.dart';
 import 'package:fitness_app/widgets/achievement_card.dart';
 
-class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+class HomeScreen extends StatelessWidget {
+  final User user;
+  final List<Workout> recentWorkouts;
 
-  @override
-  State<HomeScreen> createState() => _HomeScreenState();
-}
-
-class _HomeScreenState extends State<HomeScreen> {
-  final double _dailyTimeLimit = 25; // in minutes
-  final double _usedTime = 0; // Track used time
+  const HomeScreen({
+    Key? key,
+    required this.user,
+    required this.recentWorkouts,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
-      child: Column(
-        children: [
-          // Welcome Section
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-            child: Row(
-              children: [
-                const CircleAvatar(
-                  radius: 30,
-                  backgroundImage: AssetImage('assets/images/profile.png'),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        'Salom, Foydalanuvchi!',
-                        style: Theme.of(context).textTheme.titleLarge,
-                      ),
-                      const Text('Bugun qanday mashqlar qilmoqchisiz?'),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
+    final Color primary = const Color(0xFF00796B);
+    final Color secondary = const Color(0xFF388E3C);
+    final Color background = const Color(0xFFF5F5F5);
+    final Color accent = const Color(0xFFFFC107);
 
-          // Time Progress Bar
-          TimeProgressBar(usedTime: _usedTime, dailyTimeLimit: _dailyTimeLimit),
-
-          // Quick Stats
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatCard(
-                  context,
-                  'Kunlik mashqlar',
-                  '5/8',
-                  Icons.fitness_center,
-                ),
-                _buildStatCard(
-                  context,
-                  'Kaloriya',
-                  '450',
-                  Icons.local_fire_department,
-                ),
-                _buildStatCard(
-                  context,
-                  'Vaqt',
-                  '25 min',
-                  Icons.timer,
-                ),
-              ],
-            ),
+    return Scaffold(
+      backgroundColor: background,
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildWelcomeSection(primary),
+              const SizedBox(height: 24),
+              _buildQuickStats(primary, accent),
+              const SizedBox(height: 24),
+              _buildRecentWorkouts(),
+            ],
           ),
-
-          // Main Menu Grid
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: GridView.count(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              crossAxisCount: 2,
-              mainAxisSpacing: 16.0,
-              crossAxisSpacing: 16.0,
-              children: [
-                MenuCard(
-                  icon: Icons.show_chart,
-                  title: 'Jismoniy rivojlanish darajasi',
-                  subtitle: 'Kunlik progress',
-                  onTap: () => _navigateToSection(0),
-                ),
-                MenuCard(
-                  icon: Icons.school,
-                  title: 'Professiogramma',
-                  subtitle: 'Kasbiy mezonlar',
-                  onTap: () => _navigateToSection(1),
-                ),
-                MenuCard(
-                  icon: Icons.fitness_center,
-                  title: 'Individual mashg\'ulotlar',
-                  subtitle: 'Mashqlar ro\'yxati',
-                  onTap: () => _navigateToSection(2),
-                ),
-                MenuCard(
-                  icon: Icons.track_changes,
-                  title: 'Jismoniy tayyorgarlik',
-                  subtitle: 'Joriy daraja',
-                  onTap: () => _navigateToSection(3),
-                ),
-              ],
-            ),
-          ),
-
-          // Recent Achievements
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Yaqinda qo\'lga kiritilgan yutuqlar',
-                  style: Theme.of(context).textTheme.titleMedium,
-                ),
-                const SizedBox(height: 8),
-                const SingleChildScrollView(
-                  scrollDirection: Axis.horizontal,
-                  child: const Row(
-                    children: [
-                      AchievementCard(
-                        title: '5 kun ketma-ket',
-                        description: 'Mashqlarni davom ettirish',
-                        icon: Icons.star,
-                        color: Colors.amber,
-                      ),
-                      AchievementCard(
-                        title: '1000 kaloriya',
-                        description: 'Yakunlangan mashqlar',
-                        icon: Icons.local_fire_department,
-                        color: Colors.red,
-                      ),
-                      AchievementCard(
-                        title: 'Yangi mashq',
-                        description: 'Qo\'shilgan mashq',
-                        icon: Icons.add_circle,
-                        color: Colors.green,
-                      ),
-                    ],
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ],
+        ),
       ),
     );
   }
 
-  Widget _buildStatCard(
-      BuildContext context, String title, String value, IconData icon) {
+  Widget _buildWelcomeSection(Color primary) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Salom, ${user.name}!',
+          style: TextStyle(
+            fontSize: 26,
+            fontWeight: FontWeight.bold,
+            color: primary,
+          ),
+        ),
+        const SizedBox(height: 8),
+        Text(
+          'Bugun mashg‘ulot qilishga tayyormisiz?',
+          style: TextStyle(
+            fontSize: 16,
+            color: Colors.grey[700],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildQuickStats(Color primary, Color accent) {
     return Card(
+      color: Colors.white,
+      shadowColor: Colors.grey.withOpacity(0.2),
+      elevation: 6,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
       child: Padding(
-        padding: const EdgeInsets.all(12),
+        padding: const EdgeInsets.all(20.0),
         child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(icon, color: Theme.of(context).colorScheme.primary),
-            const SizedBox(height: 8),
             Text(
-              value,
-              style: Theme.of(context).textTheme.titleLarge,
+              'Tezkor statistikalar',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: primary,
+              ),
             ),
-            Text(
-              title,
-              style: Theme.of(context).textTheme.bodySmall,
+            const SizedBox(height: 16),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: [
+                _buildStatItem(
+                    'Mashg‘ulotlar', '${recentWorkouts.length}', primary),
+                _buildStatItem('Vaqt', '2 min', primary),
+                _buildStatItem('Yurgan', '100 m', primary),
+              ],
             ),
           ],
         ),
@@ -182,7 +103,118 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _navigateToSection(int index) {
-    // Navigate to respective sections
+  Widget _buildStatItem(String label, String value, Color primary) {
+    return Column(
+      children: [
+        Text(
+          value,
+          style: TextStyle(
+            fontSize: 22,
+            fontWeight: FontWeight.bold,
+            color: primary,
+          ),
+        ),
+        const SizedBox(height: 6),
+        Text(
+          label,
+          style: TextStyle(
+            fontSize: 14,
+            color: Colors.grey[600],
+          ),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildRecentWorkouts() {
+    final List<Map<String, dynamic>> menuItems = [
+      {
+        'icon': Icons.show_chart,
+        'title': 'Jismoniy rivojlanish',
+        'subtitle': 'Kunlik progress',
+        'color': const Color(0xFF00796B),
+      },
+      {
+        'icon': Icons.school,
+        'title': 'Professiogramma',
+        'subtitle': 'Kasbiy mezonlar',
+        'color': const Color(0xFF388E3C),
+      },
+      {
+        'icon': Icons.fitness_center,
+        'title': 'Mashg‘ulotlar',
+        'subtitle': 'Mashqlar ro‘yxati',
+        'color': const Color(0xFFFFC107),
+      },
+      {
+        'icon': Icons.track_changes,
+        'title': 'Tayyorgarlik',
+        'subtitle': 'Joriy daraja',
+        'color': const Color(0xFF7B1FA2),
+      },
+    ];
+
+    return GridView.builder(
+      physics: const NeverScrollableScrollPhysics(),
+      shrinkWrap: true,
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+        childAspectRatio: 1.1,
+      ),
+      itemCount: menuItems.length,
+      itemBuilder: (context, index) {
+        final item = menuItems[index];
+        return InkWell(
+          borderRadius: BorderRadius.circular(16),
+          onTap: () {},
+          child: Ink(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: item['color'].withOpacity(0.15),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Padding(
+              padding: const EdgeInsets.all(16),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    item['icon'],
+                    size: 40,
+                    color: item['color'],
+                  ),
+                  const SizedBox(height: 12),
+                  Text(
+                    item['title'],
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    item['subtitle'],
+                    textAlign: TextAlign.center,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
   }
 }

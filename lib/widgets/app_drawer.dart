@@ -1,7 +1,8 @@
 import 'package:fitness_app/screens/profile_screen.dart';
 import 'package:fitness_app/screens/workouts_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:fitness_app/screens/drawer_screens.dart';
+import 'package:fitness_app/screens/drawer_screens/drawer_screens.dart';
+import 'package:fitness_app/models/user.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -55,10 +56,7 @@ class AppDrawer extends StatelessWidget {
             title: const Text('Mening ma\'lumotlarim'),
             onTap: () {
               Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const ProfileScreen()),
-              );
+              _navigateToProfile(context);
             },
           ),
           ListTile(
@@ -92,7 +90,7 @@ class AppDrawer extends StatelessWidget {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                    builder: (context) => const SelfAssessmentScreen()),
+                    builder: (context) =>   SelfAssessmentScreen()),
               );
             },
           ),
@@ -152,6 +150,27 @@ class AppDrawer extends StatelessWidget {
             },
           ),
         ],
+      ),
+    );
+  }
+
+  void _navigateToProfile(BuildContext context) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => ProfileScreen(
+          user: User(
+            id: '1',
+            name: 'Foydalanuvchi',
+            email: 'user@example.com',
+            profileImageUrl: 'https://example.com/profile.jpg',
+            birthDate: '1990-01-01',
+            gender: 'Erkak',
+            height: 175,
+            weight: 70,
+            phone: '+998901234567',
+          ),
+        ),
       ),
     );
   }

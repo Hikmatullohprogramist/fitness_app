@@ -1,3 +1,4 @@
+import 'package:fitness_app/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'screens/main_screen.dart';
 import 'screens/splash_screen.dart';
@@ -21,10 +22,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Fitness App',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue),
-        useMaterial3: true,
-      ),
+      theme: optiFormaTheme,
       initialRoute: '/',
       routes: {
         '/': (context) => const SplashScreen(),

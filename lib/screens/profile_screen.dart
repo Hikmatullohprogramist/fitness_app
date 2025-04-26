@@ -1,129 +1,64 @@
 import 'package:flutter/material.dart';
+import '../models/user.dart';
 
 class ProfileScreen extends StatelessWidget {
-  const ProfileScreen({super.key});
+  final User user;
+
+  const ProfileScreen({
+    Key? key,
+    required this.user,
+  }) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    return SingleChildScrollView(
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('Profil'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.edit),
+            onPressed: () {
+              // TODO: Navigate to edit profile screen
+            },
+          ),
+        ],
+      ),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            _buildProfileHeader(),
+            _buildProfileInfo(),
+            _buildSettingsSection(),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildProfileHeader() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      color: Colors.blue.withOpacity(0.1),
       child: Column(
         children: [
-          // Profile Header
-          Container(
-            padding: const EdgeInsets.all(16),
-            color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-            child: Column(
-              children: [
-                const CircleAvatar(
-                  radius: 50,
-                  backgroundImage: AssetImage('assets/images/profile.png'),
-                ),
-                const SizedBox(height: 16),
-                Text(
-                  'Foydalanuvchi Ismi',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  'Professional sportchi',
-                  style: Theme.of(context).textTheme.bodyLarge,
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                  children: [
-                    _buildProfileStat('Mashqlar', '120'),
-                    _buildProfileStat('Yutuqlar', '15'),
-                    _buildProfileStat('Kunlar', '30'),
-                  ],
-                ),
-              ],
+          CircleAvatar(
+            radius: 50,
+            backgroundImage: NetworkImage(user.profileImageUrl),
+          ),
+          const SizedBox(height: 16),
+          Text(
+            user.name,
+            style: const TextStyle(
+              fontSize: 24,
+              fontWeight: FontWeight.bold,
             ),
           ),
-
-          // Profile Settings
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Profil sozlamalari',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 16),
-                _buildSettingTile(
-                  context,
-                  'Shaxsiy ma\'lumotlar',
-                  Icons.person,
-                  () {
-                    // Navigate to personal info
-                  },
-                ),
-                _buildSettingTile(
-                  context,
-                  'Mashq rejasi',
-                  Icons.fitness_center,
-                  () {
-                    // Navigate to workout plan
-                  },
-                ),
-                _buildSettingTile(
-                  context,
-                  'Bildirishnomalar',
-                  Icons.notifications,
-                  () {
-                    // Navigate to notifications
-                  },
-                ),
-                _buildSettingTile(
-                  context,
-                  'Til',
-                  Icons.language,
-                  () {
-                    // Navigate to language settings
-                  },
-                ),
-              ],
-            ),
-          ),
-
-          // Account Settings
-          Padding(
-            padding: const EdgeInsets.all(16),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  'Hisob sozlamalari',
-                  style: Theme.of(context).textTheme.titleLarge,
-                ),
-                const SizedBox(height: 16),
-                _buildSettingTile(
-                  context,
-                  'Parolni o\'zgartirish',
-                  Icons.lock,
-                  () {
-                    // Navigate to change password
-                  },
-                ),
-                _buildSettingTile(
-                  context,
-                  'Xavfsizlik',
-                  Icons.security,
-                  () {
-                    // Navigate to security settings
-                  },
-                ),
-                _buildSettingTile(
-                  context,
-                  'Chiqish',
-                  Icons.logout,
-                  () {
-                    // Logout
-                  },
-                ),
-              ],
+          const SizedBox(height: 8),
+          Text(
+            user.email,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
             ),
           ),
         ],
@@ -131,43 +66,98 @@ class ProfileScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildProfileStat(String label, String value) {
-    return Column(
-      children: [
-        Text(
-          value,
-          style: const TextStyle(
-            fontSize: 20,
-            fontWeight: FontWeight.bold,
-          ),
+  Widget _buildProfileInfo() {
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            const Text(
+              'Shaxsiy ma\'lumotlar',
+              style: TextStyle(
+                fontSize: 18,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 16),
+            _buildInfoRow('Tug\'ilgan sana', user.birthDate),
+            _buildInfoRow('Jinsi', user.gender),
+            _buildInfoRow('Bo\'yi', '${user.height} sm'),
+            _buildInfoRow('Vazni', '${user.weight} kg'),
+            _buildInfoRow('Telefon', user.phone),
+          ],
         ),
-        Text(
-          label,
-          style: const TextStyle(
-            fontSize: 14,
-            color: Colors.grey,
-          ),
-        ),
-      ],
+      ),
     );
   }
 
-  Widget _buildSettingTile(
-    BuildContext context,
-    String title,
-    IconData icon,
-    VoidCallback onTap,
-  ) {
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8.0),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              fontSize: 16,
+              color: Colors.grey[600],
+            ),
+          ),
+          Text(
+            value,
+            style: const TextStyle(
+              fontSize: 16,
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildSettingsSection() {
     return Card(
-      margin: const EdgeInsets.only(bottom: 8),
-      child: ListTile(
-        leading: Icon(
-          icon,
-          color: Theme.of(context).colorScheme.primary,
-        ),
-        title: Text(title),
-        trailing: const Icon(Icons.chevron_right),
-        onTap: onTap,
+      margin: const EdgeInsets.all(16),
+      child: Column(
+        children: [
+          ListTile(
+            leading: const Icon(Icons.settings),
+            title: const Text('Sozlamalar'),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              // TODO: Navigate to settings screen
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.help_outline),
+            title: const Text('Yordam va qo\'llab-quvvatlash'),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              // TODO: Navigate to help screen
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.info_outline),
+            title: const Text('Ilova haqida'),
+            trailing: const Icon(Icons.arrow_forward_ios),
+            onTap: () {
+              // TODO: Navigate to about screen
+            },
+          ),
+          const Divider(),
+          ListTile(
+            leading: const Icon(Icons.logout, color: Colors.red),
+            title: const Text('Chiqish', style: TextStyle(color: Colors.red)),
+            onTap: () {
+              // TODO: Implement logout
+            },
+          ),
+        ],
       ),
     );
   }
