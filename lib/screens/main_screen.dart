@@ -57,7 +57,6 @@ class _MainScreenState extends State<MainScreen> {
       ],
     ),
     const WorkoutsScreen(),
-    // StatisticsScreen(workouts: []),
     ProfileScreen(
       user: User(
         id: '1',

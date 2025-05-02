@@ -33,22 +33,23 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
   ];
 
   int _selectedCategoryIndex = 0;
-  int _currentStep = 0;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.grey[50],
       body: Column(
         children: [
+          // Category selector with improved design
           Container(
             height: 70,
-            padding: const EdgeInsets.symmetric(vertical: 10),
+            margin: const EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
-              color: Theme.of(context).scaffoldBackgroundColor,
+              color: Colors.white,
               boxShadow: [
                 BoxShadow(
-                  color: Colors.black.withOpacity(0.05),
-                  blurRadius: 5,
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 6,
                   offset: const Offset(0, 2),
                 ),
               ],
@@ -56,7 +57,8 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
               itemCount: categories.length,
-              padding: const EdgeInsets.symmetric(horizontal: 12),
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              physics: const BouncingScrollPhysics(),
               itemBuilder: (context, index) {
                 final isSelected = index == _selectedCategoryIndex;
                 return Padding(
@@ -79,7 +81,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                         },
                         child: Container(
                           padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
+                              horizontal: 16, vertical: 12),
                           child: Row(
                             children: [
                               Icon(
@@ -90,7 +92,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                                         .textTheme
                                         .bodyLarge
                                         ?.color,
-                                size: 20,
+                                size: 18,
                               ),
                               const SizedBox(width: 8),
                               Text(
@@ -117,89 +119,194 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
               },
             ),
           ),
-          Expanded(
-            child: Stepper(
-              currentStep: _currentStep,
-              onStepTapped: (step) {
-                setState(() {
-                  _currentStep = step;
-                });
-              },
-              onStepContinue: () {
-                if (_currentStep < 4) {
-                  setState(() {
-                    _currentStep++;
-                  });
-                }
-              },
-              onStepCancel: () {
-                if (_currentStep > 0) {
-                  setState(() {
-                    _currentStep--;
-                  });
-                }
-              },
-              steps: List.generate(
-                5,
-                (index) => Step(
-                  title: Text(
-                    'Mashg\'ulot ${index + 1}',
-                    style: TextStyle(
-                      color: _currentStep == index
-                          ? Theme.of(context).primaryColor
-                          : Colors.black87,
-                      fontWeight: FontWeight.bold,
-                    ),
+
+          // Title and filter
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  categories[_selectedCategoryIndex]['name'],
+                  style: const TextStyle(
+                    fontSize: 20,
+                    fontWeight: FontWeight.bold,
                   ),
-                  content: Container(
+                ),
+                Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.05),
+                        blurRadius: 4,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
+                  ),
+                  child: IconButton(
+                    icon: const Icon(Icons.filter_list),
+                    onPressed: () {},
+                    color: Theme.of(context).primaryColor,
+                    iconSize: 22,
+                  ),
+                ),
+              ],
+            ),
+          ),
+
+          // Workout grid with improved design
+          Expanded(
+            child: GridView.builder(
+              padding: const EdgeInsets.all(16),
+              physics: const BouncingScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 16,
+                mainAxisSpacing: 16,
+                childAspectRatio: 0.8,
+              ),
+              itemCount: 6,
+              itemBuilder: (context, index) {
+                return InkWell(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const WorkoutInfoScreen(),
+                      ),
+                    );
+                  },
+                  child: Container(
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
-                      gradient: LinearGradient(
-                        colors: [Color(0xFFE0F7F4), Color(0xFFF8F8F8)],
-                      ),
+                      color: Colors.white,
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.teal.withOpacity(0.05),
-                          blurRadius: 8,
-                          offset: Offset(0, 4),
+                          color: Colors.black.withOpacity(0.06),
+                          blurRadius: 10,
+                          offset: const Offset(0, 4),
                         ),
                       ],
                     ),
-                    child: ListTile(
-                      contentPadding: const EdgeInsets.all(16),
-                      leading: CircleAvatar(
-                        radius: 28,
-                        backgroundImage:
-                            AssetImage('assets/images/workout_example.png'),
-                      ),
-                      title: const Text(
-                        'Kunlik mashg\'ulot',
-                        style: TextStyle(fontWeight: FontWeight.bold),
-                      ),
-                      subtitle: Row(
-                        children: const [
-                          Icon(Icons.timer_outlined, size: 14),
-                          SizedBox(width: 4),
-                          Text('45 daqiqa'),
-                          SizedBox(width: 8),
-                          Icon(Icons.repeat, size: 14),
-                          SizedBox(width: 4),
-                          Text('3 marta'),
-                        ],
-                      ),
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const WorkoutInfoScreen(),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Workout image
+                        Stack(
+                          children: [
+                            ClipRRect(
+                              borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(16),
+                              ),
+                              child: Image.asset(
+                                'assets/workout.jpg',
+                                height: 120,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                            // Difficulty badge
+                            Positioned(
+                              top: 10,
+                              left: 10,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 8,
+                                  vertical: 4,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  index % 3 == 0
+                                      ? 'Oson'
+                                      : (index % 3 == 1
+                                          ? 'O\'rta'
+                                          : 'Murakkab'),
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 10,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            // Bookmark button
+                            Positioned(
+                              top: 8,
+                              right: 8,
+                              child: Container(
+                                padding: const EdgeInsets.all(4),
+                                decoration: const BoxDecoration(
+                                  color: Colors.white,
+                                  shape: BoxShape.circle,
+                                ),
+                                child: Icon(
+                                  Icons.bookmark_border,
+                                  size: 18,
+                                  color: Theme.of(context).primaryColor,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        // Workout info
+                        Padding(
+                          padding: const EdgeInsets.all(12),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                'Mashg\'ulot ${index + 1}',
+                                style: const TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 16,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                              const SizedBox(height: 8),
+                              Row(
+                                children: [
+                                  Icon(Icons.timer_outlined,
+                                      size: 14, color: Colors.grey[600]),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${30 + (index * 5)} daqiqa',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 6),
+                              Row(
+                                children: [
+                                  Icon(Icons.local_fire_department_outlined,
+                                      size: 14, color: Colors.grey[600]),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    '${180 + (index * 20)} kal',
+                                    style: TextStyle(
+                                      fontSize: 12,
+                                      color: Colors.grey[600],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
                           ),
-                        );
-                      },
+                        ),
+                      ],
                     ),
                   ),
-                  isActive: _currentStep >= index,
-                ),
-              ),
+                );
+              },
             ),
           ),
         ],

@@ -1,3 +1,6 @@
+import 'package:fitness_app/screens/pysical_development.dart';
+import 'package:fitness_app/screens/workout_category_screen.dart';
+import 'package:fitness_app/screens/workouts_screen.dart';
 import 'package:flutter/material.dart';
 import '../models/workout.dart';
 import '../models/user.dart';
@@ -34,7 +37,7 @@ class HomeScreen extends StatelessWidget {
               const SizedBox(height: 24),
               _buildQuickStats(primary, accent),
               const SizedBox(height: 24),
-              _buildRecentWorkouts(),
+              _buildRecentWorkouts(context),
             ],
           ),
         ),
@@ -126,31 +129,53 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildRecentWorkouts() {
+  Widget _buildRecentWorkouts(BuildContext context) {
     final List<Map<String, dynamic>> menuItems = [
       {
         'icon': Icons.show_chart,
         'title': 'Jismoniy rivojlanish',
         'subtitle': 'Kunlik progress',
         'color': const Color(0xFF00796B),
+        'goto': () {}
       },
       {
         'icon': Icons.school,
         'title': 'Professiogramma',
         'subtitle': 'Kasbiy mezonlar',
         'color': const Color(0xFF388E3C),
+        'goto': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => PhysicalDevelopmentScreen()),
+          );
+        }
       },
       {
         'icon': Icons.fitness_center,
         'title': 'Mashg‘ulotlar',
         'subtitle': 'Mashqlar ro‘yxati',
         'color': const Color(0xFFFFC107),
+        'goto': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => Scaffold(
+                appBar: AppBar(
+                  title: const Text('Mashg‘ulotlar'),
+                ),
+                body: const WorkoutsScreen(),
+              ),
+            ),
+          );
+        }
       },
       {
         'icon': Icons.track_changes,
         'title': 'Tayyorgarlik',
         'subtitle': 'Joriy daraja',
         'color': const Color(0xFF7B1FA2),
+        'goto': () {}
       },
     ];
 
@@ -168,7 +193,7 @@ class HomeScreen extends StatelessWidget {
         final item = menuItems[index];
         return InkWell(
           borderRadius: BorderRadius.circular(16),
-          onTap: () {},
+          onTap: item['goto'],
           child: Ink(
             decoration: BoxDecoration(
               color: Colors.white,
