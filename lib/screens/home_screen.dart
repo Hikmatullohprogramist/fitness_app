@@ -136,20 +136,21 @@ class HomeScreen extends StatelessWidget {
         'title': 'Jismoniy rivojlanish',
         'subtitle': 'Kunlik progress',
         'color': const Color(0xFF00796B),
-        'goto': () {}
+        'goto': () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => PhysicalDevelopmentScreen(),
+            ),
+          );
+        }
       },
       {
         'icon': Icons.school,
         'title': 'Professiogramma',
         'subtitle': 'Kasbiy mezonlar',
         'color': const Color(0xFF388E3C),
-        'goto': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => PhysicalDevelopmentScreen()),
-          );
-        }
+        'goto': () {}
       },
       {
         'icon': Icons.fitness_center,
