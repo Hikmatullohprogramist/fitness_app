@@ -20,109 +20,83 @@ class HomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final Color primary = const Color(0xFF00796B);
-    final Color secondary = const Color(0xFF388E3C);
-    final Color background = const Color(0xFFF5F5F5);
-    final Color accent = const Color(0xFFFFC107);
+    final List<_MenuItem> menuItems = [
+      _MenuItem('Jismoniy rivojlanganlik kòrsatkichlari', Icons.monitor_weight,
+          '/ideal-body'),
+      _MenuItem('Jismoniy tayyorgarlik ko‘rsatkichlari', Icons.fitness_center,
+          '/jismoniytk'),
+      _MenuItem('Professiogramma', Icons.assessment, '/progress'),
+      _MenuItem('J.t daqiqalik kompleksi (animatsiya)', Icons.directions_run,
+          '/activity_anim'),
+      _MenuItem('J. faoliyati (QR, kadr, rasm)', Icons.qr_code, '/activity_qr'),
+      _MenuItem('Mashqlar majmuasi', Icons.sports_gymnastics, '/exercises'),
+    ];
 
     return Scaffold(
-      backgroundColor: background,
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              _buildWelcomeSection(primary),
-              const SizedBox(height: 24),
-              _buildQuickStats(primary, accent),
-              const SizedBox(height: 24),
+      body: Container(
+        color: Theme.of(context).colorScheme.surface,
+        child: ListView(
+          padding: const EdgeInsets.all(20),
+          children: [
+            _buildGreeting(context, user),
+            const SizedBox(height: 24),
+            GridView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                mainAxisSpacing: 20,
+                crossAxisSpacing: 20,
+                childAspectRatio: 1.1,
+              ),
+              itemCount: menuItems.length,
+              itemBuilder: (context, index) {
+                final item = menuItems[index];
+                return _MenuCard(item: item);
+              },
+            ),
+            const SizedBox(height: 24),
+            if (recentWorkouts.isNotEmpty) ...[
+              Text('So‘nggi mashg‘ulotlar',
+                  style: Theme.of(context)
+                      .textTheme
+                      .titleMedium
+                      ?.copyWith(fontWeight: FontWeight.bold)),
+              const SizedBox(height: 12),
               _buildRecentWorkouts(context),
             ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildWelcomeSection(Color primary) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Text(
-          'Salom, ${user.name}!',
-          style: TextStyle(
-            fontSize: 26,
-            fontWeight: FontWeight.bold,
-            color: primary,
-          ),
-        ),
-        const SizedBox(height: 8),
-        Text(
-          'Bugun mashg‘ulot qilishga tayyormisiz?',
-          style: TextStyle(
-            fontSize: 16,
-            color: Colors.grey[700],
-          ),
-        ),
-      ],
-    );
-  }
-
-  Widget _buildQuickStats(Color primary, Color accent) {
-    return Card(
-      color: Colors.white,
-      shadowColor: Colors.grey.withOpacity(0.2),
-      elevation: 6,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
-      ),
-      child: Padding(
-        padding: const EdgeInsets.all(20.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Tezkor statistikalar',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: primary,
-              ),
-            ),
-            const SizedBox(height: 16),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                _buildStatItem(
-                    'Mashg‘ulotlar', '${recentWorkouts.length}', primary),
-                _buildStatItem('Vaqt', '2 min', primary),
-                _buildStatItem('Yurgan', '100 m', primary),
-              ],
-            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildStatItem(String label, String value, Color primary) {
-    return Column(
+  Widget _buildGreeting(BuildContext context, User user) {
+    return Row(
       children: [
-        Text(
-          value,
-          style: TextStyle(
-            fontSize: 22,
-            fontWeight: FontWeight.bold,
-            color: primary,
-          ),
+        CircleAvatar(
+          radius: 28,
+          backgroundImage:
+              user.profileImageUrl != null && user.profileImageUrl.isNotEmpty
+                  ? NetworkImage(user.profileImageUrl)
+                  : null,
+          child: user.profileImageUrl == null || user.profileImageUrl.isEmpty
+              ? Icon(Icons.person,
+                  size: 32, color: Theme.of(context).colorScheme.primary)
+              : null,
         ),
-        const SizedBox(height: 6),
-        Text(
-          label,
-          style: TextStyle(
-            fontSize: 14,
-            color: Colors.grey[600],
+        const SizedBox(width: 16),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text('Salom, ${user.name.split(' ').first}!',
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 20)),
+              const SizedBox(height: 4),
+              Text('Bugun mashg‘ulot qilishga tayyormisiz?',
+                  style: TextStyle(color: Colors.grey[700], fontSize: 14)),
+            ],
           ),
         ),
       ],
@@ -130,117 +104,98 @@ class HomeScreen extends StatelessWidget {
   }
 
   Widget _buildRecentWorkouts(BuildContext context) {
-    final List<Map<String, dynamic>> menuItems = [
-      {
-        'icon': Icons.show_chart,
-        'title': 'Jismoniy rivojlanish',
-        'subtitle': 'Kunlik progress',
-        'color': const Color(0xFF00796B),
-        'goto': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => PhysicalDevelopmentScreen(),
-            ),
-          );
-        }
-      },
-      {
-        'icon': Icons.school,
-        'title': 'Professiogramma',
-        'subtitle': 'Kasbiy mezonlar',
-        'color': const Color(0xFF388E3C),
-        'goto': () {}
-      },
-      {
-        'icon': Icons.fitness_center,
-        'title': 'Mashg‘ulotlar',
-        'subtitle': 'Mashqlar ro‘yxati',
-        'color': const Color(0xFFFFC107),
-        'goto': () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => Scaffold(
-                appBar: AppBar(
-                  title: const Text('Mashg‘ulotlar'),
-                ),
-                body: const WorkoutsScreen(),
-              ),
-            ),
-          );
-        }
-      },
-      {
-        'icon': Icons.track_changes,
-        'title': 'Tayyorgarlik',
-        'subtitle': 'Joriy daraja',
-        'color': const Color(0xFF7B1FA2),
-        'goto': () {}
-      },
-    ];
-
-    return GridView.builder(
-      physics: const NeverScrollableScrollPhysics(),
-      shrinkWrap: true,
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
-        childAspectRatio: 1.1,
-      ),
-      itemCount: menuItems.length,
-      itemBuilder: (context, index) {
-        final item = menuItems[index];
-        return InkWell(
-          borderRadius: BorderRadius.circular(16),
-          onTap: item['goto'],
-          child: Ink(
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: item['color'].withOpacity(0.15),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Icon(
-                    item['icon'],
-                    size: 40,
-                    color: item['color'],
-                  ),
-                  const SizedBox(height: 12),
-                  Text(
-                    item['title'],
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    item['subtitle'],
-                    textAlign: TextAlign.center,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            ),
+    return Column(
+      children: recentWorkouts.take(3).map((workout) {
+        return Card(
+          margin: const EdgeInsets.only(bottom: 10),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          child: ListTile(
+            leading: Icon(Icons.fitness_center,
+                color: Theme.of(context).colorScheme.primary),
+            title: Text(workout.type),
+            subtitle: Text(
+                '${workout.date.day}.${workout.date.month}.${workout.date.year}'),
+            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
+            onTap: () {},
           ),
         );
+      }).toList(),
+    );
+  }
+}
+
+class _MenuItem {
+  final String title;
+  final IconData icon;
+  final String route;
+  _MenuItem(this.title, this.icon, this.route);
+}
+
+class _MenuCard extends StatefulWidget {
+  final _MenuItem item;
+  const _MenuCard({required this.item});
+
+  @override
+  State<_MenuCard> createState() => _MenuCardState();
+}
+
+class _MenuCardState extends State<_MenuCard>
+    with SingleTickerProviderStateMixin {
+  double _scale = 1.0;
+
+  @override
+  Widget build(BuildContext context) {
+    final Color accent = Theme.of(context).colorScheme.primary;
+    return GestureDetector(
+      onTapDown: (_) => setState(() => _scale = 0.97),
+      onTapUp: (_) => setState(() => _scale = 1.0),
+      onTapCancel: () => setState(() => _scale = 1.0),
+      onTap: () {
+        Navigator.of(context).pushNamed(widget.item.route);
       },
+      child: AnimatedScale(
+        scale: _scale,
+        duration: const Duration(milliseconds: 120),
+        curve: Curves.easeOut,
+        child: Container(
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            boxShadow: [
+              BoxShadow(
+                color: accent.withOpacity(0.18),
+                blurRadius: 18,
+                offset: const Offset(0, 6),
+              ),
+            ],
+            border: Border.all(color: accent.withOpacity(0.35), width: 1.6),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  color: accent.withOpacity(0.13),
+                ),
+                padding: const EdgeInsets.all(16),
+                child: Icon(widget.item.icon, size: 36, color: accent),
+              ),
+              const SizedBox(height: 18),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                child: Text(
+                  widget.item.title,
+                  textAlign: TextAlign.center,
+                  style: const TextStyle(
+                      fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

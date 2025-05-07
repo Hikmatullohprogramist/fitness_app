@@ -1,9 +1,14 @@
+import 'package:fitness_app/screens/exercises_screen.dart';
+import 'package:fitness_app/screens/physical_training_screen.dart';
+import 'package:fitness_app/screens/professiogramma_screen.dart';
+import 'package:fitness_app/screens/pysical_development.dart';
 import 'package:fitness_app/utils/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'screens/main_screen.dart';
 import 'screens/splash_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
+import 'screens/ideal_body_screen.dart';
 import 'widgets/app_drawer.dart';
 import 'widgets/menu_card.dart';
 import 'widgets/time_progress_bar.dart';
@@ -27,6 +32,11 @@ class MyApp extends StatelessWidget {
         '/register': (context) => const RegisterScreen(),
         '/main': (context) => const MainScreen(),
         '/home': (context) => const MainScreen(),
+        '/ideal-body': (context) => const IdealBodyScreen(),
+        '/jismoniytk': (context) => PhysicalDevelopmentScreen(),
+        '/progress': (context) => const ProfessiogrammaScreen(),
+        '/exercises': (context) => const ExercisesScreen(),
+        '/activity_anim': (context) => const PhysicalTrainingScreen(),
       },
     );
   }
