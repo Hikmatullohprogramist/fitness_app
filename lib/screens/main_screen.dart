@@ -19,43 +19,7 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
-    HomeScreen(
-      user: User(
-        id: '1',
-        name: 'Foydalanuvchi',
-        email: 'user@example.com',
-        profileImageUrl: 'https://example.com/profile.jpg',
-        birthDate: '1990-01-01',
-        gender: 'Erkak',
-        height: 175,
-        weight: 70,
-        phone: '+998901234567',
-      ),
-      recentWorkouts: [
-        Workout(
-          type: "Kuch mashg\'ulot",
-          durationMinutes: 45,
-          notes: "Yuqori kuch",
-          exercises: [
-            Exercise(
-              name: 'Bench Press',
-              sets: 3,
-              reps: 10,
-              weight: 70.0,
-              notes: 'Yaxshi his qildim',
-            ),
-            Exercise(
-              name: 'Squats',
-              sets: 4,
-              reps: 12,
-              weight: 80.0,
-            ),
-          ],
-          caloriesBurned: 500,
-          date: DateTime.now().subtract(const Duration(days: 1)),
-        ),
-      ],
-    ),
+    HomeScreen(),
     const WorkoutsScreen(),
     ProfileScreen(
       user: User(

@@ -177,20 +177,24 @@ class _PhysicalTrainingScreenState extends State<PhysicalTrainingScreen>
                       ),
                     ),
                     const SizedBox(height: 16),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceAround,
-                      children: [
-                        _buildInfoChip(
-                          icon: Icons.timer,
-                          label: exercise['duration'],
-                          theme: theme,
-                        ),
-                        _buildInfoChip(
-                          icon: Icons.repeat,
-                          label: exercise['repetitions'],
-                          theme: theme,
-                        ),
-                      ],
+                    SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          _buildInfoChip(
+                            icon: Icons.timer,
+                            label: exercise['duration'],
+                            theme: theme,
+                          ),
+                          const SizedBox(width: 8),
+                          _buildInfoChip(
+                            icon: Icons.repeat,
+                            label: exercise['repetitions'],
+                            theme: theme,
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

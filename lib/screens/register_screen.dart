@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
+import '../services/auth_service.dart';
+import '../models/auth_model.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -53,6 +55,9 @@ class _RegisterScreenState extends State<RegisterScreen>
   int _selectedHeight = 165;
   int _selectedWeight = 65;
   int _selectedAge = 20;
+
+  final _authService = AuthService();
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -204,16 +209,40 @@ class _RegisterScreenState extends State<RegisterScreen>
     });
   }
 
-  void _submitForm() {
+  Future<void> _register() async {
     if (_formKey.currentState!.validate() && _acceptTerms) {
-      // TODO: Implement registration logic
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Ro\'yxatdan o\'tish muvaffaqiyatli'),
-          backgroundColor: Colors.green,
-        ),
-      );
-      Navigator.of(context).pushReplacementNamed('/home');
+      setState(() {
+        _isLoading = true;
+      });
+
+      try {
+        final authModel = AuthModel(
+          email: _emailController.text,
+          password: _passwordController.text,
+          name: '${_firstNameController.text} ${_lastNameController.text}',
+        );
+
+        final response = await _authService.register(authModel);
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Registration successful!')),
+          );
+          Navigator.of(context).pushReplacementNamed('/home');
+        }
+      } catch (e) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Error: ${e.toString()}')),
+          );
+        }
+      } finally {
+        if (mounted) {
+          setState(() {
+            _isLoading = false;
+          });
+        }
+      }
     } else if (!_acceptTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
@@ -804,7 +833,7 @@ class _RegisterScreenState extends State<RegisterScreen>
           Row(
             children: [
               ElevatedButton.icon(
-                onPressed: _currentPage == 3 ? _submitForm : _nextPage,
+                onPressed: _currentPage == 3 ? _register : _nextPage,
                 icon: Icon(
                   _currentPage == 3 ? Icons.check : Icons.arrow_forward,
                   color: Colors.white,

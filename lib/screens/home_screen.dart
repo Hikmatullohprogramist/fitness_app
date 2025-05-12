@@ -1,35 +1,52 @@
-import 'package:fitness_app/screens/pysical_development.dart';
-import 'package:fitness_app/screens/workout_category_screen.dart';
-import 'package:fitness_app/screens/workouts_screen.dart';
+import 'package:fitness_app/models/user_model.dart';
+import 'package:fitness_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import '../models/workout.dart';
-import '../models/user.dart';
-import 'package:fitness_app/widgets/menu_card.dart';
-import 'package:fitness_app/widgets/time_progress_bar.dart';
-import 'package:fitness_app/widgets/achievement_card.dart';
 
-class HomeScreen extends StatelessWidget {
-  final User user;
-  final List<Workout> recentWorkouts;
-
+class HomeScreen extends StatefulWidget {
   const HomeScreen({
     Key? key,
-    required this.user,
-    required this.recentWorkouts,
   }) : super(key: key);
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  final authService = AuthService();
+  UserModel? user;
+  List<Workout> recentWorkouts = [];
+
+  getCurrentUser() async {
+    final loginUser = await authService.getUser();
+    if (loginUser != null) {
+      setState(() {
+        user = loginUser;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    getCurrentUser();
+
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
     final List<_MenuItem> menuItems = [
-      _MenuItem('Jismoniy rivojlanganlik kòrsatkichlari', Icons.monitor_weight,
-          '/ideal-body'),
-      _MenuItem('Jismoniy tayyorgarlik ko‘rsatkichlari', Icons.fitness_center,
+      _MenuItem('Jismoniy rivojlanganlik darajasi', Icons.fitness_center,
+          '/physical_development_level'),
+      _MenuItem('Jismoniy tayyorgarlik ko\'rsatkichlari', Icons.fitness_center,
           '/jismoniytk'),
       _MenuItem('Professiogramma', Icons.assessment, '/progress'),
       _MenuItem('J.t daqiqalik kompleksi (animatsiya)', Icons.directions_run,
           '/activity_anim'),
       _MenuItem('J. faoliyati (QR, kadr, rasm)', Icons.qr_code, '/activity_qr'),
       _MenuItem('Mashqlar majmuasi', Icons.sports_gymnastics, '/exercises'),
+      _MenuItem('Upload screen', Icons.upload, '/upload_exercises'),
+      _MenuItem('Mening mashqlarim', Icons.fitness_center, '/my_exercises'),
     ];
 
     return Scaffold(
@@ -57,7 +74,7 @@ class HomeScreen extends StatelessWidget {
             ),
             const SizedBox(height: 24),
             if (recentWorkouts.isNotEmpty) ...[
-              Text('So‘nggi mashg‘ulotlar',
+              Text('So\'nggi mashg\'ulotlar',
                   style: Theme.of(context)
                       .textTheme
                       .titleMedium
@@ -71,31 +88,79 @@ class HomeScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildGreeting(BuildContext context, User user) {
+  Widget buildLevelBadge(BuildContext context, String? level) {
+    Color badgeColor;
+    String label;
+    switch (level) {
+      case 'Minimal':
+        badgeColor = Colors.green;
+        label = 'Minimal';
+        break;
+      case 'Optimal':
+        badgeColor = Colors.orange;
+        label = 'Optimal';
+        break;
+      case 'Maximal':
+        badgeColor = Colors.red;
+        label = 'Maximal';
+        break;
+      default:
+        badgeColor = Colors.grey;
+        label = 'Nomalum';
+    }
+    return InkWell(
+      borderRadius: BorderRadius.circular(12),
+      // onTap: () => _showEditLevelDialog(context),
+      onTap: () => _showEditLevelDialog(context),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+        decoration: BoxDecoration(
+          color: badgeColor.withOpacity(0.15),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Icon(Icons.fitness_center, color: badgeColor, size: 18),
+            const SizedBox(width: 6),
+            Text(
+              'Daraja: $label',
+              style: TextStyle(
+                color: badgeColor,
+                fontWeight: FontWeight.bold,
+                fontSize: 15,
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGreeting(BuildContext context, UserModel? user) {
     return Row(
       children: [
-        CircleAvatar(
-          radius: 28,
-          backgroundImage:
-              user.profileImageUrl != null && user.profileImageUrl.isNotEmpty
-                  ? NetworkImage(user.profileImageUrl)
-                  : null,
-          child: user.profileImageUrl == null || user.profileImageUrl.isEmpty
-              ? Icon(Icons.person,
-                  size: 32, color: Theme.of(context).colorScheme.primary)
-              : null,
-        ),
         const SizedBox(width: 16),
         Expanded(
           child: Column(
+            spacing: 8,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text('Salom, ${user.name.split(' ').first}!',
-                  style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 20)),
-              const SizedBox(height: 4),
-              Text('Bugun mashg‘ulot qilishga tayyormisiz?',
-                  style: TextStyle(color: Colors.grey[700], fontSize: 14)),
+              Text(
+                'Salom, ${user?.name.split(' ').first}!',
+                style: const TextStyle(
+                  fontWeight: FontWeight.bold,
+                  fontSize: 20,
+                ),
+              ),
+              Text(
+                'Bugun mashg\'ulot qilishga tayyormisiz ?',
+                style: TextStyle(
+                  color: Colors.grey[700],
+                  fontSize: 14,
+                ),
+              ),
+              buildLevelBadge(context, user?.fitnessLevel),
             ],
           ),
         ),
@@ -122,6 +187,44 @@ class HomeScreen extends StatelessWidget {
         );
       }).toList(),
     );
+  }
+
+  void _showEditLevelDialog(BuildContext context) async {
+    final levels = ['Minimal', 'Optimal', 'Maximal'];
+    String? selected = user?.fitnessLevel;
+
+    await showDialog(
+      context: context,
+      builder: (context) {
+        return AlertDialog(
+          title: const Text('Darajani o\'gartirish'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: levels.map((level) {
+              return RadioListTile<String>(
+                value: level,
+                groupValue: selected,
+                title: Text(level),
+                onChanged: (value) {
+                  Navigator.of(context).pop();
+                  _updateUserLevel(value!);
+                },
+              );
+            }).toList(),
+          ),
+        );
+      },
+    );
+  }
+
+  void _updateUserLevel(String newLevel) async {
+    if (user == null) return;
+    // TODO: Serverga PATCH/PUT so'rov yuborish (authService.updateUserLevel)
+    setState(() {
+      user = user!.copyWith(fitnessLevel: newLevel);
+    });
+    // TODO: Secure storage'ga ham yangilash
+    await authService.updateUser(user!);
   }
 }
 

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import '../services/auth_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -12,6 +14,8 @@ class _SplashScreenState extends State<SplashScreen>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
+
+  final authService = AuthService();
 
   @override
   void initState() {
@@ -27,9 +31,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     _controller.forward();
 
-    Future.delayed(const Duration(seconds: 3), () {
-      Navigator.of(context).pushReplacementNamed('/login');
-    });
+    _checkAuthAndNavigate();
   }
 
   @override
@@ -40,6 +42,23 @@ class _SplashScreenState extends State<SplashScreen>
       overlays: SystemUiOverlay.values,
     );
     super.dispose();
+  }
+
+  Future<void> _checkAuthAndNavigate() async {
+    const storage = FlutterSecureStorage();
+    final token = await storage.read(key: 'auth_token');
+    await Future.delayed(
+      const Duration(
+        seconds: 2,
+      ),
+    );
+    if (mounted) {
+      if (token != null && token.isNotEmpty) {
+        Navigator.of(context).pushReplacementNamed('/home');
+      } else {
+        Navigator.of(context).pushReplacementNamed('/login');
+      }
+    }
   }
 
   @override
@@ -59,11 +78,11 @@ class _SplashScreenState extends State<SplashScreen>
         child: Center(
           child: FadeTransition(
             opacity: _animation,
-            child: Column(
+            child: const Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(Icons.fitness_center, size: 100, color: Colors.white),
-                const SizedBox(height: 20),
+                SizedBox(height: 20),
                 Text(
                   'Fitness App',
                   style: TextStyle(
@@ -72,7 +91,7 @@ class _SplashScreenState extends State<SplashScreen>
                     color: Colors.white,
                   ),
                 ),
-                const SizedBox(height: 10),
+                SizedBox(height: 10),
                 Text(
                   'Jismoniy tayyorgarlik uchun ilova',
                   style: TextStyle(fontSize: 16, color: Colors.white70),
