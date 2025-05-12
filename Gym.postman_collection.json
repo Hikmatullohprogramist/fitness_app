@@ -1,0 +1,465 @@
+{
+	"info": {
+		"_postman_id": "b98b0ae0-215a-46f9-93da-ba6f8eb5aac2",
+		"name": "Gym",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33009969",
+		"_collection_link": "https://grey-astronaut-333739.postman.co/workspace/My-Workspace~072489eb-bdee-4fc9-809c-3a3596132752/collection/22270129-b98b0ae0-215a-46f9-93da-ba6f8eb5aac2?action=share&source=collection_link&creator=33009969"
+	},
+	"item": [
+		{
+			"name": "Auth",
+			"item": [
+				{
+					"name": "Login",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "email",
+									"value": "test@example.com",
+									"type": "text"
+								},
+								{
+									"key": "password",
+									"value": "password",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}login",
+							"host": [
+								"{{BASE_URL}}login"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Register",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}register",
+							"host": [
+								"{{BASE_URL}}register"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "User",
+			"item": [
+				{
+					"name": "Profile",
+					"request": {
+						"method": "GET",
+						"header": []
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Exercise assesment",
+			"item": [
+				{
+					"name": "Get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}exercise-assessments",
+							"host": [
+								"{{BASE_URL}}exercise-assessments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "POST",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "exercise_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "rating",
+									"value": "unsatisfactory",
+									"description": "good, satisfactory, unsatisfactory",
+									"type": "text"
+								},
+								{
+									"key": "comment",
+									"value": "test",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}exercise-assessments",
+							"host": [
+								"{{BASE_URL}}exercise-assessments"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Show",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}exercise-assessments/1",
+							"host": [
+								"{{BASE_URL}}exercise-assessments"
+							],
+							"path": [
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Sat",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}exercise-assessments/stats/1",
+							"host": [
+								"{{BASE_URL}}exercise-assessments"
+							],
+							"path": [
+								"stats",
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Exercise",
+			"item": [
+				{
+					"name": "Stat",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept-Charset",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}user-stats",
+							"host": [
+								"{{BASE_URL}}user-stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Daily stat",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}daily-stats",
+							"host": [
+								"{{BASE_URL}}daily-stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Do exercise",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "exercise_id",
+									"value": "1",
+									"type": "text"
+								},
+								{
+									"key": "duration",
+									"value": "120",
+									"description": "in secunds",
+									"type": "text"
+								},
+								{
+									"key": "repetitions",
+									"value": "2",
+									"type": "text"
+								},
+								{
+									"key": "distance",
+									"value": "1000",
+									"description": "in meters",
+									"type": "text"
+								},
+								{
+									"key": "rating",
+									"value": "good",
+									"description": "good, satisfactory, unsatisfactory",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{BASE_URL}}exercise-stats",
+							"host": [
+								"{{BASE_URL}}exercise-stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Weekly",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}weekly-stats",
+							"host": [
+								"{{BASE_URL}}weekly-stats"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Exercise stat",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}exercise-performance/1",
+							"host": [
+								"{{BASE_URL}}exercise-performance"
+							],
+							"path": [
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "theory-materials",
+			"item": [
+				{
+					"name": "Get",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}theory-materials",
+							"host": [
+								"{{BASE_URL}}theory-materials"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Show",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}theory-materials/1",
+							"host": [
+								"{{BASE_URL}}theory-materials"
+							],
+							"path": [
+								"1"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "Download",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}theory-materials/1/download",
+							"host": [
+								"{{BASE_URL}}theory-materials"
+							],
+							"path": [
+								"1",
+								"download"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Exersices",
+			"item": [
+				{
+					"name": "exersices",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "Accept",
+								"value": "application/json",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{BASE_URL}}exersices",
+							"host": [
+								"{{BASE_URL}}exersices"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "show",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{BASE_URL}}exercise/1",
+							"host": [
+								"{{BASE_URL}}exercise"
+							],
+							"path": [
+								"1"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "statistics",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{BASE_URL}}statistics",
+					"host": [
+						"{{BASE_URL}}statistics"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "categories",
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Accept",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{BASE_URL}}category",
+					"host": [
+						"{{BASE_URL}}category"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"auth": {
+		"type": "bearer",
+		"bearer": [
+			{
+				"key": "token",
+				"value": "3|j88cby8O4qaVTLSUHFlevmVOn9A7pIRnsFMqaMkma508a4bc",
+				"type": "string"
+			}
+		]
+	},
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"packages": {},
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "BASE_URL",
+			"value": "https://fitnes.bizsoft.uz/api/",
+			"type": "string"
+		}
+	]
+}
