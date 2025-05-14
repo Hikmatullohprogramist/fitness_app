@@ -17,6 +17,8 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       'icon': Icons.calendar_today,
       'totalTime': '8 daqiqa',
       'optimalTime': 25,
+      'category': 'Bo\'yin va yelka',
+      'categoryIcon': Icons.fitness_center,
       'workouts': [
         {
           'title': 'Bo\'yni mashq qilish',
@@ -25,6 +27,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           'difficulty': 'Oson',
           'image': 'assets/workout.jpg',
           'time': '07:00 - Ertalab',
+          'category': 'Bo\'yin',
         },
         {
           'title': 'Yelka mashqlari',
@@ -33,6 +36,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           'difficulty': 'Oson',
           'image': 'assets/workout.jpg',
           'time': '18:00 - Kechqurun',
+          'category': 'Yelka',
         },
       ],
     },
@@ -43,6 +47,8 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       'icon': Icons.calendar_today,
       'totalTime': '0 daqiqa',
       'optimalTime': 25,
+      'category': 'Yoga',
+      'categoryIcon': Icons.self_improvement,
       'workouts': [
         {
           'title': 'Yoga',
@@ -51,6 +57,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           'difficulty': 'Oson',
           'image': 'assets/workout.jpg',
           'time': '08:00 - Ertalab',
+          'category': 'Yoga',
         },
       ],
     },
@@ -61,6 +68,8 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       'icon': Icons.calendar_today,
       'totalTime': '0 daqiqa',
       'optimalTime': 25,
+      'category': 'Kuch mashqlari',
+      'categoryIcon': Icons.fitness_center,
       'workouts': [
         {
           'title': 'Kuch mashqlari',
@@ -69,6 +78,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           'difficulty': 'Murakkab',
           'image': 'assets/workout.jpg',
           'time': '17:00 - Kechqurun',
+          'category': 'Kuch',
         },
       ],
     },
@@ -79,6 +89,8 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       'icon': Icons.calendar_today,
       'totalTime': '0 daqiqa',
       'optimalTime': 25,
+      'category': 'Stretching',
+      'categoryIcon': Icons.accessibility_new,
       'workouts': [
         {
           'title': 'Stretching',
@@ -87,6 +99,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           'difficulty': 'Oson',
           'image': 'assets/workout.jpg',
           'time': '07:30 - Ertalab',
+          'category': 'Stretching',
         },
       ],
     },
@@ -97,6 +110,8 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       'icon': Icons.calendar_today,
       'totalTime': '0 daqiqa',
       'optimalTime': 25,
+      'category': 'Kardio',
+      'categoryIcon': Icons.directions_run,
       'workouts': [
         {
           'title': 'Kardio',
@@ -105,6 +120,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           'difficulty': 'O\'rta',
           'image': 'assets/workout.jpg',
           'time': '18:30 - Kechqurun',
+          'category': 'Kardio',
         },
       ],
     },
@@ -115,6 +131,8 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       'icon': Icons.calendar_today,
       'totalTime': '0 daqiqa',
       'optimalTime': 25,
+      'category': 'Kuch mashqlari',
+      'categoryIcon': Icons.fitness_center,
       'workouts': [
         {
           'title': 'Kuch mashqlari',
@@ -123,6 +141,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           'difficulty': 'Murakkab',
           'image': 'assets/workout.jpg',
           'time': '09:00 - Ertalab',
+          'category': 'Kuch',
         },
       ],
     },
@@ -133,6 +152,8 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       'icon': Icons.calendar_today,
       'totalTime': '0 daqiqa',
       'optimalTime': 0,
+      'category': 'Dam olish',
+      'categoryIcon': Icons.beach_access,
       'workouts': [
         {
           'title': 'Dam olish',
@@ -141,6 +162,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           'difficulty': 'Oson',
           'image': 'assets/workout.jpg',
           'time': 'Dam olish kuni',
+          'category': 'Dam olish',
         },
       ],
     },
@@ -423,6 +445,40 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                                 fit: BoxFit.cover,
                               ),
                             ),
+                            // Category badge
+                            Positioned(
+                              top: 10,
+                              left: 10,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(
+                                      weekDays[_selectedDayIndex]
+                                          ['categoryIcon'],
+                                      color: Colors.white,
+                                      size: 14,
+                                    ),
+                                    const SizedBox(width: 4),
+                                    Text(
+                                      workout['category'],
+                                      style: const TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 12,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
                             // Time badge
                             Positioned(
                               top: 10,
@@ -448,7 +504,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                             ),
                             // Difficulty badge
                             Positioned(
-                              top: 10,
+                              top: 50,
                               left: 10,
                               child: Container(
                                 padding: const EdgeInsets.symmetric(

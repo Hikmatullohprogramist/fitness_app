@@ -44,9 +44,7 @@ class _HomePageState extends State<HomePage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.notifications),
-            onPressed: () {
-              // Show notifications
-            },
+            onPressed: () {},
           ),
         ],
       ),

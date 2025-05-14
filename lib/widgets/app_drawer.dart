@@ -44,7 +44,6 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.book),
             title: const Text('Nazariy ma\'lumot'),
             onTap: () {
-              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const TheoryScreen()),
@@ -55,7 +54,6 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.person),
             title: const Text('Mening ma\'lumotlarim'),
             onTap: () {
-              Navigator.pop(context);
               _navigateToProfile(context);
             },
           ),
@@ -63,7 +61,6 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.timer),
             title: const Text('Vaqt reglamenti'),
             onTap: () {
-              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -86,7 +83,6 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.book_online),
             title: const Text('Mening jurnalim'),
             onTap: () {
-              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const JournalScreen()),
@@ -98,7 +94,7 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.settings),
             title: const Text('Sozlamalar'),
             onTap: () {
-              Navigator.pop(context);
+              // Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const SettingsScreen()),
@@ -109,7 +105,6 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.help),
             title: const Text('Yordam va qo\'llab-quvvatlash'),
             onTap: () {
-              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -121,7 +116,6 @@ class AppDrawer extends StatelessWidget {
             leading: const Icon(Icons.info),
             title: const Text('Ilova haqida'),
             onTap: () {
-              Navigator.pop(context);
               Navigator.push(
                 context,
                 MaterialPageRoute(builder: (context) => const AboutScreen()),
@@ -146,7 +140,7 @@ class AppDrawer extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProfileScreen(),
+        builder: (context) => const ProfileScreen(),
       ),
     );
   }
