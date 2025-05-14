@@ -36,17 +36,23 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   Widget build(BuildContext context) {
     final List<_MenuItem> menuItems = [
-      _MenuItem('Jismoniy rivojlanganlik darajasi', Icons.fitness_center,
+      _MenuItem('Jismoniy rivojlanganlik ko\'rsatkichlari',
+          Icons.analytics_outlined, '/ideal_body'),
+      _MenuItem('Jismoniy rivojlanganlik darajasi', Icons.trending_up,
           '/physical_development_level'),
-      _MenuItem('Jismoniy tayyorgarlik ko\'rsatkichlari', Icons.fitness_center,
-          '/jismoniytk'),
-      _MenuItem('Professiogramma', Icons.assessment, '/progress'),
-      _MenuItem('J.t daqiqalik kompleksi (animatsiya)', Icons.directions_run,
-          '/activity_anim'),
-      _MenuItem('J. faoliyati (QR, kadr, rasm)', Icons.qr_code, '/activity_qr'),
-      _MenuItem('Mashqlar majmuasi', Icons.sports_gymnastics, '/exercises'),
-      _MenuItem('Upload screen', Icons.upload, '/upload_exercises'),
-      _MenuItem('Mening mashqlarim', Icons.fitness_center, '/my_exercises'),
+      _MenuItem(
+          'Jismoniy tayyorgarlik ko\'rsatkichlari', Icons.speed, '/jismoniytk'),
+      _MenuItem('Professiogramma', Icons.assessment_outlined, '/progress'),
+      _MenuItem('J.t daqiqalik kompleksi (animatsiya)',
+          Icons.play_circle_outline, '/activity_anim'),
+      _MenuItem('J. faoliyati (QR, kadr, rasm)', Icons.camera_alt_outlined,
+          '/activity_qr'),
+      _MenuItem(
+          'Mashqlar majmuasi', Icons.sports_gymnastics_outlined, '/exercises'),
+      _MenuItem(
+          'Mening mashqlarim', Icons.fitness_center_outlined, '/my_exercises'),
+      _MenuItem(
+          'Mening mashqlarim', Icons.fitness_center_outlined, '/my_exercises'),
     ];
 
     return Scaffold(
@@ -92,15 +98,15 @@ class _HomeScreenState extends State<HomeScreen> {
     Color badgeColor;
     String label;
     switch (level) {
-      case 'Minimal':
+      case 'Minimal' || '1':
         badgeColor = Colors.green;
         label = 'Minimal';
         break;
-      case 'Optimal':
+      case 'Optimal' || '2':
         badgeColor = Colors.orange;
         label = 'Optimal';
         break;
-      case 'Maximal':
+      case 'Maximal' || '3':
         badgeColor = Colors.red;
         label = 'Maximal';
         break;

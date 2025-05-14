@@ -1,13 +1,34 @@
+import 'package:fitness_app/models/user_model.dart';
+import 'package:fitness_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
 import '../models/user.dart';
 
-class ProfileScreen extends StatelessWidget {
-  final User user;
-
+class ProfileScreen extends StatefulWidget {
   const ProfileScreen({
     Key? key,
-    required this.user,
   }) : super(key: key);
+
+  @override
+  State<ProfileScreen> createState() => _ProfileScreenState();
+}
+
+class _ProfileScreenState extends State<ProfileScreen> {
+  final authService = AuthService();
+  UserModel? user;
+  getCurrentUser() async {
+    final loginUser = await authService.getUser();
+    if (loginUser != null) {
+      setState(() {
+        user = loginUser;
+      });
+    }
+  }
+
+  @override
+  void initState() {
+    getCurrentUser();
+    super.initState();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -43,11 +64,11 @@ class ProfileScreen extends StatelessWidget {
         children: [
           CircleAvatar(
             radius: 50,
-            backgroundImage: NetworkImage(user.profileImageUrl),
+            child: Icon(Icons.person),
           ),
           const SizedBox(height: 16),
           Text(
-            user.name,
+            user?.name ?? '',
             style: const TextStyle(
               fontSize: 24,
               fontWeight: FontWeight.bold,
@@ -55,7 +76,7 @@ class ProfileScreen extends StatelessWidget {
           ),
           const SizedBox(height: 8),
           Text(
-            user.email,
+            user?.email ?? '',
             style: TextStyle(
               fontSize: 16,
               color: Colors.grey[600],
@@ -82,11 +103,11 @@ class ProfileScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            _buildInfoRow('Tug\'ilgan sana', user.birthDate),
-            _buildInfoRow('Jinsi', user.gender),
-            _buildInfoRow('Bo\'yi', '${user.height} sm'),
-            _buildInfoRow('Vazni', '${user.weight} kg'),
-            _buildInfoRow('Telefon', user.phone),
+            _buildInfoRow('Tug\'ilgan sana', user?.birthDate ?? ''),
+            _buildInfoRow('Jinsi', user?.gender ?? ''),
+            _buildInfoRow('Bo\'yi', '${user?.height} sm'),
+            _buildInfoRow('Vazni', '${user?.weight} kg'),
+            _buildInfoRow('Telefon', user?.phone ?? ''),
           ],
         ),
       ),

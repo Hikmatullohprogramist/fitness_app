@@ -20,20 +20,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _screens = [
     HomeScreen(),
-    const WorkoutsScreen(),
-    ProfileScreen(
-      user: User(
-        id: '1',
-        name: 'Foydalanuvchi',
-        email: 'user@example.com',
-        profileImageUrl: 'https://example.com/profile.jpg',
-        birthDate: '1990-01-01',
-        gender: 'Erkak',
-        height: 175,
-        weight: 70,
-        phone: '+998901234567',
-      ),
-    ),
+    ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {
@@ -68,10 +55,7 @@ class _MainScreenState extends State<MainScreen> {
         onDestinationSelected: _onItemTapped,
         destinations: const [
           NavigationDestination(icon: Icon(Icons.home), label: 'Asosiy'),
-          NavigationDestination(
-            icon: Icon(Icons.fitness_center),
-            label: 'Mashqlar',
-          ),
+
           // NavigationDestination(
           //   icon: Icon(Icons.assessment),
           //   label: 'Statistika',

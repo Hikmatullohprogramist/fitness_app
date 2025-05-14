@@ -9,40 +9,174 @@ class WorkoutsScreen extends StatefulWidget {
 }
 
 class _WorkoutsScreenState extends State<WorkoutsScreen> {
-  final List<Map<String, dynamic>> categories = const [
+  final List<Map<String, dynamic>> weekDays = const [
     {
-      'name': 'Barchasi',
-      'icon': Icons.fitness_center,
+      'name': 'Dushanba',
+      'date': '15',
+      'month': 'Aprel',
+      'icon': Icons.calendar_today,
+      'totalTime': '8 daqiqa',
+      'optimalTime': 25,
+      'workouts': [
+        {
+          'title': 'Bo\'yni mashq qilish',
+          'duration': '3 daqiqa',
+          'calories': '15 kal',
+          'difficulty': 'Oson',
+          'image': 'assets/workout.jpg',
+          'time': '07:00 - Ertalab',
+        },
+        {
+          'title': 'Yelka mashqlari',
+          'duration': '5 daqiqa',
+          'calories': '25 kal',
+          'difficulty': 'Oson',
+          'image': 'assets/workout.jpg',
+          'time': '18:00 - Kechqurun',
+        },
+      ],
     },
     {
-      'name': 'Kuch mashqlari',
-      'icon': Icons.sports_gymnastics,
+      'name': 'Seshanba',
+      'date': '16',
+      'month': 'Aprel',
+      'icon': Icons.calendar_today,
+      'totalTime': '0 daqiqa',
+      'optimalTime': 25,
+      'workouts': [
+        {
+          'title': 'Yoga',
+          'duration': '0 daqiqa',
+          'calories': '0 kal',
+          'difficulty': 'Oson',
+          'image': 'assets/workout.jpg',
+          'time': '08:00 - Ertalab',
+        },
+      ],
     },
     {
-      'name': 'Kardio',
-      'icon': Icons.directions_run,
+      'name': 'Chorshanba',
+      'date': '17',
+      'month': 'Aprel',
+      'icon': Icons.calendar_today,
+      'totalTime': '0 daqiqa',
+      'optimalTime': 25,
+      'workouts': [
+        {
+          'title': 'Kuch mashqlari',
+          'duration': '0 daqiqa',
+          'calories': '0 kal',
+          'difficulty': 'Murakkab',
+          'image': 'assets/workout.jpg',
+          'time': '17:00 - Kechqurun',
+        },
+      ],
     },
     {
-      'name': 'Yoga',
-      'icon': Icons.self_improvement,
+      'name': 'Payshanba',
+      'date': '18',
+      'month': 'Aprel',
+      'icon': Icons.calendar_today,
+      'totalTime': '0 daqiqa',
+      'optimalTime': 25,
+      'workouts': [
+        {
+          'title': 'Stretching',
+          'duration': '0 daqiqa',
+          'calories': '0 kal',
+          'difficulty': 'Oson',
+          'image': 'assets/workout.jpg',
+          'time': '07:30 - Ertalab',
+        },
+      ],
     },
     {
-      'name': 'Stretching',
-      'icon': Icons.accessibility_new,
+      'name': 'Juma',
+      'date': '19',
+      'month': 'Aprel',
+      'icon': Icons.calendar_today,
+      'totalTime': '0 daqiqa',
+      'optimalTime': 25,
+      'workouts': [
+        {
+          'title': 'Kardio',
+          'duration': '0 daqiqa',
+          'calories': '0 kal',
+          'difficulty': 'O\'rta',
+          'image': 'assets/workout.jpg',
+          'time': '18:30 - Kechqurun',
+        },
+      ],
+    },
+    {
+      'name': 'Shanba',
+      'date': '20',
+      'month': 'Aprel',
+      'icon': Icons.calendar_today,
+      'totalTime': '0 daqiqa',
+      'optimalTime': 25,
+      'workouts': [
+        {
+          'title': 'Kuch mashqlari',
+          'duration': '0 daqiqa',
+          'calories': '0 kal',
+          'difficulty': 'Murakkab',
+          'image': 'assets/workout.jpg',
+          'time': '09:00 - Ertalab',
+        },
+      ],
+    },
+    {
+      'name': 'Yakshanba',
+      'date': '21',
+      'month': 'Aprel',
+      'icon': Icons.calendar_today,
+      'totalTime': '0 daqiqa',
+      'optimalTime': 0,
+      'workouts': [
+        {
+          'title': 'Dam olish',
+          'duration': '0 daqiqa',
+          'calories': '0 kal',
+          'difficulty': 'Oson',
+          'image': 'assets/workout.jpg',
+          'time': 'Dam olish kuni',
+        },
+      ],
     },
   ];
 
-  int _selectedCategoryIndex = 0;
+  int _selectedDayIndex = 0;
+
+  double _getProgress(int currentTime, int optimalTime) {
+    if (optimalTime == 0) return 0;
+    return (currentTime / optimalTime).clamp(0.0, 1.0);
+  }
+
+  String _getProgressText(int currentTime, int optimalTime) {
+    if (optimalTime == 0) return 'Dam olish kuni';
+    return '$currentTime/$optimalTime daqiqa';
+  }
+
+  Color _getProgressColor(double progress) {
+    if (progress >= 1.0) return Colors.green;
+    if (progress >= 0.7) return Colors.orange;
+    return Colors.red;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Text('Haftalik mashqlar'),
+        centerTitle: true,
+      ),
       backgroundColor: Colors.grey[50],
       body: Column(
         children: [
-          // Category selector with improved design
+          // Weekday selector
           Container(
-            height: 70,
+            height: 110,
             margin: const EdgeInsets.only(bottom: 8),
             decoration: BoxDecoration(
               color: Colors.white,
@@ -56,11 +190,11 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
             ),
             child: ListView.builder(
               scrollDirection: Axis.horizontal,
-              itemCount: categories.length,
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+              itemCount: weekDays.length,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
               physics: const BouncingScrollPhysics(),
               itemBuilder: (context, index) {
-                final isSelected = index == _selectedCategoryIndex;
+                final isSelected = index == _selectedDayIndex;
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6),
                   child: AnimatedContainer(
@@ -71,42 +205,62 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                       borderRadius: BorderRadius.circular(20),
                       color: isSelected
                           ? Theme.of(context).primaryColor
-                          : Theme.of(context).cardColor,
+                          : Colors.grey[100],
                       child: InkWell(
                         borderRadius: BorderRadius.circular(20),
                         onTap: () {
                           setState(() {
-                            _selectedCategoryIndex = index;
+                            _selectedDayIndex = index;
                           });
                         },
-                        child: Container(
-                          padding: const EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 12),
-                          child: Row(
+                        child: SizedBox(
+                          width: 60,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(
-                                categories[index]['icon'],
-                                color: isSelected
-                                    ? Colors.white
-                                    : Theme.of(context)
-                                        .textTheme
-                                        .bodyLarge
-                                        ?.color,
-                                size: 18,
+                              Container(
+                                width: 30,
+                                height: 30,
+                                margin: const EdgeInsets.only(bottom: 2),
+                                decoration: BoxDecoration(
+                                  color: isSelected
+                                      ? Colors.white.withOpacity(0.2)
+                                      : Colors.grey[200],
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: Center(
+                                  child: Text(
+                                    weekDays[index]['date'],
+                                    style: TextStyle(
+                                      color: isSelected
+                                          ? Colors.white
+                                          : Colors.grey[600],
+                                      fontSize: 13,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ),
                               ),
-                              const SizedBox(width: 8),
                               Text(
-                                categories[index]['name'],
+                                weekDays[index]['name'],
                                 style: TextStyle(
                                   color: isSelected
                                       ? Colors.white
-                                      : Theme.of(context)
-                                          .textTheme
-                                          .bodyLarge
-                                          ?.color,
+                                      : Colors.grey[600],
+                                  fontSize: 10,
                                   fontWeight: isSelected
                                       ? FontWeight.bold
                                       : FontWeight.normal,
+                                ),
+                              ),
+                              Text(
+                                weekDays[index]['month'],
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white.withOpacity(0.8)
+                                      : Colors.grey[500],
+                                  fontSize: 8,
                                 ),
                               ),
                             ],
@@ -120,55 +274,116 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
             ),
           ),
 
-          // Title and filter
-          Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // Progress card
+          Container(
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  categories[_selectedCategoryIndex]['name'],
-                  style: const TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Bugungi progress',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: _getProgressColor(
+                          _getProgress(
+                            int.parse(weekDays[_selectedDayIndex]['totalTime']
+                                .toString()
+                                .split(' ')[0]),
+                            weekDays[_selectedDayIndex]['optimalTime'],
+                          ),
+                        ).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        _getProgressText(
+                          int.parse(weekDays[_selectedDayIndex]['totalTime']
+                              .toString()
+                              .split(' ')[0]),
+                          weekDays[_selectedDayIndex]['optimalTime'],
+                        ),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: _getProgressColor(
+                            _getProgress(
+                              int.parse(weekDays[_selectedDayIndex]['totalTime']
+                                  .toString()
+                                  .split(' ')[0]),
+                              weekDays[_selectedDayIndex]['optimalTime'],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    value: _getProgress(
+                      int.parse(weekDays[_selectedDayIndex]['totalTime']
+                          .toString()
+                          .split(' ')[0]),
+                      weekDays[_selectedDayIndex]['optimalTime'],
+                    ),
+                    backgroundColor: Colors.grey[200],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      _getProgressColor(
+                        _getProgress(
+                          int.parse(weekDays[_selectedDayIndex]['totalTime']
+                              .toString()
+                              .split(' ')[0]),
+                          weekDays[_selectedDayIndex]['optimalTime'],
+                        ),
+                      ),
+                    ),
+                    minHeight: 8,
                   ),
                 ),
-                Container(
-                  decoration: BoxDecoration(
-                    color: Colors.white,
-                    borderRadius: BorderRadius.circular(12),
-                    boxShadow: [
-                      BoxShadow(
-                        color: Colors.black.withOpacity(0.05),
-                        blurRadius: 4,
-                        offset: const Offset(0, 2),
-                      ),
-                    ],
-                  ),
-                  child: IconButton(
-                    icon: const Icon(Icons.filter_list),
-                    onPressed: () {},
-                    color: Theme.of(context).primaryColor,
-                    iconSize: 22,
+                const SizedBox(height: 8),
+                Text(
+                  'Optimal vaqt: ${weekDays[_selectedDayIndex]['optimalTime']} daqiqa',
+                  style: TextStyle(
+                    fontSize: 12,
+                    color: Colors.grey[600],
                   ),
                 ),
               ],
             ),
           ),
 
-          // Workout grid with improved design
+          // Workouts list
           Expanded(
-            child: GridView.builder(
+            child: ListView.builder(
               padding: const EdgeInsets.all(16),
               physics: const BouncingScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                crossAxisSpacing: 16,
-                mainAxisSpacing: 16,
-                childAspectRatio: 0.8,
-              ),
-              itemCount: 6,
+              itemCount: weekDays[_selectedDayIndex]['workouts'].length,
               itemBuilder: (context, index) {
+                final workout = weekDays[_selectedDayIndex]['workouts'][index];
                 return InkWell(
                   onTap: () {
                     Navigator.push(
@@ -179,6 +394,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                     );
                   },
                   child: Container(
+                    margin: const EdgeInsets.only(bottom: 16),
                     decoration: BoxDecoration(
                       borderRadius: BorderRadius.circular(16),
                       color: Colors.white,
@@ -201,10 +417,33 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                                 top: Radius.circular(16),
                               ),
                               child: Image.asset(
-                                'assets/workout.jpg',
-                                height: 120,
+                                workout['image'],
+                                height: 150,
                                 width: double.infinity,
                                 fit: BoxFit.cover,
+                              ),
+                            ),
+                            // Time badge
+                            Positioned(
+                              top: 10,
+                              right: 10,
+                              child: Container(
+                                padding: const EdgeInsets.symmetric(
+                                  horizontal: 12,
+                                  vertical: 6,
+                                ),
+                                decoration: BoxDecoration(
+                                  color: Colors.black.withOpacity(0.6),
+                                  borderRadius: BorderRadius.circular(12),
+                                ),
+                                child: Text(
+                                  workout['time'],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
                               ),
                             ),
                             // Difficulty badge
@@ -221,33 +460,12 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                                   borderRadius: BorderRadius.circular(12),
                                 ),
                                 child: Text(
-                                  index % 3 == 0
-                                      ? 'Oson'
-                                      : (index % 3 == 1
-                                          ? 'O\'rta'
-                                          : 'Murakkab'),
+                                  workout['difficulty'],
                                   style: const TextStyle(
                                     color: Colors.white,
-                                    fontSize: 10,
+                                    fontSize: 12,
                                     fontWeight: FontWeight.bold,
                                   ),
-                                ),
-                              ),
-                            ),
-                            // Bookmark button
-                            Positioned(
-                              top: 8,
-                              right: 8,
-                              child: Container(
-                                padding: const EdgeInsets.all(4),
-                                decoration: const BoxDecoration(
-                                  color: Colors.white,
-                                  shape: BoxShape.circle,
-                                ),
-                                child: Icon(
-                                  Icons.bookmark_border,
-                                  size: 18,
-                                  color: Theme.of(context).primaryColor,
                                 ),
                               ),
                             ),
@@ -256,44 +474,38 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
 
                         // Workout info
                         Padding(
-                          padding: const EdgeInsets.all(12),
+                          padding: const EdgeInsets.all(16),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
                               Text(
-                                'Mashg\'ulot ${index + 1}',
+                                workout['title'],
                                 style: const TextStyle(
                                   fontWeight: FontWeight.bold,
-                                  fontSize: 16,
+                                  fontSize: 18,
                                 ),
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
                               ),
-                              const SizedBox(height: 8),
+                              const SizedBox(height: 12),
                               Row(
                                 children: [
                                   Icon(Icons.timer_outlined,
-                                      size: 14, color: Colors.grey[600]),
-                                  const SizedBox(width: 4),
+                                      size: 16, color: Colors.grey[600]),
+                                  const SizedBox(width: 8),
                                   Text(
-                                    '${30 + (index * 5)} daqiqa',
+                                    workout['duration'],
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 14,
                                       color: Colors.grey[600],
                                     ),
                                   ),
-                                ],
-                              ),
-                              const SizedBox(height: 6),
-                              Row(
-                                children: [
+                                  const SizedBox(width: 24),
                                   Icon(Icons.local_fire_department_outlined,
-                                      size: 14, color: Colors.grey[600]),
-                                  const SizedBox(width: 4),
+                                      size: 16, color: Colors.grey[600]),
+                                  const SizedBox(width: 8),
                                   Text(
-                                    '${180 + (index * 20)} kal',
+                                    workout['calories'],
                                     style: TextStyle(
-                                      fontSize: 12,
+                                      fontSize: 14,
                                       color: Colors.grey[600],
                                     ),
                                   ),

@@ -100,7 +100,6 @@ final Map<String, Map<String, List<Map<String, String>>>> testData = {
         "III": "5:00",
         "II": "4:30",
         "I": "4:00",
-        "image": "https://example.com/running.jpg",
       },
       {
         "test": "Mana qo\'yish",
@@ -108,7 +107,6 @@ final Map<String, Map<String, List<Map<String, String>>>> testData = {
         "III": "10",
         "II": "15",
         "I": "20",
-        "image": "https://example.com/pushup.jpg",
       },
       {
         "test": "Squat",
@@ -116,7 +114,6 @@ final Map<String, Map<String, List<Map<String, String>>>> testData = {
         "III": "15",
         "II": "25",
         "I": "35",
-        "image": "https://example.com/squat.jpg",
       },
       {
         "test": "O\'tirishdan sakrash",
@@ -124,7 +121,6 @@ final Map<String, Map<String, List<Map<String, String>>>> testData = {
         "III": "25",
         "II": "35",
         "I": "45",
-        "image": "https://example.com/jump.jpg",
       },
       {
         "test": "Bo\'yni mashq qilish",
@@ -132,51 +128,98 @@ final Map<String, Map<String, List<Map<String, String>>>> testData = {
         "III": "8",
         "II": "12",
         "I": "15",
-        "image": "https://example.com/neck.jpg",
       },
-      {"test": "30m yugurish", "III": "5.9", "II": "5.7", "I": "5.1"},
-      {"test": "60m yugurish", "III": "10.9", "II": "10.5", "I": "9.6"},
-      {"test": "100m yugurish", "III": "17.8", "II": "17.4", "I": "16.4"},
-      {"test": "2000m yugurish", "III": "13:10", "II": "12:30", "I": "10:50"},
-      {"test": "500m sport yurishi", "III": "14", "II": "17", "I": "21"},
+      {
+        "test": "30m yugurish",
+        "type": "mandatory",
+        "III": "5.9",
+        "II": "5.7",
+        "I": "5.1"
+      },
+      {
+        "test": "60m yugurish",
+        "type": "mandatory",
+        "III": "10.9",
+        "II": "10.5",
+        "I": "9.6"
+      },
+      {
+        "test": "100m yugurish",
+        "type": "mandatory",
+        "III": "17.8",
+        "II": "17.4",
+        "I": "16.4"
+      },
+      {
+        "test": "2000m yugurish",
+        "type": "mandatory",
+        "III": "13:10",
+        "II": "12:30",
+        "I": "10:50"
+      },
+      {
+        "test": "500m sport yurishi",
+        "type": "mandatory",
+        "III": "14",
+        "II": "17",
+        "I": "21"
+      },
       {
         "test": "Erga tayangan holda qo'llarni bukib-yozish",
+        "type": "mandatory",
         "III": "10",
         "II": "12",
         "I": "17"
       },
       {
         "test": "Gimnastika uruladigan doska ustidan pasta sakrash",
+        "type": "mandatory",
         "III": "8",
         "II": "11",
         "I": "16"
       },
       {
         "test": "Mokisimon yugurish 3x10 metr",
+        "type": "mandatory",
         "III": "9.0",
         "II": "8.8",
         "I": "8.2"
       },
       {
         "test": "Joyda turib yuqoriga sakrash",
+        "type": "mandatory",
         "III": "10",
         "II": "12",
         "I": "18"
       },
-      {"test": "Arg'amchida sakrash", "III": "32", "II": "35", "I": "43"},
+      {
+        "test": "Arg'amchida sakrash",
+        "type": "optional",
+        "III": "32",
+        "II": "35",
+        "I": "43"
+      },
       {
         "test": "Joyidan uzunlikka sakrash",
+        "type": "mandatory",
         "III": "270",
         "II": "290",
         "I": "320"
       },
       {
         "test": "Turgandan uzunlikka sakrash",
+        "type": "optional",
         "III": "170",
         "II": "180",
         "I": "195"
       },
-      {"test": "50m masofaga suzish", "III": "1.25", "II": "1.15", "I": "1.00"}
+      {
+        "test": "50m masofaga suzish",
+        "type": "optional",
+        "III": "1.25",
+        "II": "1.15",
+        "I": "1.00"
+      }
     ]
   }
 };

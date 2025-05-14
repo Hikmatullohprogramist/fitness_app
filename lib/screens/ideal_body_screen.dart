@@ -166,27 +166,27 @@ class _IdealBodyScreenState extends State<IdealBodyScreen>
     return Column(
       children: [
         const SizedBox(height: 16),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16),
-          child: DropdownButtonFormField<int>(
-            value: selectedHeight,
-            decoration: InputDecoration(
-              labelText: 'Bo\'yingizni tanlang',
-              border:
-                  OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
-              filled: true,
-              fillColor: Colors.white,
-            ),
-            items: data
-                .map((item) => DropdownMenuItem<int>(
-                      value: item['height'],
-                      child: Text('${item['height']} sm'),
-                    ))
-                .toList(),
-            onChanged: onHeightSelected,
-            isExpanded: true,
-          ),
-        ),
+        // Padding(
+        //   padding: const EdgeInsets.symmetric(horizontal: 16),
+        //   child: DropdownButtonFormField<int>(
+        //     value: selectedHeight,
+        //     decoration: InputDecoration(
+        //       labelText: 'Bo\'yingizni tanlang',
+        //       border:
+        //           OutlineInputBorder(borderRadius: BorderRadius.circular(12)),
+        //       filled: true,
+        //       fillColor: Colors.white,
+        //     ),
+        //     items: data
+        //         .map((item) => DropdownMenuItem<int>(
+        //               value: item['height'],
+        //               child: Text('${item['height']} sm'),
+        //             ))
+        //         .toList(),
+        //     onChanged: onHeightSelected,
+        //     isExpanded: true,
+        //   ),
+        // ),
         const SizedBox(height: 16),
         Expanded(
           child: ListView.builder(

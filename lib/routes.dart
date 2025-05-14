@@ -3,6 +3,7 @@ import 'package:fitness_app/screens/professiogramma_screen.dart';
 import 'package:fitness_app/screens/pysical_development.dart';
 import 'package:fitness_app/screens/upload_exercises_screen.dart';
 import 'package:fitness_app/screens/physical_development_level_screen.dart';
+import 'package:fitness_app/screens/workouts_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/profile_screen.dart';
@@ -28,25 +29,14 @@ class AppRoutes {
   static const String activityAnimatoin = '/activity_anim';
   static const String uploadExercises = '/upload_exercises';
   static const String physicalDevelopmentLevel = '/physical_development_level';
+  static const String myExercises = '/my_exercises';
 
   static Map<String, WidgetBuilder> get routes => {
         login: (context) => const LoginScreen(),
         main: (context) => const MainScreen(),
         register: (context) => const RegisterScreen(),
         home: (context) => HomeScreen(),
-        profile: (context) => ProfileScreen(
-              user: User(
-                id: '1',
-                name: 'Test User',
-                email: 'test@example.com',
-                profileImageUrl: '',
-                birthDate: '1990-01-01',
-                gender: 'Erkak',
-                height: 175,
-                weight: 70,
-                phone: '+998901234567',
-              ),
-            ),
+        profile: (context) => ProfileScreen(),
         exercises: (context) => const ExercisesScreen(),
         activityQr: (context) => const QRExercisesScreen(),
         idealBody: (context) => const IdealBodyScreen(),
@@ -56,5 +46,6 @@ class AppRoutes {
         uploadExercises: (context) => const UploadExercisesScreen(),
         physicalDevelopmentLevel: (context) =>
             const PhysicalDevelopmentLevelScreen(),
+        myExercises: (context) => const WorkoutsScreen(),
       };
 }

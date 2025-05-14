@@ -60,17 +60,6 @@ class AppDrawer extends StatelessWidget {
             },
           ),
           ListTile(
-            leading: const Icon(Icons.fitness_center),
-            title: const Text('Mening mashg\'ulotlarim'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const WorkoutsScreen()),
-              );
-            },
-          ),
-          ListTile(
             leading: const Icon(Icons.timer),
             title: const Text('Vaqt reglamenti'),
             onTap: () {
@@ -89,8 +78,7 @@ class AppDrawer extends StatelessWidget {
               Navigator.pop(context);
               Navigator.push(
                 context,
-                MaterialPageRoute(
-                    builder: (context) =>   SelfAssessmentScreen()),
+                MaterialPageRoute(builder: (context) => SelfAssessmentScreen()),
               );
             },
           ),
@@ -158,19 +146,7 @@ class AppDrawer extends StatelessWidget {
     Navigator.push(
       context,
       MaterialPageRoute(
-        builder: (context) => ProfileScreen(
-          user: User(
-            id: '1',
-            name: 'Foydalanuvchi',
-            email: 'user@example.com',
-            profileImageUrl: 'https://example.com/profile.jpg',
-            birthDate: '1990-01-01',
-            gender: 'Erkak',
-            height: 175,
-            weight: 70,
-            phone: '+998901234567',
-          ),
-        ),
+        builder: (context) => ProfileScreen(),
       ),
     );
   }
