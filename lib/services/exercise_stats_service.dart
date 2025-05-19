@@ -1,15 +1,23 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:fitness_app/services/auth_service.dart';
 
 class ExerciseStatsService {
   static const String baseUrl = 'https://fitnes.bizsoft.uz/api';
+  final AuthService _authService = AuthService();
 
   Future<Map<String, dynamic>> getUserStats() async {
     try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Token not found. Please login first.');
+      }
+
       final response = await http.get(
         Uri.parse('$baseUrl/user-stats'),
         headers: {
-          'Accept-Charset': 'application/json',
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
         },
       );
 
@@ -25,10 +33,16 @@ class ExerciseStatsService {
 
   Future<Map<String, dynamic>> getDailyStats() async {
     try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Token not found. Please login first.');
+      }
+
       final response = await http.get(
         Uri.parse('$baseUrl/daily-stats'),
         headers: {
           'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
         },
       );
 
@@ -50,18 +64,25 @@ class ExerciseStatsService {
     required String rating,
   }) async {
     try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Token not found. Please login first.');
+      }
+
       final response = await http.post(
         Uri.parse('$baseUrl/exercise-stats'),
         headers: {
           'Accept': 'application/json',
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer $token',
         },
-        body: {
-          'exercise_id': exerciseId.toString(),
-          'duration': duration.toString(),
-          'repetitions': repetitions.toString(),
-          'distance': distance.toString(),
+        body: json.encode({
+          'exercise_id': exerciseId,
+          'duration': duration,
+          'repetitions': repetitions,
+          'distance': distance,
           'rating': rating,
-        },
+        }),
       );
 
       if (response.statusCode == 200 || response.statusCode == 201) {
@@ -76,10 +97,16 @@ class ExerciseStatsService {
 
   Future<Map<String, dynamic>> getWeeklyStats() async {
     try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Token not found. Please login first.');
+      }
+
       final response = await http.get(
         Uri.parse('$baseUrl/weekly-stats'),
         headers: {
           'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
         },
       );
 
@@ -95,10 +122,16 @@ class ExerciseStatsService {
 
   Future<Map<String, dynamic>> getExercisePerformance(int id) async {
     try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Token not found. Please login first.');
+      }
+
       final response = await http.get(
         Uri.parse('$baseUrl/exercise-performance/$id'),
         headers: {
           'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
         },
       );
 

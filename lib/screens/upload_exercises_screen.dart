@@ -11,9 +11,7 @@ class UploadExercisesScreen extends StatefulWidget {
 
 class _UploadExercisesScreenState extends State<UploadExercisesScreen> {
   final _uploadService = UploadService(
-    baseUrl: 'https://fitnes.bizsoft.uz', // Replace with your actual API URL
-    token:
-        '10|rrM2bQ344kLupApRVOUTBXN38zCtxJJ1Ky6Yp3nK9ec2a429', // Replace with your actual auth token
+    baseUrl: 'https://fitnes.bizsoft.uz',
   );
 
   bool _isUploading = false;
@@ -54,40 +52,23 @@ class _UploadExercisesScreenState extends State<UploadExercisesScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Mashqlarni yuklash'),
-        backgroundColor: Theme.of(context).colorScheme.primary,
-        foregroundColor: Colors.white,
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
+      body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             if (_isUploading)
-              Column(
-                children: [
-                  CircularProgressIndicator(value: _progress),
-                  const SizedBox(height: 16),
-                  Text(
-                    _status,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                ],
-              )
+              const CircularProgressIndicator()
             else
-              Column(
-                children: [
-                  Text(
-                    _status,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(fontSize: 16),
-                  ),
-                  const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: _uploadExercises,
-                    child: const Text('Mashqlarni yuklashni boshlash'),
-                  ),
-                ],
+              ElevatedButton(
+                onPressed: _uploadExercises,
+                child: const Text('Mashqlarni yuklash'),
+              ),
+            const SizedBox(height: 20),
+            Text(_status),
+            if (_progress > 0)
+              LinearProgressIndicator(
+                value: _progress,
               ),
           ],
         ),

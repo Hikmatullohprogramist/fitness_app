@@ -1,18 +1,23 @@
 import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:path/path.dart' as path;
+import 'package:fitness_app/services/auth_service.dart';
 
 class UploadService {
   final String baseUrl;
-  final String token;
+  final AuthService _authService = AuthService();
 
   UploadService({
     required this.baseUrl,
-    required this.token,
   });
 
   Future<bool> uploadJsonFile(File file, String category) async {
     try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Token not found. Please login first.');
+      }
+
       final request = http.MultipartRequest(
         'POST',
         Uri.parse('$baseUrl/api/exercises/upload'),
