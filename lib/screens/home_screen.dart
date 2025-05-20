@@ -1,5 +1,6 @@
 import 'package:fitness_app/models/user_model.dart';
 import 'package:fitness_app/services/auth_service.dart';
+import 'package:fitness_app/services/exercise_stats_service.dart';
 import 'package:flutter/material.dart';
 import '../models/workout.dart';
 
@@ -14,23 +15,84 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   final authService = AuthService();
+  final exerciseStatsService = ExerciseStatsService();
   UserModel? user;
-  List<Workout> recentWorkouts = [];
-
-  getCurrentUser() async {
-    final loginUser = await authService.getUser();
-    if (loginUser != null) {
-      setState(() {
-        user = loginUser;
-      });
-    }
-  }
+  Map<String, dynamic>? userStats;
+  Map<String, dynamic>? dailyStats;
+  bool isLoading = true;
 
   @override
   void initState() {
-    getCurrentUser();
-
     super.initState();
+    _loadData();
+  }
+
+  Future<void> _loadData() async {
+    setState(() {
+      isLoading = true;
+    });
+
+    try {
+      // Get user data
+      final loginUser = await authService.getUser();
+
+      // Get user stats
+      final stats = await exerciseStatsService.getUserStats();
+
+      // Get daily stats
+      final daily = await exerciseStatsService.getDailyStats();
+
+      if (mounted) {
+        setState(() {
+          user = loginUser;
+          userStats = stats;
+          dailyStats = daily;
+          isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Xatolik yuz berdi: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+        setState(() {
+          isLoading = false;
+        });
+      }
+    }
+  }
+
+  Future<void> _updateUserLevel(int newLevel) async {
+    if (user == null) return;
+
+    try {
+      setState(() {
+        user = user!.copyWith(fitnessLevel: newLevel);
+      });
+
+      await authService.updateUser(user!);
+
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Daraja muvaffaqiyatli yangilandi'),
+            backgroundColor: Colors.green,
+          ),
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Xatolik yuz berdi: $e'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -51,153 +113,196 @@ class _HomeScreenState extends State<HomeScreen> {
           'Mashqlar majmuasi', Icons.sports_gymnastics_outlined, '/exercises'),
       _MenuItem(
           'Mening mashqlarim', Icons.fitness_center_outlined, '/my_exercises'),
-      _MenuItem(
-          'Mening mashqlarim', Icons.fitness_center_outlined, '/my_exercises'),
     ];
 
     return Scaffold(
-      body: Container(
-        color: Theme.of(context).colorScheme.surface,
-        child: ListView(
-          padding: const EdgeInsets.all(20),
-          children: [
-            _buildGreeting(context, user),
-            const SizedBox(height: 24),
-            GridView.builder(
-              shrinkWrap: true,
-              physics: const NeverScrollableScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                crossAxisCount: 2,
-                mainAxisSpacing: 20,
-                crossAxisSpacing: 20,
-                childAspectRatio: 1.1,
+      appBar: AppBar(
+        title: const Text('Asosiy'),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.refresh),
+            onPressed: _loadData,
+          ),
+        ],
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : RefreshIndicator(
+              onRefresh: _loadData,
+              child: SingleChildScrollView(
+                physics: const AlwaysScrollableScrollPhysics(),
+                child: Column(
+                  children: [
+                    if (user != null) _buildUserInfo(),
+                    if (userStats != null) _buildStats(),
+                    const SizedBox(height: 24),
+                    _buildMenuGrid(menuItems),
+                  ],
+                ),
               ),
-              itemCount: menuItems.length,
-              itemBuilder: (context, index) {
-                final item = menuItems[index];
-                return _MenuCard(item: item);
-              },
             ),
-            const SizedBox(height: 24),
-            if (recentWorkouts.isNotEmpty) ...[
-              Text('So\'nggi mashg\'ulotlar',
-                  style: Theme.of(context)
-                      .textTheme
-                      .titleMedium
-                      ?.copyWith(fontWeight: FontWeight.bold)),
-              const SizedBox(height: 12),
-              _buildRecentWorkouts(context),
-            ],
+    );
+  }
+
+  Widget _buildUserInfo() {
+    return Card(
+      margin: const EdgeInsets.all(16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Row(
+              children: [
+                const CircleAvatar(
+                  radius: 30,
+                  child: Icon(Icons.person, size: 30),
+                ),
+                const SizedBox(width: 16),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        user?.name ?? '',
+                        style: const TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                      if (user?.email != null)
+                        Text(
+                          user!.email!,
+                          style: TextStyle(
+                            color: Colors.grey[600],
+                          ),
+                        ),
+                    ],
+                  ),
+                ),
+                IconButton(
+                  icon: const Icon(Icons.edit),
+                  onPressed: () => _showEditLevelDialog(context),
+                ),
+              ],
+            ),
+            const SizedBox(height: 16),
+            _buildInfoRow(
+                'Daraja', user?.fitnessLevel?.toString() ?? 'Tanlanmagan'),
+            _buildInfoRow('OTM', user?.otm ?? 'Tanlanmagan'),
+            _buildInfoRow('Kurs', '${user?.course ?? 0}'),
+            _buildInfoRow('Bo\'y', '${user?.height ?? 0} sm'),
+            _buildInfoRow('Vazn', '${user?.weight ?? 0} kg'),
           ],
         ),
       ),
     );
   }
 
-  Widget buildLevelBadge(BuildContext context, String? level) {
-    Color badgeColor;
-    String label;
-    switch (level) {
-      case 'Minimal' || '1':
-        badgeColor = Colors.green;
-        label = 'Minimal';
-        break;
-      case 'Optimal' || '2':
-        badgeColor = Colors.orange;
-        label = 'Optimal';
-        break;
-      case 'Maximal' || '3':
-        badgeColor = Colors.red;
-        label = 'Maximal';
-        break;
-      default:
-        badgeColor = Colors.grey;
-        label = 'Nomalum';
-    }
-    return InkWell(
-      borderRadius: BorderRadius.circular(12),
-      // onTap: () => _showEditLevelDialog(context),
-      onTap: () => _showEditLevelDialog(context),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-        decoration: BoxDecoration(
-          color: badgeColor.withOpacity(0.15),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
+  Widget _buildStats() {
+    return Card(
+      margin: const EdgeInsets.symmetric(horizontal: 16),
+      child: Padding(
+        padding: const EdgeInsets.all(16),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Icon(Icons.fitness_center, color: badgeColor, size: 18),
-            const SizedBox(width: 6),
-            Text(
-              'Daraja: $label',
+            const Text(
+              'Bugungi statistika',
               style: TextStyle(
-                color: badgeColor,
+                fontSize: 18,
                 fontWeight: FontWeight.bold,
-                fontSize: 15,
               ),
             ),
+            const SizedBox(height: 16),
+            if (dailyStats != null) ...[
+              _buildStatRow(
+                'Mashg\'ulotlar soni',
+                dailyStats!['total_exercises']?.toString() ?? '0',
+                Icons.fitness_center,
+              ),
+              _buildStatRow(
+                'Jami vaqt',
+                '${dailyStats!['total_duration'] ?? 0} daqiqa',
+                Icons.timer,
+              ),
+              _buildStatRow(
+                'Yakunlangan mashg\'ulotlar',
+                dailyStats!['completed_exercises']?.toString() ?? '0',
+                Icons.check_circle,
+              ),
+            ],
           ],
         ),
       ),
     );
   }
 
-  Widget _buildGreeting(BuildContext context, UserModel? user) {
-    return Row(
-      children: [
-        const SizedBox(width: 16),
-        Expanded(
-          child: Column(
-            spacing: 8,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Salom, ${user?.name.split(' ').first}!',
-                style: const TextStyle(
-                  fontWeight: FontWeight.bold,
-                  fontSize: 20,
-                ),
-              ),
-              Text(
-                'Bugun mashg\'ulot qilishga tayyormisiz ?',
-                style: TextStyle(
-                  color: Colors.grey[700],
-                  fontSize: 14,
-                ),
-              ),
-              buildLevelBadge(context, user?.fitnessLevel),
-            ],
+  Widget _buildInfoRow(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 4),
+      child: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          Text(
+            label,
+            style: TextStyle(
+              color: Colors.grey[600],
+            ),
           ),
-        ),
-      ],
+          Text(
+            value,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
+          ),
+        ],
+      ),
     );
   }
 
-  Widget _buildRecentWorkouts(BuildContext context) {
-    return Column(
-      children: recentWorkouts.take(3).map((workout) {
-        return Card(
-          margin: const EdgeInsets.only(bottom: 10),
-          shape:
-              RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-          child: ListTile(
-            leading: Icon(Icons.fitness_center,
-                color: Theme.of(context).colorScheme.primary),
-            title: Text(workout.type),
-            subtitle: Text(
-                '${workout.date.day}.${workout.date.month}.${workout.date.year}'),
-            trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {},
+  Widget _buildStatRow(String label, String value, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(vertical: 8),
+      child: Row(
+        children: [
+          Icon(icon, color: Theme.of(context).colorScheme.primary),
+          const SizedBox(width: 8),
+          Text(label),
+          const Spacer(),
+          Text(
+            value,
+            style: const TextStyle(
+              fontWeight: FontWeight.bold,
+            ),
           ),
-        );
-      }).toList(),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildMenuGrid(List<_MenuItem> items) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      padding: const EdgeInsets.all(16),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        childAspectRatio: 1.1,
+        crossAxisSpacing: 16,
+        mainAxisSpacing: 16,
+      ),
+      itemCount: items.length,
+      itemBuilder: (context, index) {
+        return _MenuCard(item: items[index]);
+      },
     );
   }
 
   void _showEditLevelDialog(BuildContext context) async {
-    final levels = ['Minimal', 'Optimal', 'Maximal'];
-    String? selected = user?.fitnessLevel;
+    final levels = [1, 2, 3];
+    int? selected = user?.fitnessLevel;
 
     await showDialog(
       context: context,
@@ -207,10 +312,10 @@ class _HomeScreenState extends State<HomeScreen> {
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: levels.map((level) {
-              return RadioListTile<String>(
+              return RadioListTile<int>(
                 value: level,
                 groupValue: selected,
-                title: Text(level),
+                title: Text(level.toString()),
                 onChanged: (value) {
                   Navigator.of(context).pop();
                   _updateUserLevel(value!);
@@ -221,16 +326,6 @@ class _HomeScreenState extends State<HomeScreen> {
         );
       },
     );
-  }
-
-  void _updateUserLevel(String newLevel) async {
-    if (user == null) return;
-    // TODO: Serverga PATCH/PUT so'rov yuborish (authService.updateUserLevel)
-    setState(() {
-      user = user!.copyWith(fitnessLevel: newLevel);
-    });
-    // TODO: Secure storage'ga ham yangilash
-    await authService.updateUser(user!);
   }
 }
 
@@ -298,7 +393,9 @@ class _MenuCardState extends State<_MenuCard>
                   widget.item.title,
                   textAlign: TextAlign.center,
                   style: const TextStyle(
-                      fontWeight: FontWeight.bold, fontSize: 16),
+                    fontWeight: FontWeight.bold,
+                    fontSize: 16,
+                  ),
                 ),
               ),
             ],

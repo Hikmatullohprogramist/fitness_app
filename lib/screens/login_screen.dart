@@ -28,20 +28,27 @@ class _LoginScreenState extends State<LoginScreen> {
           email: _emailController.text,
           password: _passwordController.text,
         );
+        //
+        // final response = await _authService.login(authModel);
+        //
+        //
+        //
+        // if (mounted) {
+        //   ScaffoldMessenger.of(context).showSnackBar(
+        //     const SnackBar(
+        //       content: Text('Muvaffaqiyatli kirdingiz!'),
+        //       backgroundColor: Colors.green,
+        //     ),
+        //   );
+        //   Navigator.of(context).pushReplacementNamed('/main');
+        // }
+        //
+        //
+_authService.login(authModel);
 
-        final response = await _authService.login(authModel);
-
-        if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Muvaffaqiyatli kirdingiz!'),
-              backgroundColor: Colors.green,
-            ),
-          );
-          Navigator.of(context).pushReplacementNamed('/main');
-        }
       } catch (e) {
         if (mounted) {
+          print(e.toString());
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
               content: Text('Xatolik: ${e.toString()}'),

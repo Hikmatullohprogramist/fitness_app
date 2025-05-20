@@ -8,9 +8,9 @@ class UserModel {
   final String? role;
   final String? course;
   final String? phone;
-  final double? height;
-  final double? weight;
-  final String? fitnessLevel;
+  final int height;
+  final int weight;
+  final int? fitnessLevel;
   final String? email;
   final String? emailVerifiedAt;
   final String? createdAt;
@@ -26,8 +26,8 @@ class UserModel {
     this.role,
     this.course,
     this.phone,
-    this.height,
-    this.weight,
+    required this.height,
+    required this.weight,
     this.fitnessLevel,
     this.email,
     this.emailVerifiedAt,
@@ -46,13 +46,11 @@ class UserModel {
       role: json['role'],
       course: json['course'],
       phone: json['phone'],
-      height: json['height'] != null
-          ? double.tryParse(json['height'].toString())
-          : null,
-      weight: json['weight'] != null
-          ? double.tryParse(json['weight'].toString())
-          : null,
-      fitnessLevel: json['fitness_level'],
+      height: json['height'],
+      weight: json['weight'],
+      fitnessLevel: json['fitness_level'] is String
+          ? int.tryParse(json['fitness_level'])
+          : json['fitness_level'],
       email: json['email'],
       emailVerifiedAt: json['email_verified_at'],
       createdAt: json['created_at'],
@@ -60,26 +58,27 @@ class UserModel {
     );
   }
 
-  Map<String, dynamic> toJson() => {
-        'id': id,
-        'name': name,
-        'gender': gender,
-        'birth_date': birthDate,
-        'otm': otm,
-        'type': type,
-        'role': role,
-        'course': course,
-        'phone': phone,
-        'height': height,
-        'weight': weight,
-        'fitness_level': fitnessLevel,
-        'email': email,
-        'email_verified_at': emailVerifiedAt,
-        'created_at': createdAt,
-        'updated_at': updatedAt,
-      };
+  Map<String, dynamic> toJson() {
+    return {
+      'id': id,
+      'name': name,
+      'gender': gender,
+      'birth_date': birthDate,
+      'otm': otm,
+      'type': type,
+      'role': role,
+      'course': course,
+      'phone': phone,
+      'height': height,
+      'weight': weight,
+      'fitness_level': fitnessLevel,
+      'email': email,
+      'email_verified_at': emailVerifiedAt,
+      'created_at': createdAt,
+      'updated_at': updatedAt,
+    };
+  }
 
-  @override
   UserModel copyWith({
     int? id,
     String? name,
@@ -90,9 +89,9 @@ class UserModel {
     String? role,
     String? course,
     String? phone,
-    double? height,
-    double? weight,
-    String? fitnessLevel,
+    int? height,
+    int? weight,
+    int? fitnessLevel,
     String? email,
     String? emailVerifiedAt,
     String? createdAt,
