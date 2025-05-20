@@ -29,22 +29,21 @@ class _LoginScreenState extends State<LoginScreen> {
           password: _passwordController.text,
         );
         //
-        // final response = await _authService.login(authModel);
+        final response = await _authService.login(authModel);
+
+
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Muvaffaqiyatli kirdingiz!'),
+              backgroundColor: Colors.green,
+            ),
+          );
+          Navigator.of(context).pushReplacementNamed('/main');
+        }
+
         //
-        //
-        //
-        // if (mounted) {
-        //   ScaffoldMessenger.of(context).showSnackBar(
-        //     const SnackBar(
-        //       content: Text('Muvaffaqiyatli kirdingiz!'),
-        //       backgroundColor: Colors.green,
-        //     ),
-        //   );
-        //   Navigator.of(context).pushReplacementNamed('/main');
-        // }
-        //
-        //
-_authService.login(authModel);
 
       } catch (e) {
         if (mounted) {

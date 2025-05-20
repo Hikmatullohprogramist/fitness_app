@@ -23,7 +23,7 @@ class ExercisesService {
         },
       );
 
-      print(response.body);
+      print(response.statusCode);
       if (response.statusCode == 200) {
         return json.decode(response.body);
       } else {

@@ -116,15 +116,7 @@ class _HomeScreenState extends State<HomeScreen> {
     ];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Asosiy'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.refresh),
-            onPressed: _loadData,
-          ),
-        ],
-      ),
+
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
@@ -133,7 +125,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 physics: const AlwaysScrollableScrollPhysics(),
                 child: Column(
                   children: [
-                    if (user != null) _buildUserInfo(),
                     if (userStats != null) _buildStats(),
                     const SizedBox(height: 24),
                     _buildMenuGrid(menuItems),
@@ -144,61 +135,6 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildUserInfo() {
-    return Card(
-      margin: const EdgeInsets.all(16),
-      child: Padding(
-        padding: const EdgeInsets.all(16),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                const CircleAvatar(
-                  radius: 30,
-                  child: Icon(Icons.person, size: 30),
-                ),
-                const SizedBox(width: 16),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        user?.name ?? '',
-                        style: const TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 4),
-                      if (user?.email != null)
-                        Text(
-                          user!.email!,
-                          style: TextStyle(
-                            color: Colors.grey[600],
-                          ),
-                        ),
-                    ],
-                  ),
-                ),
-                IconButton(
-                  icon: const Icon(Icons.edit),
-                  onPressed: () => _showEditLevelDialog(context),
-                ),
-              ],
-            ),
-            const SizedBox(height: 16),
-            _buildInfoRow(
-                'Daraja', user?.fitnessLevel?.toString() ?? 'Tanlanmagan'),
-            _buildInfoRow('OTM', user?.otm ?? 'Tanlanmagan'),
-            _buildInfoRow('Kurs', '${user?.course ?? 0}'),
-            _buildInfoRow('Bo\'y', '${user?.height ?? 0} sm'),
-            _buildInfoRow('Vazn', '${user?.weight ?? 0} kg'),
-          ],
-        ),
-      ),
-    );
-  }
 
   Widget _buildStats() {
     return Card(
