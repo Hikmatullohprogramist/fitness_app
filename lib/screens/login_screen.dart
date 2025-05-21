@@ -31,8 +31,6 @@ class _LoginScreenState extends State<LoginScreen> {
         //
         final response = await _authService.login(authModel);
 
-
-
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
@@ -44,7 +42,6 @@ class _LoginScreenState extends State<LoginScreen> {
         }
 
         //
-
       } catch (e) {
         if (mounted) {
           print(e.toString());

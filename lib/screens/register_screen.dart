@@ -1,3 +1,4 @@
+import 'package:fitness_app/models/register_model.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
@@ -184,8 +185,16 @@ class _RegisterScreenState extends State<RegisterScreen>
         canContinue = _validatePersonalInfo();
         break;
       case 1:
+        canContinue = true; // Personal info page doesn't need validation
+        break;
+      case 2:
         canContinue = _validateEducationInfo();
         break;
+      case 3:
+        canContinue = _validateAccountInfo();
+        break;
+      default:
+        canContinue = true;
     }
 
     if (canContinue) {
@@ -216,11 +225,22 @@ class _RegisterScreenState extends State<RegisterScreen>
       });
 
       try {
-        final authModel = AuthModel(
+        final authModel = RegisterModel(
           email: _emailController.text,
           password: _passwordController.text,
-          name: '${_firstNameController.text} ${_lastNameController.text}',
+          name: _firstNameController.text + ' ' + _lastNameController.text,
+          gender: _selectedGender ?? '',
+          birthDate: _selectedDate?.toString() ?? '',
+          height: _selectedHeight.toDouble(),
+          weight: _selectedWeight.toDouble(),
+          fitnessLevel: '1',
+          phone: _phoneController.text,
+          otm: _universityController.text,
+          type: _majorController.text,
+          course: int.parse(_courseController.text),
         );
+
+        print(authModel.toJson());
 
         final response = await _authService.register(authModel);
 
@@ -235,6 +255,8 @@ class _RegisterScreenState extends State<RegisterScreen>
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(content: Text('Error: ${e.toString()}')),
           );
+
+          print(e);
         }
       } finally {
         if (mounted) {

@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:fitness_app/models/register_model.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -48,7 +49,7 @@ class AuthService {
     }
   }
 
-  Future<Map<String, dynamic>> register(AuthModel authModel) async {
+  Future<Map<String, dynamic>> register(RegisterModel authModel) async {
     try {
       final response = await http.post(
         Uri.parse('$baseUrl/register'),

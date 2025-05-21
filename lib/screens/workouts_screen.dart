@@ -1,3 +1,4 @@
+import 'package:fitness_app/models/exercies_model.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/screens/workout_info_screen.dart';
 import 'package:fitness_app/services/exercises_service.dart';
@@ -12,7 +13,7 @@ class WorkoutsScreen extends StatefulWidget {
 class _WorkoutsScreenState extends State<WorkoutsScreen> {
   final ExercisesService _exercisesService = ExercisesService();
   bool _isLoading = true;
-  Map<String, dynamic>? _exercisesData;
+  List<Exercise>? _exercisesData;
   String? _error;
 
   final List<Map<String, dynamic>> weekDays = const [
@@ -492,13 +493,14 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                               weekDays[_selectedDayIndex]['workouts'][index];
                           return InkWell(
                             onTap: () {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(
-                                  builder: (context) =>
-                                      const WorkoutInfoScreen(),
-                                ),
-                              );
+                              // Navigator.push(
+                              //   context,
+                              //   MaterialPageRoute(
+                              //     builder: (context) => WorkoutInfoScreen(
+                              //       exercise: _exercisesData[index],
+                              //     ),
+                              //   ),
+                              // );
                             },
                             child: Container(
                               margin: const EdgeInsets.only(bottom: 16),

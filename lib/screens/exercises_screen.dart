@@ -1,4 +1,7 @@
+import 'package:fitness_app/models/exercies_model.dart';
+import 'package:fitness_app/screens/workout_info_screen.dart';
 import 'package:flutter/material.dart';
+import 'package:fitness_app/services/exercises_service.dart';
 
 class ExercisesScreen extends StatefulWidget {
   const ExercisesScreen({Key? key}) : super(key: key);
@@ -10,57 +13,63 @@ class ExercisesScreen extends StatefulWidget {
 class _ExercisesScreenState extends State<ExercisesScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
-
-  // Example data - replace with your actual data
-  final Map<String, List<Map<String, dynamic>>> exercises = {
-    'individual': [
-      {
-        'title': 'Yugurish',
-        'description': '30 daqiqa yugurish',
-        'image': 'assets/images/running.jpg',
-        'difficulty': 'Oson',
-      },
-      {
-        'title': 'Shpagat',
-        'description': 'Har bir oyoq uchun 5 daqiqa',
-        'image': 'assets/images/split.jpg',
-        'difficulty': 'O\'rta',
-      },
-    ],
-    'partner': [
-      {
-        'title': 'Juftlikda yugurish',
-        'description': '20 daqiqa juftlikda yugurish',
-        'image': 'assets/images/partner_running.jpg',
-        'difficulty': 'Oson',
-      },
-      {
-        'title': 'Juftlikda mashq',
-        'description': '15 daqiqa juftlikda mashq',
-        'image': 'assets/images/partner_exercise.jpg',
-        'difficulty': 'O\'rta',
-      },
-    ],
-    'team': [
-      {
-        'title': 'Jamoaviy yugurish',
-        'description': '40 daqiqa jamoaviy yugurish',
-        'image': 'assets/images/team_running.jpg',
-        'difficulty': 'Oson',
-      },
-      {
-        'title': 'Jamoaviy mashq',
-        'description': '30 daqiqa jamoaviy mashq',
-        'image': 'assets/images/team_exercise.jpg',
-        'difficulty': 'O\'rta',
-      },
-    ],
-  };
+  final ExercisesService _exercisesService = ExercisesService();
+  List<Exercise> _exercises = [];
+  bool _isLoading = true;
+  String? _error;
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _loadExercises();
+  }
+
+  Future<void> _loadExercises() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      final response = await _exercisesService.getExercises();
+      if (response.isNotEmpty) {
+        setState(() {
+          _exercises = List<Exercise>.from(response);
+          _isLoading = false;
+        });
+      } else {
+        setState(() {
+          _error = 'No exercises found';
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      print(e);
+
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+      });
+    }
+  }
+
+  List<Exercise> _getExercisesByCategory(String category) {
+    return _exercises;
+
+    // .where((exercise) {
+    //   final categories = exercise.categories.map((category) => category.name);
+    //   switch (category) {
+    //     case 'individual':
+    //       return categories.contains(1); // Yoga category
+    //     case 'partner':
+    //       return categories.contains(2); // Shoulder category
+    //     case 'team':
+    //       return categories.contains(3); // Abdominal category
+    //     default:
+    //       return false;
+    //   }
+    // }).toList();
   }
 
   @override
@@ -108,19 +117,34 @@ class _ExercisesScreenState extends State<ExercisesScreen>
           ],
         ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildExerciseList('individual', theme),
-          _buildExerciseList('partner', theme),
-          _buildExerciseList('team', theme),
-        ],
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(child: Text(_error!))
+              : TabBarView(
+                  controller: _tabController,
+                  children: [
+                    _buildExerciseList('individual', theme),
+                    _buildExerciseList('partner', theme),
+                    _buildExerciseList('team', theme),
+                  ],
+                ),
     );
   }
 
   Widget _buildExerciseList(String category, ThemeData theme) {
-    final categoryExercises = exercises[category] ?? [];
+    final categoryExercises = _getExercisesByCategory(category);
+
+    if (categoryExercises.isEmpty) {
+      return Center(
+        child: Text(
+          'Bu kategoriyada mashqlar topilmadi',
+          style: TextStyle(
+            color: theme.colorScheme.onSurface.withOpacity(0.7),
+          ),
+        ),
+      );
+    }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
@@ -133,77 +157,120 @@ class _ExercisesScreenState extends State<ExercisesScreen>
             borderRadius: BorderRadius.circular(16),
           ),
           elevation: 4,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(16)),
-                child: Image.asset(
-                  exercise['image'],
-                  height: 200,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      height: 200,
-                      color: theme.colorScheme.surfaceVariant,
-                      child: Icon(
-                        Icons.fitness_center,
-                        size: 48,
-                        color: theme.colorScheme.primary,
-                      ),
-                    );
-                  },
+          child: InkWell(
+            onTap: () {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => WorkoutInfoScreen(exercise: exercise),
                 ),
-              ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            exercise['title'],
-                            style: const TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
+              );
+            },
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (exercise.media != null && exercise.media.isNotEmpty)
+                  Stack(
+                    children: [
+                      ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16)),
+                        child: Image.network(
+                          exercise.media[0].originalUrl,
+                          height: 200,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              height: 200,
+                              color: theme.colorScheme.surfaceVariant,
+                              child: Icon(
+                                Icons.fitness_center,
+                                size: 48,
+                                color: theme.colorScheme.primary,
+                              ),
+                            );
+                          },
+                        ),
+                      ),
+                      if (exercise.media.length > 1)
+                        Positioned(
+                          top: 0,
+                          right: 0,
+                          child: ClipRRect(
+                            borderRadius: const BorderRadius.only(
+                              topRight: Radius.circular(16),
+                            ),
+                            child: Image.network(
+                              exercise.media[1].originalUrl,
+                              height: 100,
+                              width: 100,
+                              fit: BoxFit.cover,
+                              errorBuilder: (context, error, stackTrace) {
+                                return Container(
+                                  height: 100,
+                                  width: 100,
+                                  color: theme.colorScheme.surfaceVariant,
+                                  child: Icon(
+                                    Icons.fitness_center,
+                                    size: 24,
+                                    color: theme.colorScheme.primary,
+                                  ),
+                                );
+                              },
                             ),
                           ),
                         ),
-                        Container(
-                          padding: const EdgeInsets.symmetric(
-                            horizontal: 8,
-                            vertical: 4,
-                          ),
-                          decoration: BoxDecoration(
-                            color: theme.colorScheme.primary.withOpacity(0.1),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Text(
-                            exercise['difficulty'],
-                            style: TextStyle(
-                              color: theme.colorScheme.primary,
-                              fontWeight: FontWeight.bold,
+                    ],
+                  ),
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              exercise.name,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                fontWeight: FontWeight.bold,
+                              ),
                             ),
                           ),
-                        ),
-                      ],
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      exercise['description'],
-                      style: TextStyle(
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: theme.colorScheme.primary.withOpacity(0.1),
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                            child: Text(
+                              '${exercise.duration} daqiqa',
+                              style: TextStyle(
+                                color: theme.colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 8),
+                      Text(
+                        exercise.description,
+                        style: TextStyle(
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },

@@ -2,6 +2,7 @@ import 'package:fitness_app/models/user_model.dart';
 import 'package:fitness_app/services/auth_service.dart';
 import 'package:fitness_app/services/exercise_stats_service.dart';
 import 'package:flutter/material.dart';
+import 'package:lottie/lottie.dart';
 import '../models/workout.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -99,24 +100,25 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final List<_MenuItem> menuItems = [
       _MenuItem('Jismoniy rivojlanganlik ko\'rsatkichlari',
-          Icons.analytics_outlined, '/ideal_body'),
-      _MenuItem('Jismoniy rivojlanganlik darajasi', Icons.trending_up,
-          '/physical_development_level'),
-      _MenuItem(
-          'Jismoniy tayyorgarlik ko\'rsatkichlari', Icons.speed, '/jismoniytk'),
-      _MenuItem('Professiogramma', Icons.assessment_outlined, '/progress'),
+          "assets/animations/menu_2.json", '/ideal_body'),
+      _MenuItem('Jismoniy tayyorgarlik darajasi',
+          "assets/animations/menu_1.json", '/physical_development_level'),
+      _MenuItem('Jismoniy tayyorgarlik ko\'rsatkichlari',
+          "assets/animations/menu_4.json", '/jismoniytk'),
+      _MenuItem('Professiogramma', "assets/animations/professiogramma.json",
+          '/progress'),
       _MenuItem('J.t daqiqalik kompleksi (animatsiya)',
-          Icons.play_circle_outline, '/activity_anim'),
-      _MenuItem('J. faoliyati (QR, kadr, rasm)', Icons.camera_alt_outlined,
-          '/activity_qr'),
+          "assets/animations/jtd.json", '/activity_anim'),
+      _MenuItem('J. faoliyati (QR, kadr, rasm)',
+          "assets/animations/qr_code.json", '/activity_qr'),
       _MenuItem(
-          'Mashqlar majmuasi', Icons.sports_gymnastics_outlined, '/exercises'),
-      _MenuItem(
-          'Mening mashqlarim', Icons.fitness_center_outlined, '/my_exercises'),
+          'Mashqlar majmuasi', "assets/animations/mashqlar.json", '/exercises'),
+      _MenuItem('Mening mashqlarim', "assets/animations/my_exercise.json",
+          '/my_exercises'),
     ];
 
     return Scaffold(
-
+      backgroundColor: Theme.of(context).colorScheme.onTertiary,
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
           : RefreshIndicator(
@@ -134,7 +136,6 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
     );
   }
-
 
   Widget _buildStats() {
     return Card(
@@ -218,14 +219,17 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildMenuGrid(List<_MenuItem> items) {
+  Widget _buildMenuGrid(
+    List<_MenuItem> items,
+  ) {
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
       padding: const EdgeInsets.all(16),
-      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+      gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
-        childAspectRatio: 1.1,
+        childAspectRatio: MediaQuery.sizeOf(context).width /
+            (MediaQuery.of(context).size.height / 1.9),
         crossAxisSpacing: 16,
         mainAxisSpacing: 16,
       ),
@@ -267,7 +271,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _MenuItem {
   final String title;
-  final IconData icon;
+  final dynamic icon;
   final String route;
   _MenuItem(this.title, this.icon, this.route);
 }
@@ -320,9 +324,11 @@ class _MenuCardState extends State<_MenuCard>
                   color: accent.withOpacity(0.13),
                 ),
                 padding: const EdgeInsets.all(16),
-                child: Icon(widget.item.icon, size: 36, color: accent),
+                child: widget.item.icon is IconData
+                    ? Icon(widget.item.icon, size: 36, color: accent)
+                    : Lottie.asset(widget.item.icon, width: 120, height: 120),
               ),
-              const SizedBox(height: 18),
+              const SizedBox(height: 14),
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8.0),
                 child: Text(
@@ -330,7 +336,7 @@ class _MenuCardState extends State<_MenuCard>
                   textAlign: TextAlign.center,
                   style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                    fontSize: 14,
                   ),
                 ),
               ),
