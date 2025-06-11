@@ -111,9 +111,9 @@ class _HomeScreenState extends State<HomeScreen> {
           "assets/animations/jtd.json", '/activity_anim'),
       _MenuItem('J. faoliyati (QR, kadr, rasm)',
           "assets/animations/qr_code.json", '/activity_qr'),
-      _MenuItem(
-          'Mashqlar majmuasi', "assets/animations/mashqlar.json", '/exercises'),
-      _MenuItem('Mening mashqlarim', "assets/animations/my_exercise.json",
+      _MenuItem('Mashqlar majmuasi', "assets/animations/mashqlarrr.json",
+          '/exercises'),
+      _MenuItem('Mening mashqlarim', "assets/animations/speed_run-2.json",
           '/my_exercises'),
     ];
 
@@ -326,7 +326,12 @@ class _MenuCardState extends State<_MenuCard>
                 padding: const EdgeInsets.all(16),
                 child: widget.item.icon is IconData
                     ? Icon(widget.item.icon, size: 36, color: accent)
-                    : Lottie.asset(widget.item.icon, width: 120, height: 120),
+                    : Lottie.asset(
+                        widget.item.icon,
+                        width: 120,
+                        repeat: false,
+                        height: 120,
+                      ),
               ),
               const SizedBox(height: 14),
               Padding(

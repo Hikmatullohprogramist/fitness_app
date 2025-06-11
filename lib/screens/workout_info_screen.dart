@@ -166,7 +166,7 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
                                       duration:
                                           int.parse(widget.exercise.duration),
                                       repetitions:
-                                          int.parse(widget.exercise.count),
+                                      widget.exercise.count,
                                       distance: 100,
                                       rating: selectedRating,
                                     );

@@ -46,8 +46,8 @@ class UserModel {
       role: json['role'],
       course: json['course'],
       phone: json['phone'],
-      height: json['height'],
-      weight: json['weight'],
+      height: json['height'] ?? 0,
+      weight: json['weight'] ?? 0,
       fitnessLevel: json['fitness_level'] is String
           ? int.tryParse(json['fitness_level'])
           : json['fitness_level'],

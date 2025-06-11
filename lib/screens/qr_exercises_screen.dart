@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:qr_flutter/qr_flutter.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class QRExercisesScreen extends StatelessWidget {
   const QRExercisesScreen({Key? key}) : super(key: key);
@@ -7,8 +8,7 @@ class QRExercisesScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    const String webUrl =
-        'https://fitnes.bizsoft.uz/images'; // Web sahifa URL manzili
+    const String webUrl = 'https://fitnes.bizsoft.uz/images';
 
     return Scaffold(
       appBar: AppBar(
@@ -49,11 +49,15 @@ class QRExercisesScreen extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 8),
-            Text(
-              'Mashqlar ro\'yxatini ko\'rish uchun',
-              style: theme.textTheme.bodyLarge?.copyWith(
-                color: theme.colorScheme.onSurface.withOpacity(0.7),
-              ),
+            TextButton(
+              onPressed: () async {
+                try {
+                  await launchUrl(Uri.parse(webUrl));
+                } catch (e) {
+                  print('Error: $e');
+                }
+              },
+              child: Text('Mashqlar ro\'yxatini ko\'rish uchun'),
             ),
           ],
         ),

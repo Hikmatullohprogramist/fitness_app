@@ -7,8 +7,8 @@ class Exercise {
   final String createdAt;
   final String updatedAt;
   final String description;
-  final String vacationTime;
-  final String count;
+  final int vacationTime;
+  final int count;
   final List<Media> media;
   final List<Category> categories;
 
@@ -37,8 +37,8 @@ class Exercise {
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
       description: json['description'] ?? "",
-      vacationTime: json['vacation_time'] ?? "",
-      count: json['count'] ?? "",
+      vacationTime: json['vacation_time'] ?? 0,
+      count: json['count'] ?? 0,
       media: (json['media'] as List)
           .map((media) => Media.fromJson(media))
           .toList(),
