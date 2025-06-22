@@ -2,6 +2,7 @@ import 'package:fitness_app/models/exercies_model.dart';
 import 'package:fitness_app/screens/workout_info_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/services/exercises_service.dart';
+import 'package:lottie/lottie.dart';
 
 class ExercisesScreen extends StatefulWidget {
   const ExercisesScreen({Key? key}) : super(key: key);
@@ -175,23 +176,9 @@ class _ExercisesScreenState extends State<ExercisesScreen>
                       ClipRRect(
                         borderRadius: const BorderRadius.vertical(
                             top: Radius.circular(16)),
-                        child: Image.network(
-                          exercise.media[0].originalUrl,
-                          height: 200,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                          errorBuilder: (context, error, stackTrace) {
-                            return Container(
-                              height: 200,
-                              color: theme.colorScheme.surfaceVariant,
-                              child: Icon(
-                                Icons.fitness_center,
-                                size: 48,
-                                color: theme.colorScheme.primary,
-                              ),
-                            );
-                          },
-                        ),
+                        child: _buildMediaWidget(
+                            exercise.media[0].originalUrl, theme,
+                            height: 300, width: double.infinity),
                       ),
                       if (exercise.media.length > 1)
                         Positioned(
@@ -201,24 +188,9 @@ class _ExercisesScreenState extends State<ExercisesScreen>
                             borderRadius: const BorderRadius.only(
                               topRight: Radius.circular(16),
                             ),
-                            child: Image.network(
-                              exercise.media[1].originalUrl,
-                              height: 100,
-                              width: 100,
-                              fit: BoxFit.cover,
-                              errorBuilder: (context, error, stackTrace) {
-                                return Container(
-                                  height: 100,
-                                  width: 100,
-                                  color: theme.colorScheme.surfaceVariant,
-                                  child: Icon(
-                                    Icons.fitness_center,
-                                    size: 24,
-                                    color: theme.colorScheme.primary,
-                                  ),
-                                );
-                              },
-                            ),
+                            child: _buildMediaWidget(
+                                exercise.media[1].originalUrl, theme,
+                                height: 100, width: 100),
                           ),
                         ),
                     ],
@@ -250,7 +222,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
                               borderRadius: BorderRadius.circular(8),
                             ),
                             child: Text(
-                              '${exercise.duration} daqiqa',
+                              '${(double.parse(exercise.duration) * 60).round()} soniya',
                               style: TextStyle(
                                 color: theme.colorScheme.primary,
                                 fontWeight: FontWeight.bold,
@@ -275,5 +247,49 @@ class _ExercisesScreenState extends State<ExercisesScreen>
         );
       },
     );
+  }
+
+  Widget _buildMediaWidget(String url, ThemeData theme,
+      {double? height, double? width}) {
+    final ext = url.split('.').last.toLowerCase();
+    if (ext == 'json') {
+      return Lottie.network(
+        url,
+        height: height,
+        width: width,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            height: height,
+            width: width,
+            color: theme.colorScheme.surfaceVariant,
+            child: Icon(
+              Icons.fitness_center,
+              size: 48,
+              color: theme.colorScheme.primary,
+            ),
+          );
+        },
+      );
+    } else {
+      return Image.network(
+        url,
+        height: height,
+        width: width,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            height: height,
+            width: width,
+            color: theme.colorScheme.surfaceVariant,
+            child: Icon(
+              Icons.fitness_center,
+              size: 48,
+              color: theme.colorScheme.primary,
+            ),
+          );
+        },
+      );
+    }
   }
 }

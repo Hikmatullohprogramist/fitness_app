@@ -1,6 +1,7 @@
 import 'package:fitness_app/services/exercise_stats_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/models/exercies_model.dart';
+import 'package:lottie/lottie.dart';
 
 class WorkoutInfoScreen extends StatefulWidget {
   final Exercise exercise;
@@ -14,6 +15,50 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
   final ExerciseStatsService _exerciseStatsService = ExerciseStatsService();
   String rating = 'good';
 
+  Widget _buildMediaWidget(String url, ThemeData theme,
+      {double? height, double? width}) {
+    final ext = url.split('.').last.toLowerCase();
+    if (ext == 'json') {
+      return Lottie.network(
+        url,
+        height: height,
+        width: width,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            height: height,
+            width: width,
+            color: theme.colorScheme.surfaceVariant,
+            child: Icon(
+              Icons.fitness_center,
+              size: 48,
+              color: theme.colorScheme.primary,
+            ),
+          );
+        },
+      );
+    } else {
+      return Image.network(
+        url,
+        height: height,
+        width: width,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            height: height,
+            width: width,
+            color: theme.colorScheme.surfaceVariant,
+            child: Icon(
+              Icons.fitness_center,
+              size: 48,
+              color: theme.colorScheme.primary,
+            ),
+          );
+        },
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -22,10 +67,8 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
           SliverAppBar(
             expandedHeight: 400,
             flexibleSpace: FlexibleSpaceBar(
-              background: Image.network(
-                widget.exercise.media[0].originalUrl,
-                fit: BoxFit.cover,
-              ),
+              background: _buildMediaWidget(
+                  widget.exercise.media[0].originalUrl, Theme.of(context)),
             ),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
@@ -165,8 +208,7 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
                                       exerciseId: widget.exercise.id,
                                       duration:
                                           int.parse(widget.exercise.duration),
-                                      repetitions:
-                                      widget.exercise.count,
+                                      repetitions: widget.exercise.count,
                                       distance: 100,
                                       rating: selectedRating,
                                     );
