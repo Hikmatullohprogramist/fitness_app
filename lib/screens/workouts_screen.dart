@@ -175,7 +175,30 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
     },
   ];
 
+  final List<String> months = [
+    'Yanvar',
+    'Fevral',
+    'Mart',
+    'Aprel',
+    'May',
+    'Iyun',
+    'Iyul',
+    'Avgust',
+    'Sentyabr',
+    'Oktyabr',
+    'Noyabr',
+    'Dekabr'
+  ];
+
   int _selectedDayIndex = 0;
+  String? _selectedMonth;
+  String? _selectedLevel;
+
+  final List<Map<String, dynamic>> levels = [
+    {'label': 'Minimal', 'minutes': 10},
+    {'label': 'Optimal', 'minutes': 20},
+    {'label': 'Maximal', 'minutes': 30},
+  ];
 
   @override
   void initState() {
@@ -193,7 +216,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       final data = await _exercisesService.getExercises();
 
       setState(() {
-        _exercisesData = data;
+        _exercisesData = List<Exercise>.from(data['exercises']);
         _isLoading = false;
       });
     } catch (e) {
@@ -224,8 +247,27 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Haftalik mashqlar'),
+        title: Text(_selectedMonth == null
+            ? 'Oylar'
+            : _selectedLevel == null
+                ? _selectedMonth!
+                : '$_selectedMonth - $_selectedLevel'),
         centerTitle: true,
+        leading: _selectedMonth != null
+            ? IconButton(
+                icon: const Icon(Icons.arrow_back),
+                onPressed: () {
+                  setState(() {
+                    if (_selectedLevel != null) {
+                      _selectedLevel = null;
+                    } else {
+                      _selectedMonth = null;
+                      _selectedDayIndex = 0;
+                    }
+                  });
+                },
+              )
+            : null,
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh),
@@ -266,103 +308,40 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                     ],
                   ),
                 )
-              : Column(
-                  children: [
-                    // Weekday selector
-                    Container(
-                      height: 110,
-                      margin: const EdgeInsets.only(bottom: 8),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.03),
-                            blurRadius: 6,
-                            offset: const Offset(0, 2),
-                          ),
-                        ],
-                      ),
-                      child: ListView.builder(
-                        scrollDirection: Axis.horizontal,
-                        itemCount: weekDays.length,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 12, vertical: 10),
-                        physics: const BouncingScrollPhysics(),
+              : _selectedMonth == null
+                  ? Padding(
+                      padding: const EdgeInsets.all(16),
+                      child: GridView.builder(
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                          mainAxisSpacing: 16,
+                          crossAxisSpacing: 16,
+                          childAspectRatio: 2.2,
+                        ),
+                        itemCount: months.length,
                         itemBuilder: (context, index) {
-                          final isSelected = index == _selectedDayIndex;
-                          return Padding(
-                            padding: const EdgeInsets.symmetric(horizontal: 6),
-                            child: AnimatedContainer(
-                              duration: const Duration(milliseconds: 300),
-                              curve: Curves.easeInOut,
-                              child: Material(
-                                elevation: isSelected ? 4 : 0,
-                                borderRadius: BorderRadius.circular(20),
-                                color: isSelected
-                                    ? Theme.of(context).primaryColor
-                                    : Colors.grey[100],
-                                child: InkWell(
-                                  borderRadius: BorderRadius.circular(20),
-                                  onTap: () {
-                                    setState(() {
-                                      _selectedDayIndex = index;
-                                    });
-                                  },
-                                  child: SizedBox(
-                                    width: 60,
-                                    child: Column(
-                                      mainAxisAlignment:
-                                          MainAxisAlignment.center,
-                                      mainAxisSize: MainAxisSize.min,
-                                      children: [
-                                        Container(
-                                          width: 30,
-                                          height: 30,
-                                          margin:
-                                              const EdgeInsets.only(bottom: 2),
-                                          decoration: BoxDecoration(
-                                            color: isSelected
-                                                ? Colors.white.withOpacity(0.2)
-                                                : Colors.grey[200],
-                                            borderRadius:
-                                                BorderRadius.circular(8),
-                                          ),
-                                          child: Center(
-                                            child: Text(
-                                              weekDays[index]['date'],
-                                              style: TextStyle(
-                                                color: isSelected
-                                                    ? Colors.white
-                                                    : Colors.grey[600],
-                                                fontSize: 13,
-                                                fontWeight: FontWeight.bold,
-                                              ),
-                                            ),
-                                          ),
-                                        ),
-                                        Text(
-                                          weekDays[index]['name'],
-                                          style: TextStyle(
-                                            color: isSelected
-                                                ? Colors.white
-                                                : Colors.grey[600],
-                                            fontSize: 10,
-                                            fontWeight: isSelected
-                                                ? FontWeight.bold
-                                                : FontWeight.normal,
-                                          ),
-                                        ),
-                                        Text(
-                                          weekDays[index]['month'],
-                                          style: TextStyle(
-                                            color: isSelected
-                                                ? Colors.white.withOpacity(0.8)
-                                                : Colors.grey[500],
-                                            fontSize: 8,
-                                          ),
-                                        ),
-                                      ],
-                                    ),
+                          return GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                _selectedMonth = months[index];
+                                _selectedDayIndex = 0;
+                              });
+                            },
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(16),
+                              ),
+                              elevation: 4,
+                              color: Theme.of(context).primaryColor,
+                              child: Center(
+                                child: Text(
+                                  months[index],
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        Theme.of(context).secondaryHeaderColor,
                                   ),
                                 ),
                               ),
@@ -370,314 +349,490 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                           );
                         },
                       ),
-                    ),
+                    )
+                  : _selectedLevel == null
+                      ? _buildLevelSelection(context)
+                      : _buildWeeklyWorkouts(context),
+    );
+  }
 
-                    // Progress card
-                    Container(
-                      margin: const EdgeInsets.all(16),
-                      padding: const EdgeInsets.all(16),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        borderRadius: BorderRadius.circular(16),
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.05),
-                            blurRadius: 10,
-                            offset: const Offset(0, 4),
+  Widget _buildLevelSelection(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(24),
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Text(
+            'Jismoniy tayyorgarlik darajasini tanlang',
+            style: TextStyle(
+                fontSize: 22,
+                fontWeight: FontWeight.bold,
+                color: Theme.of(context).primaryColor),
+            textAlign: TextAlign.center,
+          ),
+          const SizedBox(height: 32),
+          ...levels.map((level) => Padding(
+                padding: const EdgeInsets.symmetric(vertical: 8),
+                child: GestureDetector(
+                  onTap: () {
+                    setState(() {
+                      _selectedLevel = level['label'];
+                    });
+                  },
+                  child: Card(
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(18),
+                    ),
+                    elevation: 6,
+                    color: Theme.of(context).primaryColor,
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(
+                          vertical: 22, horizontal: 16),
+                      child: Row(
+                        children: [
+                          Icon(
+                            level['label'] == 'Minimal'
+                                ? Icons.looks_one
+                                : level['label'] == 'Optimal'
+                                    ? Icons.looks_two
+                                    : Icons.looks_3,
+                            color: Theme.of(context).secondaryHeaderColor,
+                            size: 32,
+                          ),
+                          const SizedBox(width: 18),
+                          Expanded(
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  level['label'],
+                                  style: TextStyle(
+                                    fontSize: 20,
+                                    fontWeight: FontWeight.bold,
+                                    color:
+                                        Theme.of(context).secondaryHeaderColor,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  '${level['minutes']} daqiqa/kun',
+                                  style: TextStyle(
+                                    fontSize: 15,
+                                    color: Colors.grey[400],
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const Icon(
+                            Icons.arrow_forward_ios,
+                            size: 20,
+                            color: Colors.grey,
                           ),
                         ],
                       ),
+                    ),
+                  ),
+                ),
+              )),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildWeeklyWorkouts(BuildContext context) {
+    final filteredWeeks =
+        weekDays.where((w) => w['month'] == _selectedMonth).toList();
+    if (filteredWeeks.isEmpty) {
+      return Center(child: Text('Bu oyda mashqlar topilmadi'));
+    }
+    final selectedLevelMap = levels.firstWhere(
+        (l) => l['label'] == _selectedLevel,
+        orElse: () => levels[0]);
+    final int reglamentMinutes = selectedLevelMap['minutes'];
+    return Column(
+      children: [
+        // Weekday selector
+        Container(
+          height: 110,
+          margin: const EdgeInsets.only(bottom: 8),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.03),
+                blurRadius: 6,
+                offset: const Offset(0, 2),
+              ),
+            ],
+          ),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: filteredWeeks.length,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+            physics: const BouncingScrollPhysics(),
+            itemBuilder: (context, index) {
+              final isSelected = index == _selectedDayIndex;
+              return Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 6),
+                child: AnimatedContainer(
+                  duration: const Duration(milliseconds: 300),
+                  curve: Curves.easeInOut,
+                  child: Material(
+                    elevation: isSelected ? 4 : 0,
+                    borderRadius: BorderRadius.circular(20),
+                    color: isSelected
+                        ? Theme.of(context).primaryColor
+                        : Colors.grey[100],
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(20),
+                      onTap: () {
+                        setState(() {
+                          _selectedDayIndex = index;
+                        });
+                      },
+                      child: SizedBox(
+                        width: 60,
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Container(
+                              width: 30,
+                              height: 30,
+                              margin: const EdgeInsets.only(bottom: 2),
+                              decoration: BoxDecoration(
+                                color: isSelected
+                                    ? Colors.white.withOpacity(0.2)
+                                    : Colors.grey[200],
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Center(
+                                child: Text(
+                                  filteredWeeks[index]['date'],
+                                  style: TextStyle(
+                                    color: isSelected
+                                        ? Colors.white
+                                        : Colors.grey[600],
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Text(
+                              filteredWeeks[index]['name'],
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Colors.white
+                                    : Colors.grey[600],
+                                fontSize: 10,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
+                              ),
+                            ),
+                            Text(
+                              filteredWeeks[index]['month'],
+                              style: TextStyle(
+                                color: isSelected
+                                    ? Colors.white.withOpacity(0.8)
+                                    : Colors.grey[500],
+                                fontSize: 8,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+        // Progress card + reglament
+        Container(
+          margin: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(16),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black.withOpacity(0.05),
+                blurRadius: 10,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Bugungi progress',
+                    style: TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.grey[800],
+                    ),
+                  ),
+                  Container(
+                    padding:
+                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    decoration: BoxDecoration(
+                      color: _getProgressColor(
+                        _getProgress(
+                          int.parse(filteredWeeks[_selectedDayIndex]
+                                  ['totalTime']
+                              .toString()
+                              .split(' ')[0]),
+                          filteredWeeks[_selectedDayIndex]['optimalTime'],
+                        ),
+                      ).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(20),
+                    ),
+                    child: Text(
+                      _getProgressText(
+                        int.parse(filteredWeeks[_selectedDayIndex]['totalTime']
+                            .toString()
+                            .split(' ')[0]),
+                        filteredWeeks[_selectedDayIndex]['optimalTime'],
+                      ),
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        color: _getProgressColor(
+                          _getProgress(
+                            int.parse(filteredWeeks[_selectedDayIndex]
+                                    ['totalTime']
+                                .toString()
+                                .split(' ')[0]),
+                            filteredWeeks[_selectedDayIndex]['optimalTime'],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              ClipRRect(
+                borderRadius: BorderRadius.circular(8),
+                child: LinearProgressIndicator(
+                  value: _getProgress(
+                    int.parse(filteredWeeks[_selectedDayIndex]['totalTime']
+                        .toString()
+                        .split(' ')[0]),
+                    filteredWeeks[_selectedDayIndex]['optimalTime'],
+                  ),
+                  backgroundColor: Colors.grey[200],
+                  valueColor: AlwaysStoppedAnimation<Color>(
+                    _getProgressColor(
+                      _getProgress(
+                        int.parse(filteredWeeks[_selectedDayIndex]['totalTime']
+                            .toString()
+                            .split(' ')[0]),
+                        filteredWeeks[_selectedDayIndex]['optimalTime'],
+                      ),
+                    ),
+                  ),
+                  minHeight: 8,
+                ),
+              ),
+              const SizedBox(height: 8),
+              Row(
+                children: [
+                  Icon(Icons.access_time,
+                      color: Theme.of(context).primaryColor, size: 18),
+                  const SizedBox(width: 6),
+                  Text(
+                    'Vaqt reglamenti: $reglamentMinutes daqiqa',
+                    style: TextStyle(
+                      fontSize: 14,
+                      color: Theme.of(context).primaryColor,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        // Workouts list
+        Expanded(
+          child: ListView.builder(
+            padding: const EdgeInsets.all(16),
+            physics: const BouncingScrollPhysics(),
+            itemCount:
+                (filteredWeeks[_selectedDayIndex]['workouts'] as List).length,
+            itemBuilder: (context, index) {
+              final workout =
+                  filteredWeeks[_selectedDayIndex]['workouts'][index];
+              return Container(
+                margin: const EdgeInsets.only(bottom: 16),
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(16),
+                  color: Colors.white,
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.06),
+                      blurRadius: 10,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    // Workout image
+                    Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16),
+                          ),
+                          child: Image.asset(
+                            workout['image'],
+                            height: 150,
+                            width: double.infinity,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                        // Category badge
+                        Positioned(
+                          top: 10,
+                          left: 10,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(
+                                  filteredWeeks[_selectedDayIndex]
+                                      ['categoryIcon'],
+                                  color: Colors.white,
+                                  size: 14,
+                                ),
+                                const SizedBox(width: 4),
+                                Text(
+                                  workout['category'],
+                                  style: const TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 12,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                        // Time badge
+                        Positioned(
+                          top: 10,
+                          right: 10,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 12,
+                              vertical: 6,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              workout['time'],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                        // Difficulty badge
+                        Positioned(
+                          top: 50,
+                          left: 10,
+                          child: Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            decoration: BoxDecoration(
+                              color: Colors.black.withOpacity(0.6),
+                              borderRadius: BorderRadius.circular(12),
+                            ),
+                            child: Text(
+                              workout['difficulty'],
+                              style: const TextStyle(
+                                color: Colors.white,
+                                fontSize: 12,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                    // Workout info
+                    Padding(
+                      padding: const EdgeInsets.all(16),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
+                          Text(
+                            workout['title'],
+                            style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                          const SizedBox(height: 12),
                           Row(
-                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
+                              Icon(Icons.timer_outlined,
+                                  size: 16, color: Colors.grey[600]),
+                              const SizedBox(width: 8),
                               Text(
-                                'Bugungi progress',
+                                workout['duration'],
                                 style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.grey[800],
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
                                 ),
                               ),
-                              Container(
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 12, vertical: 6),
-                                decoration: BoxDecoration(
-                                  color: _getProgressColor(
-                                    _getProgress(
-                                      int.parse(weekDays[_selectedDayIndex]
-                                              ['totalTime']
-                                          .toString()
-                                          .split(' ')[0]),
-                                      weekDays[_selectedDayIndex]
-                                          ['optimalTime'],
-                                    ),
-                                  ).withOpacity(0.1),
-                                  borderRadius: BorderRadius.circular(20),
-                                ),
-                                child: Text(
-                                  _getProgressText(
-                                    int.parse(weekDays[_selectedDayIndex]
-                                            ['totalTime']
-                                        .toString()
-                                        .split(' ')[0]),
-                                    weekDays[_selectedDayIndex]['optimalTime'],
-                                  ),
-                                  style: TextStyle(
-                                    fontSize: 14,
-                                    fontWeight: FontWeight.bold,
-                                    color: _getProgressColor(
-                                      _getProgress(
-                                        int.parse(weekDays[_selectedDayIndex]
-                                                ['totalTime']
-                                            .toString()
-                                            .split(' ')[0]),
-                                        weekDays[_selectedDayIndex]
-                                            ['optimalTime'],
-                                      ),
-                                    ),
-                                  ),
+                              const SizedBox(width: 24),
+                              Icon(Icons.local_fire_department_outlined,
+                                  size: 16, color: Colors.grey[600]),
+                              const SizedBox(width: 8),
+                              Text(
+                                workout['calories'],
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[600],
                                 ),
                               ),
                             ],
                           ),
-                          const SizedBox(height: 16),
-                          ClipRRect(
-                            borderRadius: BorderRadius.circular(8),
-                            child: LinearProgressIndicator(
-                              value: _getProgress(
-                                int.parse(weekDays[_selectedDayIndex]
-                                        ['totalTime']
-                                    .toString()
-                                    .split(' ')[0]),
-                                weekDays[_selectedDayIndex]['optimalTime'],
-                              ),
-                              backgroundColor: Colors.grey[200],
-                              valueColor: AlwaysStoppedAnimation<Color>(
-                                _getProgressColor(
-                                  _getProgress(
-                                    int.parse(weekDays[_selectedDayIndex]
-                                            ['totalTime']
-                                        .toString()
-                                        .split(' ')[0]),
-                                    weekDays[_selectedDayIndex]['optimalTime'],
-                                  ),
-                                ),
-                              ),
-                              minHeight: 8,
-                            ),
-                          ),
-                          const SizedBox(height: 8),
-                          Text(
-                            'Optimal vaqt: ${weekDays[_selectedDayIndex]['optimalTime']} daqiqa',
-                            style: TextStyle(
-                              fontSize: 12,
-                              color: Colors.grey[600],
-                            ),
-                          ),
                         ],
-                      ),
-                    ),
-
-                    // Workouts list
-                    Expanded(
-                      child: ListView.builder(
-                        padding: const EdgeInsets.all(16),
-                        physics: const BouncingScrollPhysics(),
-                        itemCount:
-                            weekDays[_selectedDayIndex]['workouts'].length,
-                        itemBuilder: (context, index) {
-                          final workout =
-                              weekDays[_selectedDayIndex]['workouts'][index];
-                          return InkWell(
-                            onTap: () {
-                              // Navigator.push(
-                              //   context,
-                              //   MaterialPageRoute(
-                              //     builder: (context) => WorkoutInfoScreen(
-                              //       exercise: _exercisesData[index],
-                              //     ),
-                              //   ),
-                              // );
-                            },
-                            child: Container(
-                              margin: const EdgeInsets.only(bottom: 16),
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(16),
-                                color: Colors.white,
-                                boxShadow: [
-                                  BoxShadow(
-                                    color: Colors.black.withOpacity(0.06),
-                                    blurRadius: 10,
-                                    offset: const Offset(0, 4),
-                                  ),
-                                ],
-                              ),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  // Workout image
-                                  Stack(
-                                    children: [
-                                      ClipRRect(
-                                        borderRadius:
-                                            const BorderRadius.vertical(
-                                          top: Radius.circular(16),
-                                        ),
-                                        child: Image.asset(
-                                          workout['image'],
-                                          height: 150,
-                                          width: double.infinity,
-                                          fit: BoxFit.cover,
-                                        ),
-                                      ),
-                                      // Category badge
-                                      Positioned(
-                                        top: 10,
-                                        left: 10,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(0.6),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          child: Row(
-                                            children: [
-                                              Icon(
-                                                weekDays[_selectedDayIndex]
-                                                    ['categoryIcon'],
-                                                color: Colors.white,
-                                                size: 14,
-                                              ),
-                                              const SizedBox(width: 4),
-                                              Text(
-                                                workout['category'],
-                                                style: const TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ],
-                                          ),
-                                        ),
-                                      ),
-                                      // Time badge
-                                      Positioned(
-                                        top: 10,
-                                        right: 10,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 12,
-                                            vertical: 6,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(0.6),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          child: Text(
-                                            workout['time'],
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                      // Difficulty badge
-                                      Positioned(
-                                        top: 50,
-                                        left: 10,
-                                        child: Container(
-                                          padding: const EdgeInsets.symmetric(
-                                            horizontal: 8,
-                                            vertical: 4,
-                                          ),
-                                          decoration: BoxDecoration(
-                                            color:
-                                                Colors.black.withOpacity(0.6),
-                                            borderRadius:
-                                                BorderRadius.circular(12),
-                                          ),
-                                          child: Text(
-                                            workout['difficulty'],
-                                            style: const TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
-                                              fontWeight: FontWeight.bold,
-                                            ),
-                                          ),
-                                        ),
-                                      ),
-                                    ],
-                                  ),
-
-                                  // Workout info
-                                  Padding(
-                                    padding: const EdgeInsets.all(16),
-                                    child: Column(
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          workout['title'],
-                                          style: const TextStyle(
-                                            fontWeight: FontWeight.bold,
-                                            fontSize: 18,
-                                          ),
-                                        ),
-                                        const SizedBox(height: 12),
-                                        Row(
-                                          children: [
-                                            Icon(Icons.timer_outlined,
-                                                size: 16,
-                                                color: Colors.grey[600]),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              workout['duration'],
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey[600],
-                                              ),
-                                            ),
-                                            const SizedBox(width: 24),
-                                            Icon(
-                                                Icons
-                                                    .local_fire_department_outlined,
-                                                size: 16,
-                                                color: Colors.grey[600]),
-                                            const SizedBox(width: 8),
-                                            Text(
-                                              workout['calories'],
-                                              style: TextStyle(
-                                                fontSize: 14,
-                                                color: Colors.grey[600],
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
-                          );
-                        },
                       ),
                     ),
                   ],
                 ),
+              );
+            },
+          ),
+        ),
+      ],
     );
   }
 }

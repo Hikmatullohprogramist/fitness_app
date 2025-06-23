@@ -132,76 +132,75 @@ class _PhysicalDevelopmentScreenState extends State<PhysicalDevelopmentScreen>
     required String type,
     required ThemeData theme,
   }) {
+    print((testData[selectedAgeGroup]?[gender] ?? [])
+        .where((item) => item['type'] == type)
+        .toList());
     // Filter test data based on type (mandatory/optional)
-    final List<Map<String, String>> items =
+    final List<Map<String, dynamic>> items =
         (testData[selectedAgeGroup]?[gender] ?? [])
             .where((item) => item['type'] == type)
             .toList();
 
     final selectedLevel = _selectedLevels[gender]?[type];
 
-    return ListView.separated(
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+    return ListView.builder(
       itemCount: items.length,
-      separatorBuilder: (_, __) => const SizedBox(height: 8),
       itemBuilder: (context, index) {
-        final item = items[index];
-        return Material(
-          color: theme.colorScheme.surface,
-          borderRadius: BorderRadius.circular(20),
-          elevation: 2,
-          shadowColor: theme.shadowColor,
+        final test = items[index];
+        final ageGroups = test['age'];
+        return Card(
+          margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 16),
+          elevation: 3,
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: Padding(
             padding: const EdgeInsets.all(16),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (item['image'] != null) ...[
-                  ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
-                    child: CachedNetworkImage(
-                      imageUrl: item['image']!,
-                      height: 200,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
-                      placeholder: (context, url) => Container(
-                        height: 200,
-                        color: theme.colorScheme.surfaceVariant,
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      ),
-                      errorWidget: (context, url, error) => Container(
-                        height: 200,
-                        color: theme.colorScheme.surfaceVariant,
-                        child: Icon(
-                          Icons.fitness_center,
-                          size: 48,
-                          color: theme.colorScheme.primary,
-                        ),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-                ],
                 Text(
-                  item['test'] ?? '',
-                  style: TextStyle(
-                    fontSize: 16,
+                  test['test'],
+                  style: const TextStyle(
                     fontWeight: FontWeight.bold,
-                    color: theme.colorScheme.onSurface,
+                    fontSize: 17,
                   ),
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: 8),
+                Divider(),
+                const SizedBox(height: 8),
+                // Yoshlar
+                Text(
+                  "18-24 yosh",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: theme.primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 6),
                 Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                   children: [
-                    _gradeItem('III', item['III']!,
-                        isHighlighted: selectedLevel == 'III', theme: theme),
-                    _gradeItem('II', item['II']!,
-                        isHighlighted: selectedLevel == 'II', theme: theme),
-                    _gradeItem('I', item['I']!,
-                        isHighlighted: selectedLevel == 'I', theme: theme),
+                    _gradeBox("I", ageGroups["yoshlar"]?["I"], theme),
+                    _gradeBox("II", ageGroups["yoshlar"]?["II"], theme),
+                    _gradeBox("III", ageGroups["yoshlar"]?["III"], theme),
+                  ],
+                ),
+                const SizedBox(height: 14),
+                // Kattalar
+                Text(
+                  "25-29 yosh",
+                  style: TextStyle(
+                    fontWeight: FontWeight.w600,
+                    color: theme.primaryColor,
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                  children: [
+                    _gradeBox("I", ageGroups["kattalar"]?["I"], theme),
+                    _gradeBox("II", ageGroups["kattalar"]?["II"], theme),
+                    _gradeBox("III", ageGroups["kattalar"]?["III"], theme),
                   ],
                 ),
               ],
@@ -212,39 +211,29 @@ class _PhysicalDevelopmentScreenState extends State<PhysicalDevelopmentScreen>
     );
   }
 
-  Widget _gradeItem(String level, String value,
-      {required bool isHighlighted, required ThemeData theme}) {
+  Widget _gradeBox(String label, String? value, ThemeData theme) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+      padding: const EdgeInsets.symmetric(vertical: 8, horizontal: 14),
+      margin: const EdgeInsets.symmetric(horizontal: 4),
       decoration: BoxDecoration(
-        color: isHighlighted
-            ? theme.colorScheme.primary.withOpacity(0.1)
-            : Colors.transparent,
-        borderRadius: BorderRadius.circular(8),
-        border: isHighlighted
-            ? Border.all(color: theme.colorScheme.primary, width: 1)
-            : null,
+        color: theme.primaryColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(10),
+        border: Border.all(color: theme.primaryColor.withOpacity(0.3)),
       ),
       child: Column(
         children: [
           Text(
-            level,
+            label,
             style: TextStyle(
-              fontWeight: FontWeight.w500,
-              color: isHighlighted
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurfaceVariant,
+              fontWeight: FontWeight.bold,
+              color: theme.primaryColor,
+              fontSize: 14,
             ),
           ),
           const SizedBox(height: 4),
           Text(
-            value,
-            style: TextStyle(
-              color: isHighlighted
-                  ? theme.colorScheme.primary
-                  : theme.colorScheme.onSurface.withOpacity(0.8),
-              fontWeight: FontWeight.bold,
-            ),
+            value ?? "-",
+            style: const TextStyle(fontSize: 14),
           ),
         ],
       ),

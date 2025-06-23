@@ -19,38 +19,69 @@ class _ExercisesScreenState extends State<ExercisesScreen>
   bool _isLoading = true;
   String? _error;
 
+  // Pagination
+  int _currentPage = 1;
+  int _lastPage = 1;
+  bool _isFetchingMore = false;
+  final int _perPage = 10;
+  final ScrollController _scrollController = ScrollController();
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
-    _loadExercises();
+    _loadExercises(reset: true);
+    _scrollController.addListener(_onScroll);
   }
 
-  Future<void> _loadExercises() async {
-    try {
-      setState(() {
-        _isLoading = true;
-        _error = null;
-      });
+  @override
+  void dispose() {
+    _tabController.dispose();
+    _scrollController.dispose();
+    super.dispose();
+  }
 
-      final response = await _exercisesService.getExercises();
-      if (response.isNotEmpty) {
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 200 &&
+        !_isFetchingMore &&
+        _currentPage < _lastPage &&
+        !_isLoading) {
+      _loadExercises();
+    }
+  }
+
+  Future<void> _loadExercises({bool reset = false}) async {
+    try {
+      if (reset) {
         setState(() {
-          _exercises = List<Exercise>.from(response);
-          _isLoading = false;
+          _isLoading = true;
+          _error = null;
+          _currentPage = 1;
+          _lastPage = 1;
+          _exercises = [];
         });
       } else {
         setState(() {
-          _error = 'No exercises found';
-          _isLoading = false;
+          _isFetchingMore = true;
         });
       }
+      final response = await _exercisesService.getExercises(
+          page: _currentPage, perPage: _perPage);
+      final List<Exercise> newExercises =
+          List<Exercise>.from(response['exercises']);
+      setState(() {
+        _exercises.addAll(newExercises);
+        _currentPage = response['currentPage'] + 1;
+        _lastPage = response['lastPage'];
+        _isLoading = false;
+        _isFetchingMore = false;
+      });
     } catch (e) {
-      print(e);
-
       setState(() {
         _error = e.toString();
         _isLoading = false;
+        _isFetchingMore = false;
       });
     }
   }
@@ -71,12 +102,6 @@ class _ExercisesScreenState extends State<ExercisesScreen>
     //       return false;
     //   }
     // }).toList();
-  }
-
-  @override
-  void dispose() {
-    _tabController.dispose();
-    super.dispose();
   }
 
   @override
@@ -136,6 +161,12 @@ class _ExercisesScreenState extends State<ExercisesScreen>
   Widget _buildExerciseList(String category, ThemeData theme) {
     final categoryExercises = _getExercisesByCategory(category);
 
+    if (_isLoading && _exercises.isEmpty) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_error != null) {
+      return Center(child: Text(_error!));
+    }
     if (categoryExercises.isEmpty) {
       return Center(
         child: Text(
@@ -148,9 +179,17 @@ class _ExercisesScreenState extends State<ExercisesScreen>
     }
 
     return ListView.builder(
+      controller: _scrollController,
       padding: const EdgeInsets.all(16),
-      itemCount: categoryExercises.length,
+      itemCount: categoryExercises.length +
+          (_isFetchingMore && _currentPage <= _lastPage ? 1 : 0),
       itemBuilder: (context, index) {
+        if (index == categoryExercises.length) {
+          return const Padding(
+            padding: EdgeInsets.symmetric(vertical: 16),
+            child: Center(child: CircularProgressIndicator()),
+          );
+        }
         final exercise = categoryExercises[index];
         return Card(
           margin: const EdgeInsets.only(bottom: 16),

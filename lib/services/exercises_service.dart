@@ -1,5 +1,4 @@
 import 'dart:convert';
-import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:fitness_app/services/auth_service.dart';
 import 'package:fitness_app/models/exercies_model.dart';
@@ -8,7 +7,9 @@ import 'package:path/path.dart' as path;
 class ExercisesService {
   static const String baseUrl = 'https://fitnes.bizsoft.uz/api';
   final AuthService _authService = AuthService();
-  Future<List<Exercise>> getExercises() async {
+
+  Future<Map<String, dynamic>> getExercises(
+      {int page = 1, int perPage = 10}) async {
     try {
       final token = await _authService.getToken();
       if (token == null) {
@@ -16,7 +17,7 @@ class ExercisesService {
       }
 
       final response = await http.get(
-        Uri.parse('$baseUrl/exersices'),
+        Uri.parse('$baseUrl/exersices?page=$page&per_page=$perPage'),
         headers: {
           'Accept': 'application/json',
           'Authorization': 'Bearer $token',
@@ -26,30 +27,45 @@ class ExercisesService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedBody = json.decode(response.body);
 
-        // Check if response has data property
         if (!decodedBody.containsKey('data')) {
           throw Exception('Invalid response format: data field not found');
         }
 
         final data = decodedBody['data'];
+        List<Exercise> exercises = [];
+        int currentPage = page;
+        int lastPage = page;
+        int total = 0;
+        int perPageResult = perPage;
 
-        // Check if data is null
         if (data == null) {
-          return [];
+          return {
+            'exercises': [],
+            'currentPage': 1,
+            'lastPage': 1,
+            'total': 0,
+            'perPage': perPage
+          };
         }
 
-        // Handle paginated response structure
         if (data is Map && data.containsKey('data')) {
           final List exercisesList = data['data'];
-          return exercisesList.map((e) => Exercise.fromJson(e)).toList();
+          exercises = exercisesList.map((e) => Exercise.fromJson(e)).toList();
+          currentPage = data['current_page'] ?? page;
+          lastPage = data['last_page'] ?? page;
+          total = data['total'] ?? exercises.length;
+          perPageResult = data['per_page'] ?? perPage;
+        } else if (data is List) {
+          exercises = data.map((e) => Exercise.fromJson(e)).toList();
         }
 
-        // Handle direct list response
-        if (data is List) {
-          return data.map((e) => Exercise.fromJson(e)).toList();
-        }
-
-        throw Exception('Invalid response format: unexpected data structure');
+        return {
+          'exercises': exercises,
+          'currentPage': currentPage,
+          'lastPage': lastPage,
+          'total': total,
+          'perPage': perPageResult
+        };
       } else {
         throw Exception('Failed to get exercises: ${response.statusCode}');
       }
@@ -82,8 +98,4 @@ class ExercisesService {
       throw Exception('Error getting exercise: $e');
     }
   }
-
-
-
-
 }

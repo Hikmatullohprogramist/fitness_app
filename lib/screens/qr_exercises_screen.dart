@@ -57,7 +57,7 @@ class QRExercisesScreen extends StatelessWidget {
                   print('Error: $e');
                 }
               },
-              child: Text('Mashqlar ro\'yxatini ko\'rish uchun'),
+              child: Text('Mashqlarni ko\'rish uchun bosing'),
             ),
           ],
         ),
