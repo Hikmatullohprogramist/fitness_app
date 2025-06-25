@@ -192,12 +192,13 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
 
   int _selectedDayIndex = 0;
   String? _selectedMonth;
+  String? _selectedMinute;
   String? _selectedLevel;
 
   final List<Map<String, dynamic>> levels = [
-    {'label': 'Minimal', 'minutes': 10},
-    {'label': 'Optimal', 'minutes': 20},
-    {'label': 'Maximal', 'minutes': 30},
+    {'label': 'Minimal', 'minutes': 210},
+    {'label': 'Optimal', 'minutes': 245},
+    {'label': 'Maximal', 'minutes': 280},
   ];
 
   @override
@@ -325,6 +326,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                             onTap: () {
                               setState(() {
                                 _selectedMonth = months[index];
+
                                 _selectedDayIndex = 0;
                               });
                             },
@@ -352,7 +354,10 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                     )
                   : _selectedLevel == null
                       ? _buildLevelSelection(context)
-                      : _buildWeeklyWorkouts(context),
+                      : _buildWeeklyWorkouts(
+                          context,
+                          _selectedMinute.toString(),
+                        ),
     );
   }
 
@@ -377,6 +382,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                   onTap: () {
                     setState(() {
                       _selectedLevel = level['label'];
+                      _selectedMinute = level['minutes'].toString();
                     });
                   },
                   child: Card(
@@ -415,7 +421,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                                 ),
                                 const SizedBox(height: 4),
                                 Text(
-                                  '${level['minutes']} daqiqa/kun',
+                                  '${level['minutes']} daqiqa/hafta',
                                   style: TextStyle(
                                     fontSize: 15,
                                     color: Colors.grey[400],
@@ -440,7 +446,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
     );
   }
 
-  Widget _buildWeeklyWorkouts(BuildContext context) {
+  Widget _buildWeeklyWorkouts(BuildContext context, String minut) {
     final filteredWeeks =
         weekDays.where((w) => w['month'] == _selectedMonth).toList();
     if (filteredWeeks.isEmpty) {
@@ -497,29 +503,6 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                           mainAxisAlignment: MainAxisAlignment.center,
                           mainAxisSize: MainAxisSize.min,
                           children: [
-                            Container(
-                              width: 30,
-                              height: 30,
-                              margin: const EdgeInsets.only(bottom: 2),
-                              decoration: BoxDecoration(
-                                color: isSelected
-                                    ? Colors.white.withOpacity(0.2)
-                                    : Colors.grey[200],
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Center(
-                                child: Text(
-                                  filteredWeeks[index]['date'],
-                                  style: TextStyle(
-                                    color: isSelected
-                                        ? Colors.white
-                                        : Colors.grey[600],
-                                    fontSize: 13,
-                                    fontWeight: FontWeight.bold,
-                                  ),
-                                ),
-                              ),
-                            ),
                             Text(
                               filteredWeeks[index]['name'],
                               style: TextStyle(
@@ -533,12 +516,15 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                               ),
                             ),
                             Text(
-                              filteredWeeks[index]['month'],
+                              "${(int.parse(minut) / 7).round()} daq",
                               style: TextStyle(
                                 color: isSelected
-                                    ? Colors.white.withOpacity(0.8)
-                                    : Colors.grey[500],
-                                fontSize: 8,
+                                    ? Colors.white
+                                    : Colors.grey[600],
+                                fontSize: 10,
+                                fontWeight: isSelected
+                                    ? FontWeight.bold
+                                    : FontWeight.normal,
                               ),
                             ),
                           ],
