@@ -1,6 +1,9 @@
+import 'package:fitness_app/models/day_subcategory.dart';
 import 'package:fitness_app/models/level_model.dart';
 import 'package:dio/dio.dart';
+import 'package:fitness_app/models/sub_category_exercoes.dart';
 import 'auth_service.dart';
+import 'package:fitness_app/models/leveel_day+response.dart';
 
 class LevelService {
   final AuthService _authService = AuthService();
@@ -37,6 +40,89 @@ class LevelService {
       }
     } catch (e) {
       throw Exception('Error getting levels: $e');
+    }
+  }
+
+  Future<LevelDayResponse> getLevelDays(int levelId) async {
+    try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Token not found. Please login first.');
+      }
+
+      final response = await _dio.get(
+        "${AuthService.baseUrl}/levels/$levelId/days",
+        options: Options(headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        }),
+      );
+
+      if (response.statusCode == 200 && response.data["success"] == true) {
+        return LevelDayResponse.fromJson(response.data);
+      } else {
+        throw Exception('Failed to get level days: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error getting level days: $e');
+    }
+  }
+
+  Future<DaySubCategoriesResponse> getDaySubCategories(
+      int dayId, int levelId) async {
+    try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Token not found. Please login first.');
+      }
+
+      final response = await _dio.get(
+        "${AuthService.baseUrl}/levels/$levelId/days/$dayId/sub-categories",
+        options: Options(headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        }),
+      );
+
+      if (response.statusCode == 200 && response.data["success"] == true) {
+        print(response.data);
+
+        return DaySubCategoriesResponse.fromJson(response.data);
+      } else {
+        throw Exception(
+            'Failed to get day sub categories: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error getting day sub categories: $e');
+    }
+  }
+
+  Future<SubCategoryExercisesResponse> getSubCategoryExercises(
+      int subCategoryId, int levelId, int dayId) async {
+    try {
+      final token = await _authService.getToken();
+      if (token == null) {
+        throw Exception('Token not found. Please login first.');
+      }
+
+      final response = await _dio.get(
+        //{{BASE_URL}}levels/2/days/8/sub-categories/30/exercises
+        "${AuthService.baseUrl}/levels/$levelId/days/$dayId/sub-categories/$subCategoryId/exercises",
+        options: Options(headers: {
+          'Accept': 'application/json',
+          'Authorization': 'Bearer $token',
+        }),
+      );
+
+      if (response.statusCode == 200 && response.data["success"] == true) {
+        print(response.data);
+        return SubCategoryExercisesResponse.fromJson(response.data);
+      } else {
+        throw Exception(
+            'Failed to get sub category exercises: ${response.statusCode}');
+      }
+    } catch (e) {
+      throw Exception('Error getting sub category exercises: $e');
     }
   }
 }

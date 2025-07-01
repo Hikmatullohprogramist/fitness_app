@@ -24,6 +24,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
   int _lastPage = 1;
   bool _isFetchingMore = false;
   final int _perPage = 10;
+  
   final ScrollController _scrollController = ScrollController();
 
   @override

@@ -68,7 +68,7 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
             expandedHeight: 400,
             flexibleSpace: FlexibleSpaceBar(
               background: _buildMediaWidget(
-                  widget.exercise.media[0].originalUrl, Theme.of(context)),
+                  widget.exercise.media.first.originalUrl, Theme.of(context)),
             ),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
@@ -92,7 +92,9 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
                       const Icon(Icons.timer_outlined),
                       const SizedBox(width: 8),
                       Text(
-                        widget.exercise.duration,
+                        ((double.tryParse(widget.exercise.duration) ?? 0) * 60)
+                            .round()
+                            .toString(),
                         style: Theme.of(context).textTheme.bodyLarge,
                       ),
                     ],
@@ -206,8 +208,11 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
                                     final res =
                                         _exerciseStatsService.doExercise(
                                       exerciseId: widget.exercise.id,
-                                      duration:
-                                          int.parse(widget.exercise.duration),
+                                      duration: (double.tryParse(
+                                                  widget.exercise.duration ??
+                                                      '0') ??
+                                              0)
+                                          .round(),
                                       repetitions: widget.exercise.count,
                                       distance: 100,
                                       rating: selectedRating,

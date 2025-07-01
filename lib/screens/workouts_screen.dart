@@ -1,4 +1,8 @@
+import 'package:fitness_app/models/day_subcategory.dart';
 import 'package:fitness_app/models/exercies_model.dart';
+import 'package:fitness_app/models/leveel_day+response.dart';
+import 'package:fitness_app/screens/subcategory_exercies.dart';
+import 'package:fitness_app/services/leve_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/screens/workout_info_screen.dart';
 import 'package:fitness_app/services/exercises_service.dart';
@@ -12,6 +16,7 @@ class WorkoutsScreen extends StatefulWidget {
 
 class _WorkoutsScreenState extends State<WorkoutsScreen> {
   final ExercisesService _exercisesService = ExercisesService();
+  final LevelService _levelService = LevelService();
   bool _isLoading = true;
   List<Exercise>? _exercisesData;
   String? _error;
@@ -195,10 +200,21 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
   String? _selectedLevel;
 
   final List<Map<String, dynamic>> levels = [
-    {'label': 'Minimal', 'minutes': 10},
-    {'label': 'Optimal', 'minutes': 20},
-    {'label': 'Maximal', 'minutes': 30},
+    {"id": 2, 'label': 'Minimal', 'minutes': 210},
+    {"id": 4, 'label': 'Optimal', 'minutes': 245},
+    {"id": 6, 'label': 'Maximal', 'minutes': 280},
   ];
+
+  List<LevelDay>? _levelDays;
+  bool _isLoadingLevelDays = false;
+  String? _apiError;
+  int? _selectedLevelId;
+
+  List<SubCategoryWithCategory>? _subCategories;
+  bool _isLoadingSubCategories = false;
+
+  List<Exercise>? _exercises;
+  bool _isLoadingExercises = false;
 
   @override
   void initState() {
@@ -374,10 +390,30 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           ...levels.map((level) => Padding(
                 padding: const EdgeInsets.symmetric(vertical: 8),
                 child: GestureDetector(
-                  onTap: () {
+                  onTap: () async {
                     setState(() {
                       _selectedLevel = level['label'];
+                      _selectedLevelId = level['id'];
+                      _isLoadingLevelDays = true;
+                      _apiError = null;
+                      _levelDays = null;
+                      _selectedDayIndex = 0;
+                      _subCategories = null;
+                      _exercises = null;
                     });
+                    try {
+                      final resp =
+                          await _levelService.getLevelDays(_selectedLevelId!);
+                      setState(() {
+                        _levelDays = resp.data.days;
+                        _isLoadingLevelDays = false;
+                      });
+                    } catch (e) {
+                      setState(() {
+                        _apiError = e.toString();
+                        _isLoadingLevelDays = false;
+                      });
+                    }
                   },
                   child: Card(
                     shape: RoundedRectangleBorder(
@@ -441,10 +477,408 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
   }
 
   Widget _buildWeeklyWorkouts(BuildContext context) {
+    if (_isLoadingLevelDays) {
+      return const Center(child: CircularProgressIndicator());
+    }
+    if (_apiError != null) {
+      return Center(child: Text(_apiError!));
+    }
+    if (_levelDays != null && _levelDays!.isNotEmpty) {
+      final selectedLevelMap = levels.firstWhere(
+          (l) => l['label'] == _selectedLevel,
+          orElse: () => levels[0]);
+      final int reglamentMinutes = selectedLevelMap['minutes'];
+
+      return Column(
+        children: [
+          Container(
+            height: 110,
+            margin: const EdgeInsets.only(bottom: 8),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.03),
+                  blurRadius: 6,
+                  offset: const Offset(0, 2),
+                ),
+              ],
+            ),
+            child: ListView.builder(
+              scrollDirection: Axis.horizontal,
+              itemCount: _levelDays!.length,
+              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+              physics: const BouncingScrollPhysics(),
+              itemBuilder: (context, index) {
+                final isSelected = index == _selectedDayIndex;
+                final day = _levelDays![index];
+                return Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 6),
+                  child: AnimatedContainer(
+                    duration: const Duration(milliseconds: 300),
+                    curve: Curves.easeInOut,
+                    child: Material(
+                      elevation: isSelected ? 4 : 0,
+                      borderRadius: BorderRadius.circular(20),
+                      color: isSelected
+                          ? Theme.of(context).primaryColor
+                          : Colors.grey[100],
+                      child: InkWell(
+                        borderRadius: BorderRadius.circular(20),
+                        onTap: () async {
+                          setState(() {
+                            _selectedDayIndex = index;
+                            _isLoadingSubCategories = true;
+                            _subCategories = null;
+                            _exercises = null;
+                          });
+                          try {
+                            final resp = await _levelService
+                                .getDaySubCategories(day.id, _selectedLevelId!);
+                            setState(() {
+                              _subCategories = resp.data.subCategories;
+                              _isLoadingSubCategories = false;
+                            });
+                          } catch (e) {
+                            setState(() {
+                              _isLoadingSubCategories = false;
+                            });
+                          }
+                        },
+                        child: SizedBox(
+                          width: 60,
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Text(
+                                day.name,
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.grey[600],
+                                  fontSize: 10,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
+                              ),
+                              Text(
+                                "${(int.parse(day.duration) / _levelDays!.length).round()} daq",
+                                style: TextStyle(
+                                  color: isSelected
+                                      ? Colors.white
+                                      : Colors.grey[600],
+                                  fontSize: 10,
+                                  fontWeight: isSelected
+                                      ? FontWeight.bold
+                                      : FontWeight.normal,
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+          Container(
+            margin: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.05),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Bugungi progress',
+                      style: TextStyle(
+                        fontSize: 16,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.grey[800],
+                      ),
+                    ),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 12, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: _getProgressColor(
+                          _getProgress(
+                            int.tryParse(
+                                    _levelDays![_selectedDayIndex].duration) ??
+                                0,
+                            reglamentMinutes,
+                          ),
+                        ).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        _getProgressText(
+                          int.tryParse(
+                                  _levelDays![_selectedDayIndex].duration) ??
+                              0,
+                          reglamentMinutes,
+                        ),
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontWeight: FontWeight.bold,
+                          color: _getProgressColor(
+                            _getProgress(
+                              int.tryParse(_levelDays![_selectedDayIndex]
+                                      .duration) ??
+                                  0,
+                              reglamentMinutes,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    value: _getProgress(
+                      int.tryParse(_levelDays![_selectedDayIndex].duration) ??
+                          0,
+                      reglamentMinutes,
+                    ),
+                    backgroundColor: Colors.grey[200],
+                    valueColor: AlwaysStoppedAnimation<Color>(
+                      _getProgressColor(
+                        _getProgress(
+                          int.tryParse(
+                                  _levelDays![_selectedDayIndex].duration) ??
+                              0,
+                          reglamentMinutes,
+                        ),
+                      ),
+                    ),
+                    minHeight: 8,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    Icon(Icons.access_time,
+                        color: Theme.of(context).primaryColor, size: 18),
+                    const SizedBox(width: 6),
+                    Text(
+                      'Vaqt reglamenti: $reglamentMinutes daqiqa',
+                      style: TextStyle(
+                        fontSize: 14,
+                        color: Theme.of(context).primaryColor,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          ),
+          if (_isLoadingSubCategories)
+            const Expanded(child: Center(child: CircularProgressIndicator())),
+          if (_exercises != null)
+            Expanded(
+              child: _exercises!.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.fitness_center,
+                              size: 60, color: Colors.grey[400]),
+                          const SizedBox(height: 12),
+                          Text(
+                            "Mashqlar topilmadi",
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () {
+                            setState(() {
+                              _exercises = null;
+                            });
+                          },
+                        ),
+                        const Text(
+                          "Subkategoriya mashqlari",
+                          style: TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 18),
+                        ),
+                      ],
+                    ),
+            ),
+          if (_subCategories != null)
+            Expanded(
+              child: _subCategories!.isEmpty
+                  ? Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(Icons.inbox, size: 60, color: Colors.grey[400]),
+                          const SizedBox(height: 12),
+                          Text(
+                            "Subkategoriya topilmadi",
+                            style: TextStyle(
+                              color: Colors.grey[600],
+                              fontSize: 18,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: const EdgeInsets.all(16),
+                      itemCount: _subCategories!.length,
+                      itemBuilder: (context, index) {
+                        final sub = _subCategories![index];
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16),
+                          ),
+                          elevation: 4,
+                          margin: const EdgeInsets.only(bottom: 16),
+                          child: ListTile(
+                            contentPadding: const EdgeInsets.symmetric(
+                                vertical: 12, horizontal: 18),
+                            leading: CircleAvatar(
+                              backgroundColor: Theme.of(context).primaryColor,
+                              child: const Icon(
+                                Icons.fitness_center,
+                                color: Colors.white,
+                              ),
+                            ),
+                            title: Text(
+                              sub.name,
+                              style: TextStyle(
+                                fontWeight: FontWeight.bold,
+                                fontSize: 17,
+                                color: Theme.of(context).primaryColor,
+                              ),
+                            ),
+                            subtitle: Padding(
+                              padding: const EdgeInsets.only(top: 4.0),
+                              child: Row(
+                                children: [
+                                  Icon(Icons.category,
+                                      size: 16, color: Colors.grey[600]),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    sub.category.name,
+                                    style: TextStyle(
+                                      color: Colors.grey[700],
+                                      fontSize: 14,
+                                    ),
+                                  ),
+                                  if (sub.pivot.duration != null) ...[
+                                    const SizedBox(width: 12),
+                                    Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 8, vertical: 2),
+                                      decoration: BoxDecoration(
+                                        color: Colors.green.withOpacity(0.15),
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          Icon(Icons.timer,
+                                              size: 14,
+                                              color: Colors.green[700]),
+                                          const SizedBox(width: 3),
+                                          Text(
+                                            '${sub.pivot.duration ?? ""} daq',
+                                            style: TextStyle(
+                                              color: Colors.green[700],
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w500,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ]
+                                ],
+                              ),
+                            ),
+                            trailing: const Icon(Icons.arrow_forward_ios,
+                                size: 18, color: Colors.grey),
+                            onTap: () async {
+                              setState(() {
+                                _isLoadingExercises = true;
+                              });
+                              try {
+                                final resp =
+                                    await _levelService.getSubCategoryExercises(
+                                  sub.id,
+                                  _selectedLevelId!,
+                                  _levelDays![_selectedDayIndex].id,
+                                );
+                                setState(() {
+                                  _isLoadingExercises = false;
+                                });
+                                if (!mounted) return;
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        SubCategoryExercisesScreen(
+                                      subCategoryName: sub.name,
+                                      exercises: resp.data.exercises,
+                                      isLoadingExercises: _isLoadingExercises,
+                                    ),
+                                  ),
+                                );
+                              } catch (e) {
+                                setState(() {
+                                  _isLoadingExercises = false;
+                                });
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                      content: Text(
+                                          "Mashqlarni yuklashda xatolik: $e")),
+                                );
+                              }
+                            },
+                          ),
+                        );
+                      },
+                    ),
+            ),
+          if (_isLoadingExercises)
+            const Expanded(child: Center(child: CircularProgressIndicator())),
+        ],
+      );
+    }
     final filteredWeeks =
         weekDays.where((w) => w['month'] == _selectedMonth).toList();
     if (filteredWeeks.isEmpty) {
-      return Center(child: Text('Bu oyda mashqlar topilmadi'));
+      return const Center(child: Text('Bu oyda mashqlar topilmadi'));
     }
     final selectedLevelMap = levels.firstWhere(
         (l) => l['label'] == _selectedLevel,
