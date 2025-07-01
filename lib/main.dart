@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
       theme: optiFormaTheme,
 
       //optiFormaTheme,
-      initialRoute: AppRoutes.login,
+      initialRoute: AppRoutes.splash,
       routes: AppRoutes.routes,
     );
   }

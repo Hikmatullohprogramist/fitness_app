@@ -20,7 +20,7 @@ class _SplashScreenState extends State<SplashScreen>
   @override
   void initState() {
     super.initState();
-    SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
+    // SystemChrome.setEnabledSystemUIMode(SystemUiMode.immersive);
 
     _controller = AnimationController(
       vsync: this,
@@ -47,6 +47,7 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _checkAuthAndNavigate() async {
     const storage = FlutterSecureStorage();
     final token = await storage.read(key: 'auth_token');
+
     await Future.delayed(
       const Duration(
         seconds: 2,
@@ -54,8 +55,9 @@ class _SplashScreenState extends State<SplashScreen>
     );
     if (mounted) {
       if (token != null && token.isNotEmpty) {
-        Navigator.of(context).pushReplacementNamed('/home');
+        Navigator.of(context).pushReplacementNamed('/main');
       } else {
+        print(token);
         Navigator.of(context).pushReplacementNamed('/login');
       }
     }
