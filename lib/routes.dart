@@ -14,7 +14,6 @@ import 'screens/ideal_body_screen.dart';
 import 'screens/physical_training_screen.dart';
 import 'screens/login_screen.dart';
 import 'screens/register_screen.dart';
-import 'models/user.dart';
 
 class AppRoutes {
   static const String login = '/login';
@@ -37,12 +36,12 @@ class AppRoutes {
         login: (context) => const LoginScreen(),
         main: (context) => const MainScreen(),
         register: (context) => const RegisterScreen(),
-        home: (context) => HomeScreen(),
-        profile: (context) => ProfileScreen(),
+        home: (context) => const HomeScreen(),
+        profile: (context) => const ProfileScreen(),
         exercises: (context) => const ExercisesScreen(),
         activityQr: (context) => const QRExercisesScreen(),
         idealBody: (context) => const IdealBodyScreen(),
-        physicalTraining: (context) => PhysicalDevelopmentScreen(),
+        physicalTraining: (context) => const PhysicalDevelopmentScreen(),
         professiogramma: (context) => const ProfessiogrammaScreen(),
         activityAnimatoin: (context) => const PhysicalTrainingScreen(),
         uploadExercises: (context) => const UploadExercisesScreen(),

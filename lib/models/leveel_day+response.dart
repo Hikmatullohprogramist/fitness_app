@@ -30,9 +30,7 @@ class LevelData {
   factory LevelData.fromJson(Map<String, dynamic> json) {
     return LevelData(
       level: LevelInfo.fromJson(json['level']),
-      days: (json['days'] as List)
-          .map((e) => LevelDay.fromJson(e))
-          .toList(),
+      days: (json['days'] as List).map((e) => LevelDay.fromJson(e)).toList(),
     );
   }
 }
@@ -84,7 +82,7 @@ class LevelDay {
       id: json['id'],
       levelId: json['level_id'],
       name: json['name'],
-      duration: json['duration'],
+      duration: json['duration'].toString(),
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
       subCategories: (json['sub_categories'] as List)
@@ -142,7 +140,7 @@ class Pivot {
     return Pivot(
       dayId: json['day_id'],
       subCategoryId: json['sub_category_id'],
-      duration: json['duration'],
+      duration: json['duration'].toString(),
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
     );

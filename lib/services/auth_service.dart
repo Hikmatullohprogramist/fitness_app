@@ -8,7 +8,7 @@ import '../models/user_model.dart';
 
 class AuthService {
   static const String baseUrl = 'https://fitnes.bizsoft.uz/api';
-  static final FlutterSecureStorage _storage = FlutterSecureStorage();
+  static const FlutterSecureStorage _storage = FlutterSecureStorage();
   static const _tokenKey = 'auth_token';
   static const _userKey = 'user_info';
 

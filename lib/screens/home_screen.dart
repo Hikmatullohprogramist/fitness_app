@@ -3,7 +3,6 @@ import 'package:fitness_app/services/auth_service.dart';
 import 'package:fitness_app/services/exercise_stats_service.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
-import '../models/workout.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({

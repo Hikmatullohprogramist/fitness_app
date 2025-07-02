@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import '../data/test_data.dart';
-import 'package:cached_network_image/cached_network_image.dart';
 
 class PhysicalDevelopmentScreen extends StatefulWidget {
+  const PhysicalDevelopmentScreen({super.key});
+
   @override
   State<PhysicalDevelopmentScreen> createState() =>
       _PhysicalDevelopmentScreenState();
@@ -15,7 +16,7 @@ class _PhysicalDevelopmentScreenState extends State<PhysicalDevelopmentScreen>
   late TabController _typeTabController;
 
   // Selected level for each gender and type
-  Map<String, Map<String, String?>> _selectedLevels = {
+  final Map<String, Map<String, String?>> _selectedLevels = {
     'boy': {
       'mandatory': null,
       'optional': null,
@@ -166,7 +167,7 @@ class _PhysicalDevelopmentScreenState extends State<PhysicalDevelopmentScreen>
                   ),
                 ),
                 const SizedBox(height: 8),
-                Divider(),
+                const Divider(),
                 const SizedBox(height: 8),
                 // Yoshlar
                 Text(

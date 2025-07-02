@@ -16,7 +16,7 @@ class UserRepository implements BaseRepository<User> {
   Future<User?> get(String id) async {
     final data = _box.get('current_user');
     if (data == null) return null;
-    return User.fromJson(data as Map<String, dynamic>);
+    return User.fromJson(data);
   }
 
   @override

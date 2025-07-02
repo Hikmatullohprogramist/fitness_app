@@ -1,8 +1,6 @@
 import 'package:fitness_app/screens/profile_screen.dart';
-import 'package:fitness_app/screens/workouts_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/screens/drawer_screens/drawer_screens.dart';
-import 'package:fitness_app/models/user.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});

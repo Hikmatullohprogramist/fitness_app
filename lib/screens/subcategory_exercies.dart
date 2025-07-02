@@ -67,8 +67,7 @@ class SubCategoryExercisesScreen extends StatelessWidget {
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
-                            if (exercise.media != null &&
-                                exercise.media.isNotEmpty)
+                            if (exercise.media.isNotEmpty)
                               Stack(
                                 children: [
                                   ClipRRect(

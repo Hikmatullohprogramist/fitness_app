@@ -124,13 +124,13 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
                           builder: (context) {
                             String selectedRating = 'good';
                             return AlertDialog(
-                              title: Row(
+                              title: const Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
-                                  const Icon(Icons.star_rate_rounded,
+                                  Icon(Icons.star_rate_rounded,
                                       color: Colors.amber),
-                                  const SizedBox(width: 8),
-                                  const Text(
+                                  SizedBox(width: 8),
+                                  Text(
                                     'Mashqni baholang',
                                     style: TextStyle(
                                         fontSize: 20,
@@ -144,8 +144,8 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
                                   mainAxisSize: MainAxisSize.min,
                                   children: [
                                     RadioListTile(
-                                      title: Row(
-                                        children: const [
+                                      title: const Row(
+                                        children: [
                                           Icon(Icons.sentiment_satisfied,
                                               color: Colors.lightGreen),
                                           SizedBox(width: 8),
@@ -161,8 +161,8 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
                                       },
                                     ),
                                     RadioListTile(
-                                      title: Row(
-                                        children: const [
+                                      title: const Row(
+                                        children: [
                                           Icon(Icons.sentiment_neutral,
                                               color: Colors.orange),
                                           SizedBox(width: 8),
@@ -178,8 +178,8 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
                                       },
                                     ),
                                     RadioListTile(
-                                      title: Row(
-                                        children: const [
+                                      title: const Row(
+                                        children: [
                                           Icon(Icons.sentiment_dissatisfied,
                                               color: Colors.red),
                                           SizedBox(width: 8),

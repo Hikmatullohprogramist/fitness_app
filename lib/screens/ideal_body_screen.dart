@@ -84,11 +84,11 @@ class _IdealBodyScreenState extends State<IdealBodyScreen>
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Row(
+        title: const Row(
           children: [
             Icon(Icons.monitor_weight, color: Colors.white),
-            const SizedBox(width: 8),
-            const Text('J. rivojlanish ko\'rsatgichlari'),
+            SizedBox(width: 8),
+            Text('J. rivojlanish ko\'rsatgichlari'),
           ],
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,

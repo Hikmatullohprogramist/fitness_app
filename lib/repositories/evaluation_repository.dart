@@ -24,7 +24,7 @@ class EvaluationRepository implements BaseRepository<Evaluation> {
   Future<List<Evaluation>> getAll() async {
     final data = _box.get('evaluations');
     if (data == null) return [];
-    return (data as List).map((e) => Evaluation.fromJson(e)).toList();
+    return (data).map((e) => Evaluation.fromJson(e)).toList();
   }
 
   @override

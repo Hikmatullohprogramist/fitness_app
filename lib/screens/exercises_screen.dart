@@ -24,7 +24,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
   int _lastPage = 1;
   bool _isFetchingMore = false;
   final int _perPage = 10;
-  
+
   final ScrollController _scrollController = ScrollController();
 
   @override
@@ -88,21 +88,19 @@ class _ExercisesScreenState extends State<ExercisesScreen>
   }
 
   List<Exercise> _getExercisesByCategory(String category) {
-    return _exercises;
-
-    // .where((exercise) {
-    //   final categories = exercise.categories.map((category) => category.name);
-    //   switch (category) {
-    //     case 'individual':
-    //       return categories.contains(1); // Yoga category
-    //     case 'partner':
-    //       return categories.contains(2); // Shoulder category
-    //     case 'team':
-    //       return categories.contains(3); // Abdominal category
-    //     default:
-    //       return false;
-    //   }
-    // }).toList();
+    return _exercises.where((exercise) {
+      final categoryIds = exercise.categories.map((c) => c.id).toList();
+      switch (category) {
+        case 'individual':
+          return categoryIds.contains(1);
+        case 'partner':
+          return categoryIds.contains(2);
+        case 'team':
+          return categoryIds.contains(3);
+        default:
+          return false;
+      }
+    }).toList();
   }
 
   @override
@@ -210,7 +208,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                if (exercise.media != null && exercise.media.isNotEmpty)
+                if (exercise.media.isNotEmpty)
                   Stack(
                     children: [
                       ClipRRect(

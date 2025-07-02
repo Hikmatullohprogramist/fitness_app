@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:fitness_app/services/auth_service.dart';
 import 'package:fitness_app/models/exercies_model.dart';
-import 'package:path/path.dart' as path;
 
 class ExercisesService {
   static const String baseUrl = 'https://fitnes.bizsoft.uz/api';

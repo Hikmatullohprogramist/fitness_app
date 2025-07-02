@@ -115,7 +115,7 @@ class StatisticsScreen extends StatelessWidget {
             const SizedBox(height: 16),
             _buildStatRow('Mashg\'ulotlar soni', '$totalWorkouts'),
             _buildStatRow(
-                'Jami kaloriya', '${totalCalories.toStringAsFixed(0)}'),
+                'Jami kaloriya', totalCalories.toStringAsFixed(0)),
             _buildStatRow(
                 'Jami vaqt', '${totalDuration.toStringAsFixed(0)} min'),
           ],
@@ -175,8 +175,8 @@ class StatisticsScreen extends StatelessWidget {
                   alignment: BarChartAlignment.spaceAround,
                   maxY: 1000,
                   barTouchData: BarTouchData(enabled: false),
-                  titlesData: FlTitlesData(show: false),
-                  gridData: FlGridData(show: false),
+                  titlesData: const FlTitlesData(show: false),
+                  gridData: const FlGridData(show: false),
                   borderData: FlBorderData(show: false),
                   barGroups: [
                     BarChartGroupData(

@@ -24,7 +24,7 @@ class JournalRepository implements BaseRepository<JournalEntry> {
   Future<List<JournalEntry>> getAll() async {
     final data = _box.get('journal_entries');
     if (data == null) return [];
-    return (data as List).map((e) => JournalEntry.fromJson(e)).toList();
+    return (data).map((e) => JournalEntry.fromJson(e)).toList();
   }
 
   @override

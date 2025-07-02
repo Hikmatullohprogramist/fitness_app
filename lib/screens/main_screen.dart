@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:fitness_app/screens/home_screen.dart';
-import 'package:fitness_app/screens/workouts_screen.dart';
-import 'package:fitness_app/screens/statistics_screen.dart';
 import 'package:fitness_app/screens/profile_screen.dart';
 import 'package:fitness_app/widgets/app_drawer.dart';
-import 'package:fitness_app/models/user.dart';
 
-import '../models/workout.dart';
 
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
@@ -19,8 +15,8 @@ class _MainScreenState extends State<MainScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _screens = [
-    HomeScreen(),
-    ProfileScreen(),
+    const HomeScreen(),
+    const ProfileScreen(),
   ];
 
   void _onItemTapped(int index) {

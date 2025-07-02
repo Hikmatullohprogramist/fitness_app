@@ -24,7 +24,7 @@ class WorkoutRepository implements BaseRepository<Workout> {
   Future<List<Workout>> getAll() async {
     final data = _box.get('workouts');
     if (data == null) return [];
-    return (data as List).map((w) => Workout.fromJson(w)).toList();
+    return (data).map((w) => Workout.fromJson(w)).toList();
   }
 
   @override

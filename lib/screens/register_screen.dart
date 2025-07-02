@@ -4,7 +4,6 @@ import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
 import 'dart:io';
 import '../services/auth_service.dart';
-import '../models/auth_model.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -228,7 +227,7 @@ class _RegisterScreenState extends State<RegisterScreen>
         final authModel = RegisterModel(
           email: _emailController.text,
           password: _passwordController.text,
-          name: _firstNameController.text + ' ' + _lastNameController.text,
+          name: '${_firstNameController.text} ${_lastNameController.text}',
           gender: _selectedGender ?? '',
           birthDate: _selectedDate?.toString() ?? '',
           height: _selectedHeight.toDouble(),
@@ -463,11 +462,11 @@ class _RegisterScreenState extends State<RegisterScreen>
     return Column(
       children: [
         const SizedBox(height: 16),
-        Text('Yoshingiz nechida ?',
+        const Text('Yoshingiz nechida ?',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         const SizedBox(height: 16),
         Text('$_selectedAge',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 48)),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 48)),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
             trackHeight: 2,
@@ -496,13 +495,13 @@ class _RegisterScreenState extends State<RegisterScreen>
     return Column(
       children: [
         const SizedBox(height: 16),
-        Text('Bo\'yingiz necha santimetr ?',
+        const Text('Bo\'yingiz necha santimetr ?',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         const SizedBox(height: 16),
         Text('cm', style: TextStyle(color: Colors.grey.shade500)),
         const SizedBox(height: 8),
         Text('$_selectedHeight',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 48)),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 48)),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
             trackHeight: 2,
@@ -532,13 +531,13 @@ class _RegisterScreenState extends State<RegisterScreen>
     return Column(
       children: [
         const SizedBox(height: 16),
-        Text('Og\'irligingiz necha kilogram ?',
+        const Text('Og\'irligingiz necha kilogram ?',
             style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
         const SizedBox(height: 16),
         Text('kg', style: TextStyle(color: Colors.grey.shade500)),
         const SizedBox(height: 8),
         Text('$_selectedWeight',
-            style: TextStyle(fontWeight: FontWeight.bold, fontSize: 48)),
+            style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 48)),
         SliderTheme(
           data: SliderTheme.of(context).copyWith(
             trackHeight: 2,
@@ -632,7 +631,7 @@ class _RegisterScreenState extends State<RegisterScreen>
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text('Qayerda o\'qiysiz  ?',
+            const Text('Qayerda o\'qiysiz  ?',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
             const SizedBox(height: 16),
             _buildInputField(
@@ -693,7 +692,7 @@ class _RegisterScreenState extends State<RegisterScreen>
         padding: const EdgeInsets.all(24),
         child: Column(
           children: [
-            Text('Akkaunt ma\'lumotlaringizni kiriting',
+            const Text('Akkaunt ma\'lumotlaringizni kiriting',
                 style: TextStyle(fontWeight: FontWeight.bold, fontSize: 20)),
             const SizedBox(height: 16),
             _buildInputField(

@@ -4,7 +4,6 @@ import 'package:fitness_app/models/leveel_day+response.dart';
 import 'package:fitness_app/screens/subcategory_exercies.dart';
 import 'package:fitness_app/services/leve_service.dart';
 import 'package:flutter/material.dart';
-import 'package:fitness_app/screens/workout_info_screen.dart';
 import 'package:fitness_app/services/exercises_service.dart';
 
 class WorkoutsScreen extends StatefulWidget {
@@ -481,7 +480,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
     );
   }
 
-  Widget _buildWeeklyWorkouts(BuildContext context) {
+  Widget _buildWeeklyWorkouts(BuildContext context, String minut) {
     if (_isLoadingLevelDays) {
       return const Center(child: CircularProgressIndicator());
     }

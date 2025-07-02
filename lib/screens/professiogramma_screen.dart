@@ -21,7 +21,7 @@ class _ProfessiogrammaScreenState extends State<ProfessiogrammaScreen> {
   }
 
   void _initializeWebView() {
-    final documentUrl =
+    const documentUrl =
         'https://fitnes.bizsoft.uz/storage/theory-materials/01JTJS0FA22NEN2ER5EVT50Z2P.docx';
     final googleDocsUrl =
         'https://docs.google.com/viewer?url=${Uri.encodeComponent(documentUrl)}&embedded=true';
@@ -75,7 +75,7 @@ class _ProfessiogrammaScreenState extends State<ProfessiogrammaScreen> {
   }
 
   Future<void> _openInBrowser() async {
-    final documentUrl =
+    const documentUrl =
         'https://fitnes.bizsoft.uz/storage/theory-materials/01JTJS0FA22NEN2ER5EVT50Z2P.docx';
     final googleDocsUrl =
         'https://docs.google.com/viewer?url=${Uri.encodeComponent(documentUrl)}&embedded=true';

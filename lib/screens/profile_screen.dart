@@ -1,7 +1,6 @@
 import 'package:fitness_app/models/user_model.dart';
 import 'package:fitness_app/services/auth_service.dart';
 import 'package:flutter/material.dart';
-import '../models/user.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({
@@ -62,7 +61,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
       color: Colors.blue.withOpacity(0.1),
       child: Column(
         children: [
-          CircleAvatar(
+          const CircleAvatar(
             radius: 50,
             child: Icon(Icons.person),
           ),

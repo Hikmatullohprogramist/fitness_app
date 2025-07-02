@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:path_provider/path_provider.dart';
 import '../services/upload_service.dart';
 
 class UploadExercisesScreen extends StatefulWidget {
@@ -27,7 +26,7 @@ class _UploadExercisesScreenState extends State<UploadExercisesScreen> {
 
     try {
       // Get the path to the mashqlar directory
-      final mashqlarPath = 'mashqlar';
+      const mashqlarPath = 'mashqlar';
 
       final success = await _uploadService.uploadAllExercises(mashqlarPath);
 

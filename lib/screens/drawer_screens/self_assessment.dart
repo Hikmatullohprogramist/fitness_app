@@ -37,8 +37,8 @@ class SelfAssessmentScreen extends StatelessWidget {
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: () => _showAddDialog(context),
-        child: const Icon(Icons.add),
         backgroundColor: Theme.of(context).colorScheme.primary,
+        child: const Icon(Icons.add),
       ),
       appBar: AppBar(
         title: const Text('O\'z-o\'zini baholash'),
