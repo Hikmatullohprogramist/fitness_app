@@ -1,6 +1,7 @@
 import 'package:fitness_app/screens/profile_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/screens/drawer_screens/drawer_screens.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 class AppDrawer extends StatelessWidget {
   const AppDrawer({super.key});
@@ -124,9 +125,11 @@ class AppDrawer extends StatelessWidget {
           ListTile(
             leading: const Icon(Icons.logout),
             title: const Text('Chiqish'),
-            onTap: () {
-              Navigator.pop(context);
-              // TODO: Implement logout functionality
+            onTap: () async {
+              const storage = FlutterSecureStorage();
+              await storage.delete(key: "auth_token").then((_) {
+                Navigator.of(context).pushReplacementNamed('/login');
+              });
             },
           ),
         ],
