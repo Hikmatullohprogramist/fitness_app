@@ -28,8 +28,7 @@ class _LoginScreenState extends State<LoginScreen> {
           email: _emailController.text,
           password: _passwordController.text,
         );
-        //
-        final response = await _authService.login(authModel);
+        await _authService.login(authModel);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
@@ -44,10 +43,18 @@ class _LoginScreenState extends State<LoginScreen> {
         //
       } catch (e) {
         if (mounted) {
-          print(e.toString());
+          String errorMessage = 'Kirishda xatolik yuz berdi';
+
+          if (e.toString().contains('ValidationException')) {
+            errorMessage = 'Email yoki parol noto\'g\'ri';
+          } else if (e.toString().contains('network') ||
+              e.toString().contains('connection')) {
+            errorMessage = 'Internet aloqasini tekshiring';
+          }
+
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Xatolik: ${e.toString()}'),
+              content: Text(errorMessage),
               backgroundColor: Colors.red,
             ),
           );

@@ -26,12 +26,8 @@ class AuthService {
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
 
-        print(data);
         if (data['data'] != null) {
-          print(data['data']['user']);
           final user = UserModel.fromJson(data['data']['user']);
-
-          print(user is UserModel);
           final token = data['data']['token'];
           await _saveUserAndToken(user, token);
         }

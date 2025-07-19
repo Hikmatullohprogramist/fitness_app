@@ -89,9 +89,13 @@ class _ExercisesScreenState extends State<ExercisesScreen>
 
   List<Exercise> _getExercisesByCategory(String category) {
     return _exercises.where((exercise) {
-      final categoryIds = exercise.categories.map((c) => c.id).toList();
+      final categoryIds = exercise.categories.map((c) {
+        print(c.name);
+        return c.id
+        ;
+      }).toList();
       switch (category) {
-        case 'individual':
+        case 'Individual':
           return categoryIds.contains(1);
         case 'partner':
           return categoryIds.contains(2);

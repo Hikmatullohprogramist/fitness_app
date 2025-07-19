@@ -18,6 +18,10 @@ class SubCategoryExercisesScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Debug: Print the state when building
+    print(
+        'SubCategoryExercisesScreen build - Loading: $_isLoadingExercises, Exercises count: ${exercises.length}');
+
     return Scaffold(
       appBar: AppBar(
         title: Text(subCategoryName),
@@ -40,129 +44,132 @@ class SubCategoryExercisesScreen extends StatelessWidget {
                           fontWeight: FontWeight.w500,
                         ),
                       ),
+                      const SizedBox(height: 8),
+                      Text(
+                        "Subkategoriya: $subCategoryName",
+                        style: TextStyle(
+                          color: Colors.grey[500],
+                          fontSize: 14,
+                        ),
+                      ),
                     ],
                   ),
                 )
-              : ListView.builder(
-                  padding: const EdgeInsets.all(16),
-                  itemCount: exercises.length,
-                  itemBuilder: (context, index) {
-                    final exercise = exercises[index];
-                    return Card(
-                      margin: const EdgeInsets.only(bottom: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16),
+              : Column(
+                  children: [
+                    // Debug info
+                    Container(
+                      padding: const EdgeInsets.all(8),
+                      color: Colors.yellow[100],
+                      child: Text(
+                        'DEBUG: ${exercises.length} ta mashq topildi',
+                        style: const TextStyle(fontWeight: FontWeight.bold),
                       ),
-                      elevation: 4,
-                      child: InkWell(
-                        onTap: () {
-                          Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                              builder: (context) =>
-                                  WorkoutInfoScreen(exercise: exercise),
+                    ),
+                    Expanded(
+                      child: ListView.builder(
+                        padding: const EdgeInsets.all(16),
+                        itemCount: exercises.length,
+                        itemBuilder: (context, index) {
+                          final exercise = exercises[index];
+                          print('Rendering exercise $index: ${exercise.name}'); // Debug
+                          return Card(
+                            margin: const EdgeInsets.only(bottom: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(16),
                             ),
-                          );
-                        },
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            if (exercise.media.isNotEmpty)
-                              Stack(
-                                children: [
-                                  ClipRRect(
-                                    borderRadius: const BorderRadius.vertical(
-                                        top: Radius.circular(16)),
-                                    child: _buildMediaWidget(
-                                        exercise.media[0].originalUrl,
-                                        Theme.of(context),
-                                        height: 300,
-                                        width: double.infinity),
+                            elevation: 4,
+                            child: InkWell(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) =>
+                                        WorkoutInfoScreen(exercise: exercise),
                                   ),
-                                  if (exercise.media.length > 1)
-                                    Positioned(
-                                      top: 0,
-                                      right: 0,
-                                      child: ClipRRect(
-                                        borderRadius: const BorderRadius.only(
-                                          topRight: Radius.circular(16),
-                                        ),
-                                        child: _buildMediaWidget(
-                                            exercise.media.first.originalUrl,
-                                            Theme.of(context),
-                                            height: 100,
-                                            width: 100),
-                                      ),
-                                    ),
-                                ],
-                              ),
-                            Padding(
-                              padding: const EdgeInsets.all(16),
-                              child: Column(
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Row(
-                                    mainAxisAlignment:
-                                        MainAxisAlignment.spaceBetween,
-                                    children: [
-                                      Expanded(
-                                        child: Text(
-                                          exercise.name,
-                                          style: const TextStyle(
-                                            fontSize: 18,
-                                            fontWeight: FontWeight.bold,
+                                );
+                              },
+                              child: Padding(
+                                padding: const EdgeInsets.all(16),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.spaceBetween,
+                                      children: [
+                                        Expanded(
+                                          child: Text(
+                                            exercise.name,
+                                            style: const TextStyle(
+                                              fontSize: 18,
+                                              fontWeight: FontWeight.bold,
+                                            ),
                                           ),
                                         ),
-                                      ),
-                                      Container(
-                                        padding: const EdgeInsets.symmetric(
-                                          horizontal: 8,
-                                          vertical: 4,
-                                        ),
-                                        decoration: BoxDecoration(
-                                          color: Theme.of(context)
-                                              .colorScheme
-                                              .primary
-                                              .withOpacity(0.1),
-                                          borderRadius:
-                                              BorderRadius.circular(8),
-                                        ),
-                                        child: Text(
-                                          '${(double.parse(exercise.duration) * 60).round()} soniya',
-                                          style: TextStyle(
+                                        Container(
+                                          padding: const EdgeInsets.symmetric(
+                                            horizontal: 8,
+                                            vertical: 4,
+                                          ),
+                                          decoration: BoxDecoration(
                                             color: Theme.of(context)
                                                 .colorScheme
-                                                .primary,
-                                            fontWeight: FontWeight.bold,
+                                                .primary
+                                                .withOpacity(0.1),
+                                            borderRadius:
+                                                BorderRadius.circular(8),
                                           ),
+                                          child: Text(
+                                            '${(double.parse(exercise.duration) * 60).round()} soniya',
+                                            style: TextStyle(
+                                              color: Theme.of(context)
+                                                  .colorScheme
+                                                  .primary,
+                                              fontWeight: FontWeight.bold,
+                                            ),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    const SizedBox(height: 8),
+                                    Text(
+                                      exercise.description,
+                                      style: TextStyle(
+                                        color: Theme.of(context)
+                                            .colorScheme
+                                            .onSurface
+                                            .withOpacity(0.7),
+                                      ),
+                                    ),
+                                    if (exercise.media.isNotEmpty) ...[
+                                      const SizedBox(height: 12),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: _buildMediaWidget(
+                                          exercise.media[0].originalUrl,
+                                          Theme.of(context),
+                                          height: 200,
+                                          width: double.infinity,
                                         ),
                                       ),
                                     ],
-                                  ),
-                                  const SizedBox(height: 8),
-                                  Text(
-                                    exercise.description,
-                                    style: TextStyle(
-                                      color: Theme.of(context)
-                                          .colorScheme
-                                          .onSurface
-                                          .withOpacity(0.7),
-                                    ),
-                                  ),
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ],
-                        ),
+                          );
+                        },
                       ),
-                    );
-                  },
+                    ),
+                  ],
                 ),
     );
   }
 
   Widget _buildMediaWidget(String url, ThemeData theme,
       {double? height, double? width}) {
+    print('Building media widget for URL: $url'); // Debug
     final ext = url.split('.').last.toLowerCase();
     if (ext == 'json') {
       return Lottie.network(

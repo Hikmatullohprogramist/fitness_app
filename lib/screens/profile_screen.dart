@@ -38,7 +38,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
           IconButton(
             icon: const Icon(Icons.edit),
             onPressed: () {
-              // TODO: Navigate to edit profile screen
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text(
+                      'Profil tahrirlash funksiyasi tez orada qo\'shiladi'),
+                  backgroundColor: Colors.blue,
+                ),
+              );
             },
           ),
         ],
@@ -148,7 +154,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             title: const Text('Sozlamalar'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
-              // TODO: Navigate to settings screen
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Sozlamalar sahifasi tez orada qo\'shiladi'),
+                  backgroundColor: Colors.blue,
+                ),
+              );
             },
           ),
           const Divider(),
@@ -157,7 +168,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
             title: const Text('Yordam va qo\'llab-quvvatlash'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
-              // TODO: Navigate to help screen
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Yordam sahifasi tez orada qo\'shiladi'),
+                  backgroundColor: Colors.blue,
+                ),
+              );
             },
           ),
           const Divider(),
@@ -166,15 +182,43 @@ class _ProfileScreenState extends State<ProfileScreen> {
             title: const Text('Ilova haqida'),
             trailing: const Icon(Icons.arrow_forward_ios),
             onTap: () {
-              // TODO: Navigate to about screen
+              ScaffoldMessenger.of(context).showSnackBar(
+                const SnackBar(
+                  content: Text('Ilova haqida sahifasi tez orada qo\'shiladi'),
+                  backgroundColor: Colors.blue,
+                ),
+              );
             },
           ),
           const Divider(),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text('Chiqish', style: TextStyle(color: Colors.red)),
-            onTap: () {
-              // TODO: Implement logout
+            onTap: () async {
+              final shouldLogout = await showDialog<bool>(
+                context: context,
+                builder: (context) => AlertDialog(
+                  title: const Text('Chiqish'),
+                  content: const Text('Haqiqatan ham chiqmoqchimisiz?'),
+                  actions: [
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(false),
+                      child: const Text('Bekor qilish'),
+                    ),
+                    TextButton(
+                      onPressed: () => Navigator.of(context).pop(true),
+                      child: const Text('Chiqish'),
+                    ),
+                  ],
+                ),
+              );
+
+              if (shouldLogout == true) {
+                await authService.logout();
+                if (mounted) {
+                  Navigator.of(context).pushReplacementNamed('/login');
+                }
+              }
             },
           ),
         ],

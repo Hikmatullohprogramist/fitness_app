@@ -26,6 +26,8 @@ class ExercisesService {
       if (response.statusCode == 200) {
         final Map<String, dynamic> decodedBody = json.decode(response.body);
 
+        print(decodedBody);
+
         if (!decodedBody.containsKey('data')) {
           throw Exception('Invalid response format: data field not found');
         }
@@ -58,13 +60,16 @@ class ExercisesService {
           exercises = data.map((e) => Exercise.fromJson(e)).toList();
         }
 
-        return {
+        var dataa ={
           'exercises': exercises,
           'currentPage': currentPage,
           'lastPage': lastPage,
           'total': total,
           'perPage': perPageResult
         };
+
+        print(dataa);
+        return dataa;
       } else {
         throw Exception('Failed to get exercises: ${response.statusCode}');
       }

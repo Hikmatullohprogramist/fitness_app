@@ -1,8 +1,6 @@
 import 'package:fitness_app/models/register_model.dart';
 import 'package:flutter/material.dart';
-import 'package:image_picker/image_picker.dart';
 import 'package:flutter/services.dart';
-import 'dart:io';
 import '../services/auth_service.dart';
 
 class RegisterScreen extends StatefulWidget {
@@ -39,14 +37,10 @@ class _RegisterScreenState extends State<RegisterScreen>
   bool _acceptTerms = false;
   String? _selectedGender;
   DateTime? _selectedDate;
-  File? _profileImage;
-  final ImagePicker _picker = ImagePicker();
-
+  
   // Page control
   int _currentPage = 0;
   final PageController _pageController = PageController();
-
-  final List<String> _genders = ['Erkak', 'Ayol'];
 
   late AnimationController _animationController;
   late Animation<double> _fadeAnimation;
@@ -95,74 +89,6 @@ class _RegisterScreenState extends State<RegisterScreen>
     _addressController.dispose();
     _pageController.dispose();
     super.dispose();
-  }
-
-  Future<void> _pickImage() async {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Wrap(
-            children: <Widget>[
-              ListTile(
-                leading: const Icon(Icons.photo_library),
-                title: const Text('Galereyadan tanlash'),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  final XFile? image =
-                      await _picker.pickImage(source: ImageSource.gallery);
-                  if (image != null) {
-                    setState(() {
-                      _profileImage = File(image.path);
-                    });
-                  }
-                },
-              ),
-              ListTile(
-                leading: const Icon(Icons.photo_camera),
-                title: const Text('Kamera'),
-                onTap: () async {
-                  Navigator.of(context).pop();
-                  final XFile? image =
-                      await _picker.pickImage(source: ImageSource.camera);
-                  if (image != null) {
-                    setState(() {
-                      _profileImage = File(image.path);
-                    });
-                  }
-                },
-              ),
-            ],
-          ),
-        );
-      },
-    );
-  }
-
-  Future<void> _selectDate(BuildContext context) async {
-    final DateTime? picked = await showDatePicker(
-      context: context,
-      initialDate: _selectedDate ?? DateTime(2000),
-      firstDate: DateTime(1950),
-      lastDate: DateTime.now(),
-      builder: (context, child) {
-        return Theme(
-          data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: Theme.of(context).colorScheme.primary,
-              onPrimary: Colors.white,
-              onSurface: Theme.of(context).colorScheme.onSurface,
-            ),
-          ),
-          child: child!,
-        );
-      },
-    );
-    if (picked != null) {
-      setState(() {
-        _selectedDate = picked;
-      });
-    }
   }
 
   bool _validatePersonalInfo() {
@@ -239,23 +165,34 @@ class _RegisterScreenState extends State<RegisterScreen>
           course: int.parse(_courseController.text),
         );
 
-        print(authModel.toJson());
-
-        final response = await _authService.register(authModel);
+        await _authService.register(authModel);
 
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Registration successful!')),
+            const SnackBar(
+              content: Text('Ro\'yxatdan o\'tish muvaffaqiyatli yakunlandi!'),
+              backgroundColor: Colors.green,
+            ),
           );
-          Navigator.of(context).pushReplacementNamed('/home');
+          Navigator.of(context).pushReplacementNamed('/main');
         }
       } catch (e) {
         if (mounted) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text('Error: ${e.toString()}')),
-          );
+          String errorMessage = 'Ro\'yxatdan o\'tishda xatolik yuz berdi';
 
-          print(e);
+          if (e.toString().contains('ValidationException')) {
+            errorMessage = 'Ma\'lumotlarni to\'g\'ri kiriting';
+          } else if (e.toString().contains('network') ||
+              e.toString().contains('connection')) {
+            errorMessage = 'Internet aloqasini tekshiring';
+          }
+
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text(errorMessage),
+              backgroundColor: Colors.red,
+            ),
+          );
         }
       } finally {
         if (mounted) {
@@ -345,47 +282,6 @@ class _RegisterScreenState extends State<RegisterScreen>
                   const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
             ),
             validator: validator,
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildProfileImage() {
-    return FadeTransition(
-      opacity: _fadeAnimation,
-      child: SlideTransition(
-        position: _slideAnimation,
-        child: GestureDetector(
-          onTap: _pickImage,
-          child: Container(
-            width: 120,
-            height: 120,
-            margin: const EdgeInsets.only(bottom: 24),
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              color: Theme.of(context).colorScheme.surface,
-              boxShadow: [
-                BoxShadow(
-                  color: Theme.of(context).colorScheme.shadow.withOpacity(0.1),
-                  blurRadius: 20,
-                  spreadRadius: 5,
-                ),
-              ],
-              image: _profileImage != null
-                  ? DecorationImage(
-                      image: FileImage(_profileImage!),
-                      fit: BoxFit.cover,
-                    )
-                  : null,
-            ),
-            child: _profileImage == null
-                ? Icon(
-                    Icons.person_add,
-                    size: 50,
-                    color: Theme.of(context).colorScheme.primary,
-                  )
-                : null,
           ),
         ),
       ),

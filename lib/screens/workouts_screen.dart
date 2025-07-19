@@ -1,7 +1,6 @@
 import 'package:fitness_app/models/day_subcategory.dart';
 import 'package:fitness_app/models/exercies_model.dart';
-import 'package:fitness_app/models/leveel_day+response.dart';
-import 'package:fitness_app/screens/subcategory_exercies.dart';
+import 'package:fitness_app/models/level_day_response.dart';
 import 'package:fitness_app/services/leve_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/services/exercises_service.dart';
@@ -542,6 +541,13 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                             setState(() {
                               _subCategories = resp.data.subCategories;
                               _isLoadingSubCategories = false;
+
+                              // Debug: Print the number of subcategories received
+                              print(
+                                  'Subcategories received: ${resp.data.subCategories.length}');
+                              for (var sub in resp.data.subCategories) {
+                                print('Subcategory: ${sub.name}');
+                              }
                             });
                           } catch (e) {
                             setState(() {
@@ -698,6 +704,19 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           ),
           if (_isLoadingSubCategories)
             const Expanded(child: Center(child: CircularProgressIndicator())),
+          if (_isLoadingExercises)
+            const Expanded(
+              child: Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(),
+                    SizedBox(height: 16),
+                    Text('Mashqlar yuklanmoqda...'),
+                  ],
+                ),
+              ),
+            ),
           if (_exercises != null)
             Expanded(
               child: _exercises!.isEmpty
@@ -719,25 +738,143 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                         ],
                       ),
                     )
-                  : Row(
+                  : Column(
                       children: [
-                        IconButton(
-                          icon: const Icon(Icons.arrow_back),
-                          onPressed: () {
-                            setState(() {
-                              _exercises = null;
-                            });
-                          },
+                        // Back button and title
+                        Container(
+                          padding: const EdgeInsets.all(16),
+                          child: Row(
+                            children: [
+                              IconButton(
+                                icon: const Icon(Icons.arrow_back),
+                                onPressed: () async {
+                                  setState(() {
+                                    _exercises = null;
+                                    _isLoadingSubCategories = true;
+                                  });
+                                  // Reload subcategories
+                                  try {
+                                    final resp =
+                                        await _levelService.getDaySubCategories(
+                                            _levelDays![_selectedDayIndex].id,
+                                            _selectedLevelId!);
+                                    setState(() {
+                                      _subCategories = resp.data.subCategories;
+                                      _isLoadingSubCategories = false;
+                                    });
+                                  } catch (e) {
+                                    setState(() {
+                                      _isLoadingSubCategories = false;
+                                    });
+                                  }
+                                },
+                              ),
+                              const Text(
+                                "Subkategoriya mashqlari",
+                                style: TextStyle(
+                                    fontWeight: FontWeight.bold, fontSize: 18),
+                              ),
+                            ],
+                          ),
                         ),
-                        const Text(
-                          "Subkategoriya mashqlari",
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold, fontSize: 18),
+                        // Debug info
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 16),
+                          child: Container(
+                            padding: const EdgeInsets.all(8),
+                            color: Colors.yellow[100],
+                            child: Text(
+                              'DEBUG: ${_exercises!.length} ta mashq topildi',
+                              style:
+                                  const TextStyle(fontWeight: FontWeight.bold),
+                            ),
+                          ),
+                        ),
+                        // Exercises list
+                        Expanded(
+                          child: ListView.builder(
+                            padding: const EdgeInsets.all(16),
+                            itemCount: _exercises!.length,
+                            shrinkWrap: true,
+                            itemBuilder: (context, index) {
+                              final exercise = _exercises![index];
+                              return Card(
+                                margin: const EdgeInsets.only(bottom: 16),
+                                shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(16),
+                                ),
+                                elevation: 4,
+                                child: InkWell(
+                                  onTap: () {
+                                    // Navigate to exercise details if needed
+                                  },
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(16),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Expanded(
+                                              child: Text(
+                                                exercise.name,
+                                                style: const TextStyle(
+                                                  fontSize: 18,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                            Container(
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                horizontal: 8,
+                                                vertical: 4,
+                                              ),
+                                              decoration: BoxDecoration(
+                                                color: Theme.of(context)
+                                                    .colorScheme
+                                                    .primary
+                                                    .withOpacity(0.1),
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              child: Text(
+                                                '${(double.parse(exercise.duration) * 60).round()} soniya',
+                                                style: TextStyle(
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .primary,
+                                                  fontWeight: FontWeight.bold,
+                                                ),
+                                              ),
+                                            ),
+                                          ],
+                                        ),
+                                        const SizedBox(height: 8),
+                                        Text(
+                                          exercise.description,
+                                          style: TextStyle(
+                                            color: Theme.of(context)
+                                                .colorScheme
+                                                .onSurface
+                                                .withOpacity(0.7),
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ),
+                              );
+                            },
+                          ),
                         ),
                       ],
                     ),
             ),
-          if (_subCategories != null)
+          if (_subCategories != null && _exercises == null)
             Expanded(
               child: _subCategories!.isEmpty
                   ? Center(
@@ -760,6 +897,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                   : ListView.builder(
                       padding: const EdgeInsets.all(16),
                       itemCount: _subCategories!.length,
+                      shrinkWrap: true,
                       itemBuilder: (context, index) {
                         final sub = _subCategories![index];
                         return Card(
@@ -835,6 +973,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                             onTap: () async {
                               setState(() {
                                 _isLoadingExercises = true;
+                                // Don't hide subcategories immediately
                               });
                               try {
                                 final resp =
@@ -843,30 +982,45 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                                   _selectedLevelId!,
                                   _levelDays![_selectedDayIndex].id,
                                 );
+
+                                // Debug: Print the number of exercises received
+                                print(
+                                    'Exercises received: ${resp.data.exercises.length}');
+                                for (var exercise in resp.data.exercises) {
+                                  print('Exercise: ${exercise.name}');
+                                }
+
                                 setState(() {
+                                  _exercises = resp.data.exercises;
+                                  _subCategories =
+                                      null; // Hide subcategories when exercises are loaded
                                   _isLoadingExercises = false;
                                 });
-                                if (!mounted) return;
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) =>
-                                        SubCategoryExercisesScreen(
-                                      subCategoryName: sub.name,
-                                      exercises: resp.data.exercises,
-                                      isLoadingExercises: _isLoadingExercises,
-                                    ),
-                                  ),
-                                );
                               } catch (e) {
-                                setState(() {
-                                  _isLoadingExercises = false;
-                                });
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                      content: Text(
-                                          "Mashqlarni yuklashda xatolik: $e")),
-                                );
+                                // Reload subcategories on error
+                                try {
+                                  final resp =
+                                      await _levelService.getDaySubCategories(
+                                          _levelDays![_selectedDayIndex].id,
+                                          _selectedLevelId!);
+                                  setState(() {
+                                    _subCategories = resp.data.subCategories;
+                                    _isLoadingExercises = false;
+                                  });
+                                } catch (subError) {
+                                  setState(() {
+                                    _isLoadingExercises = false;
+                                  });
+                                }
+                                print(
+                                    'Error loading exercises: $e'); // Debug print
+                                if (mounted) {
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    SnackBar(
+                                        content: Text(
+                                            "Mashqlarni yuklashda xatolik: $e")),
+                                  );
+                                }
                               }
                             },
                           ),

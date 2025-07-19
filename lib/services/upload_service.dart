@@ -42,17 +42,13 @@ class UploadService {
       request.fields['category'] = category;
 
       final response = await request.send();
-      final responseBody = await response.stream.bytesToString();
 
       if (response.statusCode == 200 || response.statusCode == 201) {
-        print('File uploaded successfully: ${file.path}');
         return true;
       } else {
-        print('Error uploading file: $responseBody');
         return false;
       }
     } catch (e) {
-      print('Exception while uploading file: $e');
       return false;
     }
   }
@@ -61,7 +57,6 @@ class UploadService {
     try {
       final directory = Directory(directoryPath);
       if (!await directory.exists()) {
-        print('Directory does not exist: $directoryPath');
         return false;
       }
 

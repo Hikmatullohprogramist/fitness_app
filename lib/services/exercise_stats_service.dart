@@ -88,11 +88,9 @@ class ExerciseStatsService {
       if (response.statusCode == 200 || response.statusCode == 201) {
         return json.decode(response.body);
       } else {
-        print(response.body);
         throw Exception('Failed to record exercise');
       }
     } catch (e) {
-      print(e);
       throw Exception('Error recording exercise: $e');
     }
   }

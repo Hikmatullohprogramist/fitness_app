@@ -57,7 +57,6 @@ class _SplashScreenState extends State<SplashScreen>
       if (token != null && token.isNotEmpty) {
         Navigator.of(context).pushReplacementNamed('/main');
       } else {
-        print(token);
         Navigator.of(context).pushReplacementNamed('/login');
       }
     }
