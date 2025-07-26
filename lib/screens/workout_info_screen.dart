@@ -2,6 +2,7 @@ import 'package:fitness_app/services/exercise_stats_service.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/models/exercies_model.dart';
 import 'package:lottie/lottie.dart';
+import '../utils/video_extensions.dart';
 
 class WorkoutInfoScreen extends StatefulWidget {
   final Exercise exercise;
@@ -36,6 +37,12 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
             ),
           );
         },
+      );
+    } else if (["mp4", "mov", "webm", "mkv"].contains(ext)) {
+      return url.toVideoPlayerWidget(
+        aspectRatio: 16 / 9,
+        autoPlay: false,
+        looping: false,
       );
     } else {
       return Image.network(
