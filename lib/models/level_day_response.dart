@@ -140,7 +140,7 @@ class Pivot {
     return Pivot(
       dayId: json['day_id'],
       subCategoryId: json['sub_category_id'],
-      duration: json['duration'].toString(),
+      duration: json['duration']?.toString(),
       createdAt: json['created_at'],
       updatedAt: json['updated_at'],
     );

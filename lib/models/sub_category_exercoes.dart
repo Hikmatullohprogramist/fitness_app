@@ -38,9 +38,8 @@ class SubCategoryExercisesData {
       level: LevelShort.fromJson(json['level']),
       day: DayShort.fromJson(json['day']),
       subCategory: SubCategoryDetail.fromJson(json['sub_category']),
-      exercises: (json['exercises'] as List)
-          .map((e) => Exercise.fromJson(e))
-          .toList(),
+      exercises:
+          (json['exercises'] as List).map((e) => Exercise.fromJson(e)).toList(),
     );
   }
 }
@@ -77,7 +76,7 @@ class DayShort {
     return DayShort(
       id: json['id'],
       name: json['name'],
-      duration: json['duration'],
+      duration: json['duration'].toString(),
     );
   }
 }
