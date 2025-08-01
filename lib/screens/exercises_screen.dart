@@ -3,6 +3,7 @@ import 'package:fitness_app/screens/workout_info_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/services/exercises_service.dart';
 import 'package:lottie/lottie.dart';
+import '../utils/video_extensions.dart';
 
 class ExercisesScreen extends StatefulWidget {
   const ExercisesScreen({Key? key}) : super(key: key);
@@ -88,11 +89,11 @@ class _ExercisesScreenState extends State<ExercisesScreen>
   }
 
   List<Exercise> _getExercisesByCategory(String category) {
+    print("category $category");
     return _exercises.where((exercise) {
       final categoryIds = exercise.categories.map((c) {
         print(c.name);
-        return c.id
-        ;
+        return c.id;
       }).toList();
       switch (category) {
         case 'Individual':
@@ -153,7 +154,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
               : TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildExerciseList('individual', theme),
+                    _buildExerciseList('Individual', theme),
                     _buildExerciseList('partner', theme),
                     _buildExerciseList('team', theme),
                   ],
@@ -312,6 +313,12 @@ class _ExercisesScreenState extends State<ExercisesScreen>
             ),
           );
         },
+      );
+    } else if (['mp4', 'mov', 'webm', 'mkv'].contains(ext)) {
+      return url.toVideoPlayerWidget(
+        aspectRatio: 16 / 9,
+        autoPlay: false,
+        looping: false,
       );
     } else {
       return Image.network(

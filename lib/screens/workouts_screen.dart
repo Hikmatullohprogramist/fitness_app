@@ -215,6 +215,11 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
   List<Exercise>? _exercises;
   bool _isLoadingExercises = false;
 
+  // Step counter variables
+  int _currentSteps = 0;
+  int _dailyGoal = 10000;
+  bool _isStepCounterActive = false;
+
   @override
   void initState() {
     super.initState();
@@ -256,6 +261,26 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
     if (progress >= 1.0) return Colors.green;
     if (progress >= 0.7) return Colors.orange;
     return Colors.red;
+  }
+
+  // Step counter methods
+  void _startStepCounter() {
+    // Simulate step counting - in a real app, this would use device sensors
+    Future.delayed(const Duration(seconds: 2), () {
+      if (mounted && _isStepCounterActive) {
+        setState(() {
+          _currentSteps += 10; // Simulate 10 steps every 2 seconds
+        });
+        _startStepCounter(); // Continue counting
+      }
+    });
+  }
+
+  void _stopStepCounter() {
+    // Stop the step counter
+    setState(() {
+      _isStepCounterActive = false;
+    });
   }
 
   @override
@@ -410,6 +435,10 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                       setState(() {
                         _levelDays = resp.data.days;
                         _isLoadingLevelDays = false;
+                        // Automatically select the first day if available
+                        if (resp.data.days.isNotEmpty) {
+                          _selectedDayIndex = 0;
+                        }
                       });
                     } catch (e) {
                       setState(() {
@@ -515,6 +544,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
               itemBuilder: (context, index) {
                 final isSelected = index == _selectedDayIndex;
                 final day = _levelDays![index];
+
                 return Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 6),
                   child: AnimatedContainer(
@@ -535,24 +565,29 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                             _subCategories = null;
                             _exercises = null;
                           });
+
                           try {
                             final resp = await _levelService
                                 .getDaySubCategories(day.id, _selectedLevelId!);
                             setState(() {
                               _subCategories = resp.data.subCategories;
                               _isLoadingSubCategories = false;
-
-                              // Debug: Print the number of subcategories received
-                              print(
-                                  'Subcategories received: ${resp.data.subCategories.length}');
-                              for (var sub in resp.data.subCategories) {
-                                print('Subcategory: ${sub.name}');
-                              }
                             });
                           } catch (e) {
                             setState(() {
                               _isLoadingSubCategories = false;
                             });
+                            if (mounted) {
+                              print(e);
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Subkategoriyalarni yuklashda xatolik: $e'),
+                                  backgroundColor: Colors.red,
+                                  duration: const Duration(seconds: 3),
+                                ),
+                              );
+                            }
                           }
                         },
                         child: SizedBox(
@@ -704,6 +739,136 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           ),
           if (_isLoadingSubCategories)
             const Expanded(child: Center(child: CircularProgressIndicator())),
+          // Step Counter Widget
+          Container(
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            padding: const EdgeInsets.all(16),
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                colors: [
+                  Theme.of(context).primaryColor,
+                  Theme.of(context).primaryColor.withOpacity(0.8),
+                ],
+                begin: Alignment.topLeft,
+                end: Alignment.bottomRight,
+              ),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
+            ),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Row(
+                      children: [
+                        Icon(
+                          Icons.directions_walk,
+                          color: Colors.white,
+                          size: 24,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Kunlik qadamlar',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 18,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Switch(
+                      value: _isStepCounterActive,
+                      onChanged: (value) {
+                        setState(() {
+                          _isStepCounterActive = value;
+                          if (value) {
+                            _startStepCounter();
+                          } else {
+                            _stopStepCounter();
+                          }
+                        });
+                      },
+                      activeColor: Colors.white,
+                      activeTrackColor: Colors.white.withOpacity(0.3),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          '$_currentSteps',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 32,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'qadam',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        Text(
+                          '$_dailyGoal',
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: 24,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
+                        Text(
+                          'maqsad',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                ClipRRect(
+                  borderRadius: BorderRadius.circular(8),
+                  child: LinearProgressIndicator(
+                    value: _currentSteps / _dailyGoal,
+                    backgroundColor: Colors.white.withOpacity(0.3),
+                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                    minHeight: 8,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  '${((_currentSteps / _dailyGoal) * 100).round()}% bajarildi',
+                  style: TextStyle(
+                    color: Colors.white.withOpacity(0.9),
+                    fontSize: 12,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+              ],
+            ),
+          ),
           if (_isLoadingExercises)
             const Expanded(
               child: Center(
@@ -775,19 +940,6 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                                     fontWeight: FontWeight.bold, fontSize: 18),
                               ),
                             ],
-                          ),
-                        ),
-                        // Debug info
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Container(
-                            padding: const EdgeInsets.all(8),
-                            color: Colors.yellow[100],
-                            child: Text(
-                              'DEBUG: ${_exercises!.length} ta mashq topildi',
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold),
-                            ),
                           ),
                         ),
                         // Exercises list
@@ -983,13 +1135,6 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                                   _levelDays![_selectedDayIndex].id,
                                 );
 
-                                // Debug: Print the number of exercises received
-                                print(
-                                    'Exercises received: ${resp.data.exercises.length}');
-                                for (var exercise in resp.data.exercises) {
-                                  print('Exercise: ${exercise.name}');
-                                }
-
                                 setState(() {
                                   _exercises = resp.data.exercises;
                                   _subCategories =
@@ -1012,8 +1157,6 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                                     _isLoadingExercises = false;
                                   });
                                 }
-                                print(
-                                    'Error loading exercises: $e'); // Debug print
                                 if (mounted) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(

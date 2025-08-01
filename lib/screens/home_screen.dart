@@ -221,16 +221,40 @@ class _HomeScreenState extends State<HomeScreen> {
   Widget _buildMenuGrid(
     List<_MenuItem> items,
   ) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final screenHeight = MediaQuery.of(context).size.height;
+
+    // Responsive grid configuration with more conservative aspect ratios
+    int crossAxisCount;
+    double childAspectRatio;
+    double spacing;
+
+    if (screenWidth < 600) {
+      // Mobile phones (portrait and small landscape)
+      crossAxisCount = 2;
+      childAspectRatio = 0.85; // Fixed aspect ratio for mobile
+      spacing = 12;
+    } else if (screenWidth < 900) {
+      // Tablets and large phones
+      crossAxisCount = 3;
+      childAspectRatio = 0.9; // Fixed aspect ratio for tablets
+      spacing = 16;
+    } else {
+      // Large tablets and desktop
+      crossAxisCount = 4;
+      childAspectRatio = 1.0; // Fixed aspect ratio for desktop
+      spacing = 20;
+    }
+
     return GridView.builder(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
-      padding: const EdgeInsets.all(16),
+      padding: EdgeInsets.all(spacing),
       gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-        crossAxisCount: 2,
-        childAspectRatio: MediaQuery.sizeOf(context).width /
-            (MediaQuery.of(context).size.height / 1.9),
-        crossAxisSpacing: 16,
-        mainAxisSpacing: 16,
+        crossAxisCount: crossAxisCount,
+        childAspectRatio: childAspectRatio,
+        crossAxisSpacing: spacing,
+        mainAxisSpacing: spacing,
       ),
       itemCount: items.length,
       itemBuilder: (context, index) {
@@ -283,37 +307,29 @@ class _MenuCard extends StatefulWidget {
   State<_MenuCard> createState() => _MenuCardState();
 }
 
-class _MenuCardState extends State<_MenuCard>
-    with SingleTickerProviderStateMixin {
-  double _scale = 1.0;
-
+class _MenuCardState extends State<_MenuCard> {
   @override
   Widget build(BuildContext context) {
     final Color accent = Theme.of(context).colorScheme.primary;
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _scale = 0.97),
-      onTapUp: (_) => setState(() => _scale = 1.0),
-      onTapCancel: () => setState(() => _scale = 1.0),
+    return InkWell(
       onTap: () {
         Navigator.of(context).pushNamed(widget.item.route);
       },
-      child: AnimatedScale(
-        scale: _scale,
-        duration: const Duration(milliseconds: 120),
-        curve: Curves.easeOut,
-        child: Container(
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(24),
-            boxShadow: [
-              BoxShadow(
-                color: accent.withOpacity(0.18),
-                blurRadius: 18,
-                offset: const Offset(0, 6),
-              ),
-            ],
-            border: Border.all(color: accent.withOpacity(0.35), width: 1.6),
-          ),
+      borderRadius: BorderRadius.circular(24),
+      child: Container(
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(24),
+          boxShadow: [
+            BoxShadow(
+              color: accent.withOpacity(0.18),
+              blurRadius: 18,
+              offset: const Offset(0, 6),
+            ),
+          ],
+          border: Border.all(color: accent.withOpacity(0.35), width: 1.6),
+        ),
+        child: ClipRect(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
@@ -332,18 +348,23 @@ class _MenuCardState extends State<_MenuCard>
                         height: 120,
                       ),
               ),
-              const SizedBox(height: 14),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                child: Text(
-                  widget.item.title,
-                  textAlign: TextAlign.center,
-                  style: const TextStyle(
-                    fontWeight: FontWeight.bold,
-                    fontSize: 14,
+              const SizedBox(height: 12),
+              Flexible(
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                  child: Text(
+                    widget.item.title,
+                    textAlign: TextAlign.center,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                    maxLines: 2,
                   ),
                 ),
               ),
+              const SizedBox(height: 8),
             ],
           ),
         ),
