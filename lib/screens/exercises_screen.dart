@@ -221,7 +221,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
                             top: Radius.circular(16)),
                         child: _buildMediaWidget(
                             exercise.media[0].originalUrl, theme,
-                            height: 300, width: double.infinity),
+                            height: 400, width: double.infinity),
                       ),
                       if (exercise.media.length > 1)
                         Positioned(
@@ -233,7 +233,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
                             ),
                             child: _buildMediaWidget(
                                 exercise.media[1].originalUrl, theme,
-                                height: 100, width: 100),
+                                height: 300, width: 100),
                           ),
                         ),
                     ],

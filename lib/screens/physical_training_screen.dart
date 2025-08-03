@@ -85,44 +85,8 @@ class _PhysicalTrainingScreenState extends State<PhysicalTrainingScreen>
         title: const Text('Jismoniy tayyorgarlik kompleksi'),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: Colors.white,
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white.withOpacity(0.5),
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          labelStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.normal,
-          ),
-          tabs: const [
-            Tab(
-              icon: Icon(Icons.wb_sunny),
-              text: 'Dastlabki',
-            ),
-            Tab(
-              icon: Icon(Icons.fitness_center),
-              text: 'Kuch',
-            ),
-            Tab(
-              icon: Icon(Icons.accessibility_new),
-              text: 'Cho\'zish',
-            ),
-          ],
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildExerciseList('warmup', theme),
-          _buildExerciseList('strength', theme),
-          _buildExerciseList('stretching', theme),
-        ],
-      ),
+      body: _buildExerciseList('warmup', theme),
     );
   }
 
@@ -141,7 +105,7 @@ class _PhysicalTrainingScreenState extends State<PhysicalTrainingScreen>
           ),
           elevation: 4,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
               ClipRRect(
                 borderRadius:

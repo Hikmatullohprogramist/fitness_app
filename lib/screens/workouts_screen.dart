@@ -16,7 +16,6 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
   final ExercisesService _exercisesService = ExercisesService();
   final LevelService _levelService = LevelService();
   bool _isLoading = true;
-  List<Exercise>? _exercisesData;
   String? _error;
 
   final List<Map<String, dynamic>> weekDays = const [
@@ -236,7 +235,6 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       final data = await _exercisesService.getExercises();
 
       setState(() {
-        _exercisesData = List<Exercise>.from(data['exercises']);
         _isLoading = false;
       });
     } catch (e) {
