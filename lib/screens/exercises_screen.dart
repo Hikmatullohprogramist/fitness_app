@@ -20,11 +20,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
   bool _isLoading = true;
   String? _error;
 
-  // Pagination
-  int _currentPage = 1;
-  int _lastPage = 1;
-  bool _isFetchingMore = false;
-  final int _perPage = 10;
+  // Removed pagination variables since we load all exercises at once
 
   final ScrollController _scrollController = ScrollController();
 
@@ -33,7 +29,6 @@ class _ExercisesScreenState extends State<ExercisesScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _loadExercises(reset: true);
-    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -43,69 +38,86 @@ class _ExercisesScreenState extends State<ExercisesScreen>
     super.dispose();
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 200 &&
-        !_isFetchingMore &&
-        _currentPage < _lastPage &&
-        !_isLoading) {
-      _loadExercises();
-    }
-  }
+  // Removed _onScroll method since we load all exercises at once
 
   Future<void> _loadExercises({bool reset = false}) async {
     try {
-      if (reset) {
-        setState(() {
-          _isLoading = true;
-          _error = null;
-          _currentPage = 1;
-          _lastPage = 1;
-          _exercises = [];
-        });
-      } else {
-        setState(() {
-          _isFetchingMore = true;
-        });
-      }
+      setState(() {
+        _isLoading = true;
+        _error = null;
+        _exercises = [];
+      });
+
+      // Load all exercises at once to avoid pagination issues
       final response = await _exercisesService.getExercises(
-          page: _currentPage, perPage: _perPage);
+          page: 1, perPage: 1000); // Load 1000 exercises at once
       final List<Exercise> newExercises =
           List<Exercise>.from(response['exercises']);
+
       setState(() {
-        _exercises.addAll(newExercises);
-        _currentPage = response['currentPage'] + 1;
-        _lastPage = response['lastPage'];
+        _exercises = newExercises; // Replace instead of addAll
         _isLoading = false;
-        _isFetchingMore = false;
       });
+
+      print("Loaded ${newExercises.length} exercises");
+      if (newExercises.isNotEmpty) {
+        print(
+            "First exercise categories: ${newExercises.first.categories.map((c) => '${c.id}:${c.name}').toList()}");
+      }
+
+      // Test individual exercises
+      _testIndividualExercises();
     } catch (e) {
       setState(() {
         _error = e.toString();
         _isLoading = false;
-        _isFetchingMore = false;
       });
     }
   }
 
   List<Exercise> _getExercisesByCategory(String category) {
-    print("category $category");
+    print("Filtering for category: $category");
+    print("Total exercises loaded: ${_exercises.length}");
+
     return _exercises.where((exercise) {
       final categoryIds = exercise.categories.map((c) {
-        print(c.name);
         return c.id;
       }).toList();
+
+      print("Exercise: ${exercise.name}, Category IDs: $categoryIds");
+
       switch (category) {
-        case 'Individual':
-          return categoryIds.contains(1);
+        case 'individual':
+          final hasIndividual = categoryIds.contains(1);
+          print("Individual check for ${exercise.name}: $hasIndividual");
+          return hasIndividual;
         case 'partner':
           return categoryIds.contains(2);
         case 'team':
           return categoryIds.contains(3);
         default:
+          print("Unknown category: $category");
           return false;
       }
     }).toList();
+  }
+
+  // Test method to debug individual exercises
+  void _testIndividualExercises() {
+    print("=== TESTING INDIVIDUAL EXERCISES ===");
+    print("Total exercises: ${_exercises.length}");
+
+    final individualExercises = _exercises.where((exercise) {
+      final categoryIds = exercise.categories.map((c) => c.id).toList();
+      return categoryIds.contains(1);
+    }).toList();
+
+    print("Individual exercises found: ${individualExercises.length}");
+    for (var exercise in individualExercises) {
+      print(
+          "Individual exercise: ${exercise.name}, Categories: ${exercise.categories.map((c) => '${c.id}:${c.name}').toList()}");
+    }
+    print("=== END TEST ===");
   }
 
   @override
@@ -117,6 +129,13 @@ class _ExercisesScreenState extends State<ExercisesScreen>
         title: const Text('Mashqlar'),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: Colors.white,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.bug_report),
+            onPressed: _testIndividualExercises,
+            tooltip: 'Debug Individual Exercises',
+          ),
+        ],
         bottom: TabBar(
           controller: _tabController,
           labelColor: Colors.white,
@@ -154,7 +173,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
               : TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildExerciseList('Individual', theme),
+                    _buildExerciseList('individual', theme),
                     _buildExerciseList('partner', theme),
                     _buildExerciseList('team', theme),
                   ],
@@ -185,15 +204,8 @@ class _ExercisesScreenState extends State<ExercisesScreen>
     return ListView.builder(
       controller: _scrollController,
       padding: const EdgeInsets.all(16),
-      itemCount: categoryExercises.length +
-          (_isFetchingMore && _currentPage <= _lastPage ? 1 : 0),
+      itemCount: categoryExercises.length,
       itemBuilder: (context, index) {
-        if (index == categoryExercises.length) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
         final exercise = categoryExercises[index];
         return Card(
           margin: const EdgeInsets.only(bottom: 16),
@@ -203,6 +215,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
           elevation: 4,
           child: InkWell(
             onTap: () {
+              print("navigat");
               Navigator.push(
                 context,
                 MaterialPageRoute(
@@ -214,29 +227,32 @@ class _ExercisesScreenState extends State<ExercisesScreen>
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (exercise.media.isNotEmpty)
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(16)),
-                        child: _buildMediaWidget(
-                            exercise.media[0].originalUrl, theme,
-                            height: 400, width: double.infinity),
-                      ),
-                      if (exercise.media.length > 1)
-                        Positioned(
-                          top: 0,
-                          right: 0,
-                          child: ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topRight: Radius.circular(16),
-                            ),
-                            child: _buildMediaWidget(
-                                exercise.media[1].originalUrl, theme,
-                                height: 300, width: 100),
-                          ),
+                  Container(
+                    height: 400,
+                    child: Stack(
+                      children: [
+                        ClipRRect(
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(16)),
+                          child: _buildMediaWidget(
+                              exercise.media[0].originalUrl, theme,
+                              height: 400, width: double.infinity),
                         ),
-                    ],
+                        if (exercise.media.length > 1)
+                          Positioned(
+                            top: 0,
+                            right: 0,
+                            child: ClipRRect(
+                              borderRadius: const BorderRadius.only(
+                                topRight: Radius.circular(16),
+                              ),
+                              child: _buildMediaWidget(
+                                  exercise.media[1].originalUrl, theme,
+                                  height: 300, width: 100),
+                            ),
+                          ),
+                      ],
+                    ),
                   ),
                 Padding(
                   padding: const EdgeInsets.all(16),
@@ -248,7 +264,11 @@ class _ExercisesScreenState extends State<ExercisesScreen>
                         children: [
                           Expanded(
                             child: Text(
-                              exercise.name,
+                              exercise.categories.any((c) => c.id == 1)
+                                  ? exercise.name
+                                  : exercise.categories.isNotEmpty
+                                      ? exercise.categories.first.name
+                                      : exercise.name,
                               style: const TextStyle(
                                 fontSize: 18,
                                 fontWeight: FontWeight.bold,
@@ -295,50 +315,64 @@ class _ExercisesScreenState extends State<ExercisesScreen>
   Widget _buildMediaWidget(String url, ThemeData theme,
       {double? height, double? width}) {
     final ext = url.split('.').last.toLowerCase();
-    if (ext == 'json') {
-      return Lottie.network(
-        url,
-        height: height,
-        width: width,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            height: height,
-            width: width,
-            color: theme.colorScheme.surfaceVariant,
-            child: Icon(
-              Icons.fitness_center,
-              size: 48,
-              color: theme.colorScheme.primary,
-            ),
-          );
-        },
-      );
-    } else if (['mp4', 'mov', 'webm', 'mkv'].contains(ext)) {
-      return url.toVideoPlayerWidget(
-        aspectRatio: 16 / 9,
-        autoPlay: false,
-        looping: false,
-      );
-    } else {
-      return Image.network(
-        url,
-        height: height,
-        width: width,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            height: height,
-            width: width,
-            color: theme.colorScheme.surfaceVariant,
-            child: Icon(
-              Icons.fitness_center,
-              size: 48,
-              color: theme.colorScheme.primary,
-            ),
-          );
-        },
-      );
+
+    // Wrap all widgets in a Container with proper constraints
+    Widget buildWidget() {
+      if (ext == 'json') {
+        return Lottie.network(
+          url,
+          height: height,
+          width: width,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              height: height,
+              width: width,
+              color: theme.colorScheme.surfaceVariant,
+              child: Icon(
+                Icons.fitness_center,
+                size: 48,
+                color: theme.colorScheme.primary,
+              ),
+            );
+          },
+        );
+      } else if (['mp4', 'mov', 'webm', 'mkv'].contains(ext)) {
+        return Container(
+          height: height,
+          width: width,
+          child: url.toVideoPlayerWidget(
+            aspectRatio: 16 / 9,
+            autoPlay: false,
+            looping: false,
+          ),
+        );
+      } else {
+        return Image.network(
+          url,
+          height: height,
+          width: width,
+          fit: BoxFit.cover,
+          errorBuilder: (context, error, stackTrace) {
+            return Container(
+              height: height,
+              width: width,
+              color: theme.colorScheme.surfaceVariant,
+              child: Icon(
+                Icons.fitness_center,
+                size: 48,
+                color: theme.colorScheme.primary,
+              ),
+            );
+          },
+        );
+      }
     }
+
+    return Container(
+      height: height,
+      width: width,
+      child: buildWidget(),
+    );
   }
 }
