@@ -1,4 +1,7 @@
 // success: true, message: Exercises retrieved successfully, data: {current_page: 1, data: [{id: 5, name: Team exercies, duration: 20, category_ids: null, created_at: 2025-05-21T04:00:56.000000Z, updated_at: 2025-05-21T04:00:56.000000Z, description: asdasdas, vacation_time: 20, count: 200, media: [{id: 5, model_type: App\Models\Exercise, model_id: 5, uuid: 23a919b1-41ad-4dc7-90a3-32d6dbdd4d2c, collection_name: media, name: 12, file_name: 01JVRG0RB0VTAQM09TJ4228HVW.png, mime_type: image/png, disk: public, conversions_disk: public, size: 590762, manipulations: [], custom_properties: [], generated_conversions: {thumb: true, preview: true}, responsive_images: [], order_column: 1, created_at: 2025-05-21T04:00:56.000000Z, updated_at: 2025-05-21T04:00:56.000000Z, original_url: https://fitnes.bizsoft.uz/storage/5/01JVRG0RB0VTAQM09TJ4228HVW.png, preview_url: https://fitnes.bizsoft.uz/storage/5/conversions/01JVRG0RB0VTAQM09TJ4228HVW-preview.jpg}], categories: [{id: 2, name: Jamoaviy mashqlar , created_at: 2025-05-14T05
+import 'package:fitness_app/models/normalize.dart';
+import 'package:path/path.dart' hide normalize;
+
 class Exercise {
   final int id;
   final String name;
@@ -11,22 +14,26 @@ class Exercise {
   final int count;
   final List<Media> media;
   final List<Category> categories;
+  double met;
 
-  Exercise({
-    required this.id,
-    required this.name,
-    required this.duration,
-    this.categoryIds,
-    required this.createdAt,
-    required this.updatedAt,
-    required this.description,
-    required this.vacationTime,
-    required this.count,
-    required this.media,
-    required this.categories,
-  });
+  Exercise(
+      {required this.id,
+      required this.name,
+      required this.duration,
+      this.categoryIds,
+      required this.createdAt,
+      required this.updatedAt,
+      required this.description,
+      required this.vacationTime,
+      required this.count,
+      required this.media,
+      required this.categories,
+      this.met = 1.0});
 
   factory Exercise.fromJson(Map<String, dynamic> json) {
+    print(normalize(
+        "normalized ${json["name"] ?? ""} ${json["description"] ?? ""}"));
+
     return Exercise(
       id: json['id'],
       name: json['name'],
@@ -45,6 +52,11 @@ class Exercise {
       categories: (json['categories'] as List)
           .map((category) => Category.fromJson(category))
           .toList(),
+
+      met: getMetValue(
+        normalize(json['name'] ?? ""),
+        json['description'] ?? "",
+      ), // avtomatik hisoblanadi
     );
   }
 }

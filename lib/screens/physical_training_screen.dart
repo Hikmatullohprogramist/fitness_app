@@ -1,5 +1,9 @@
+import 'package:fitness_app/utils/video_extensions.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+
+import '../models/exercies_model.dart';
+import '../services/exercises_service.dart';
 
 class PhysicalTrainingScreen extends StatefulWidget {
   const PhysicalTrainingScreen({Key? key}) : super(key: key);
@@ -11,64 +15,75 @@ class PhysicalTrainingScreen extends StatefulWidget {
 class _PhysicalTrainingScreenState extends State<PhysicalTrainingScreen>
     with TickerProviderStateMixin {
   late TabController _tabController;
+  final ExercisesService _exercisesService = ExercisesService();
+  List<Exercise> _exercises = [];
+  bool _isLoading = true;
+  String? _error;
+
+  // Pagination
+  int _currentPage = 1;
+  int _lastPage = 1;
+  bool _isFetchingMore = false;
+  final int _perPage = 1000; // load many to include subcategory 51
+
+  final ScrollController _scrollController = ScrollController();
 
   // Example data - replace with your actual data
-  final Map<String, List<Map<String, dynamic>>> exercises = {
-    'warmup': [
-      {
-        'title': 'Bo\'yni mashq qilish',
-        'description': 'Bo\'yni aylantirish va egish mashqlari',
-        'animation': 'assets/animations/loading.json',
-        'duration': '5 daqiqa',
-        'repetitions': '10 marta',
-      },
-      {
-        'title': 'Yelka mashqlari',
-        'description': 'Yelkalarni aylantirish va cho\'zish',
-        'animation': 'assets/animations/loading.json',
-        'duration': '5 daqiqa',
-        'repetitions': '12 marta',
-      },
-    ],
-    'strength': [
-      {
-        'title': 'Mana qo\'yish',
-        'description': 'To\'g\'ri mana qo\'yish texnikasi',
-        'animation': 'assets/animations/loading.json',
-        'duration': '10 daqiqa',
-        'repetitions': '3 set, 15 marta',
-      },
-      {
-        'title': 'Squat',
-        'description': 'To\'g\'ri squat texnikasi',
-        'animation': 'assets/animations/loading.json',
-        'duration': '10 daqiqa',
-        'repetitions': '3 set, 20 marta',
-      },
-    ],
-    'stretching': [
-      {
-        'title': 'Oyoq cho\'zish',
-        'description': 'Oyoqlarni cho\'zish mashqlari',
-        'animation': 'assets/animations/loading.json',
-        'duration': '8 daqiqa',
-        'repetitions': 'Har bir oyoq uchun 5 marta',
-      },
-      {
-        'title': 'Orqa cho\'zish',
-        'description': 'Orqani cho\'zish mashqlari',
-        'animation': 'assets/animations/loading.json',
-        'duration': '8 daqiqa',
-        'repetitions': '10 marta',
-      },
-    ],
-  };
 
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _loadExercises(reset: true); // <-- Fix: load exercises on init
+    _scrollController.addListener(_onScroll);
   }
+
+  Future<void> _loadExercises({bool reset = false}) async {
+    try {
+      if (reset) {
+        setState(() {
+          _isLoading = true;
+          _error = null;
+          _currentPage = 1;
+          _lastPage = 1;
+          _exercises = [];
+        });
+      } else {
+        setState(() {
+          _isFetchingMore = true;
+        });
+      }
+      final response = await _exercisesService.getExercises(
+          page: _currentPage, perPage: _perPage);
+      final List<Exercise> newExercises =
+          List<Exercise>.from(response['exercises']);
+      setState(() {
+        _exercises.addAll(newExercises);
+        _currentPage = response['currentPage'] + 1;
+        _lastPage = response['lastPage'];
+        _isLoading = false;
+        _isFetchingMore = false;
+      });
+    } catch (e) {
+      setState(() {
+        _error = e.toString();
+        _isLoading = false;
+        _isFetchingMore = false;
+      });
+    }
+  }
+
+  void _onScroll() {
+    if (_scrollController.position.pixels >=
+            _scrollController.position.maxScrollExtent - 200 &&
+        !_isFetchingMore &&
+        _currentPage < _lastPage &&
+        !_isLoading) {
+      _loadExercises();
+    }
+  }
+
+  // Removed unused _getExercisesByCategory
 
   @override
   void dispose() {
@@ -82,56 +97,44 @@ class _PhysicalTrainingScreenState extends State<PhysicalTrainingScreen>
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Jismoniy tayyorgarlik kompleksi'),
+        title: const Text('Jismoniy tarbiya daqiqalari kompleksi'),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: Colors.white,
-        bottom: TabBar(
-          controller: _tabController,
-          labelColor: Colors.white,
-          unselectedLabelColor: Colors.white.withOpacity(0.5),
-          indicatorColor: Colors.white,
-          indicatorWeight: 3,
-          labelStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.bold,
-          ),
-          unselectedLabelStyle: const TextStyle(
-            fontSize: 16,
-            fontWeight: FontWeight.normal,
-          ),
-          tabs: const [
-            Tab(
-              icon: Icon(Icons.wb_sunny),
-              text: 'Dastlabki',
-            ),
-            Tab(
-              icon: Icon(Icons.fitness_center),
-              text: 'Kuch',
-            ),
-            Tab(
-              icon: Icon(Icons.accessibility_new),
-              text: 'Cho\'zish',
-            ),
-          ],
-        ),
       ),
-      body: TabBarView(
-        controller: _tabController,
-        children: [
-          _buildExerciseList('warmup', theme),
-          _buildExerciseList('strength', theme),
-          _buildExerciseList('stretching', theme),
-        ],
-      ),
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : _error != null
+              ? Center(child: Text(_error!))
+              : _buildExerciseList('warmup', theme),
     );
   }
 
   Widget _buildExerciseList(String category, ThemeData theme) {
-    final categoryExercises = exercises[category] ?? [];
+    // Show only 'Jismoniy tarbiya daqiqalari' subcategory (id: 51)
+    List<Exercise> categoryExercises = _exercises
+        .where((exercise) => exercise.categories.any((c) => c.id == 51))
+        .toList();
+
+    if (categoryExercises.isEmpty) {
+      categoryExercises = _exercises
+          .where((e) => e.name.toLowerCase().contains('jismoniy tarbiya'))
+          .toList();
+    }
+
+    if (categoryExercises.isEmpty) {
+      return Center(
+        child: Text(
+          "Jismoniy tarbiya daqiqalari topilmadi",
+          style: TextStyle(
+            color: theme.colorScheme.onSurface.withOpacity(0.7),
+          ),
+        ),
+      );
+    }
 
     return ListView.builder(
       padding: const EdgeInsets.all(16),
-      itemCount: categoryExercises.length,
+      itemCount: categoryExercises.reversed.toList().length,
       itemBuilder: (context, index) {
         final exercise = categoryExercises[index];
         return Card(
@@ -141,29 +144,40 @@ class _PhysicalTrainingScreenState extends State<PhysicalTrainingScreen>
           ),
           elevation: 4,
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(16)),
-                child: Container(
-                  height: 200,
-                  color: theme.colorScheme.surfaceVariant,
-                  child: Lottie.asset(
-                    exercise['animation'],
-                    fit: BoxFit.contain,
-                    repeat: true,
-                    animate: true,
-                  ),
+              if (exercise.media.isNotEmpty)
+                Stack(
+                  children: [
+                    ClipRRect(
+                      borderRadius:
+                          const BorderRadius.vertical(top: Radius.circular(16)),
+                      child: _buildMediaWidget(
+                          exercise.media[0].originalUrl, theme,
+                          height: 400, width: double.infinity),
+                    ),
+                    if (exercise.media.length > 1)
+                      Positioned(
+                        top: 0,
+                        right: 0,
+                        child: ClipRRect(
+                          borderRadius: const BorderRadius.only(
+                            topRight: Radius.circular(16),
+                          ),
+                          child: _buildMediaWidget(
+                              exercise.media[1].originalUrl, theme,
+                              height: 300, width: 100),
+                        ),
+                      ),
+                  ],
                 ),
-              ),
               Padding(
                 padding: const EdgeInsets.all(16),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      exercise['title'],
+                      exercise.name,
                       style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -171,10 +185,11 @@ class _PhysicalTrainingScreenState extends State<PhysicalTrainingScreen>
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      exercise['description'],
+                      exercise.description,
                       style: TextStyle(
-                        color: theme.colorScheme.onSurface.withOpacity(0.7),
-                      ),
+                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                          fontSize: 12),
+                      textAlign: TextAlign.justify,
                     ),
                     const SizedBox(height: 16),
                     SingleChildScrollView(
@@ -184,13 +199,14 @@ class _PhysicalTrainingScreenState extends State<PhysicalTrainingScreen>
                         children: [
                           _buildInfoChip(
                             icon: Icons.timer,
-                            label: exercise['duration'],
+                            label:
+                                '${_roundToDurationBucket((double.parse(exercise.duration) * 60).round())} soniya',
                             theme: theme,
                           ),
                           const SizedBox(width: 8),
                           _buildInfoChip(
                             icon: Icons.repeat,
-                            label: exercise['repetitions'],
+                            label: "${exercise.count - 2} ~ ${exercise.count}",
                             theme: theme,
                           ),
                         ],
@@ -206,6 +222,103 @@ class _PhysicalTrainingScreenState extends State<PhysicalTrainingScreen>
     );
   }
 
+  int _roundToDurationBucket(int seconds) {
+    if (seconds >= 40 && seconds < 45) return 40;
+    if (seconds >= 45 && seconds < 50) return 45;
+    if (seconds >= 50 && seconds < 55) return 50;
+    if (seconds >= 55 && seconds <= 60) return 60;
+    return seconds;
+  }
+
+  int _toMinutes(String duration) {
+    final value = double.tryParse(duration) ?? 0;
+    if (value <= 0) return 0;
+    return value > 60 ? (value / 60).round() : value.round();
+  }
+
+// ... existing code ...
+  Widget _buildMediaWidget(String url, ThemeData theme,
+      {double? height, double? width}) {
+    final ext = url.split('.').last.toLowerCase();
+
+    if (ext == 'json') {
+      return Lottie.network(
+        url,
+        height: height,
+        width: width,
+        fit: BoxFit.cover,
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            height: height,
+            width: width,
+            color: theme.colorScheme.surfaceVariant,
+            child: Icon(
+              Icons.fitness_center,
+              size: 48,
+              color: theme.colorScheme.primary,
+            ),
+          );
+        },
+      );
+    } else if (['mp4', 'mov', 'webm', 'mkv'].contains(ext)) {
+      return url.toVideoPlayerWidget(
+        aspectRatio: 16 / 9,
+        autoPlay: false,
+        looping: false,
+      );
+    } else {
+      return Image.network(
+        url,
+        height: height,
+        width: width,
+        fit: BoxFit.cover,
+        loadingBuilder: (context, child, loadingProgress) {
+          if (loadingProgress == null) return child;
+          return Container(
+            height: height,
+            width: width,
+            color: theme.colorScheme.surfaceVariant,
+            child: Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  CircularProgressIndicator(
+                    value: loadingProgress.expectedTotalBytes != null
+                        ? loadingProgress.cumulativeBytesLoaded /
+                            loadingProgress.expectedTotalBytes!
+                        : null,
+                    color: theme.colorScheme.primary,
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    'Yuklanmoqda...',
+                    style: TextStyle(
+                      color: theme.colorScheme.primary,
+                      fontSize: 12,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          );
+        },
+        errorBuilder: (context, error, stackTrace) {
+          return Container(
+            height: height,
+            width: width,
+            color: theme.colorScheme.surfaceVariant,
+            child: Icon(
+              Icons.fitness_center,
+              size: 48,
+              color: theme.colorScheme.primary,
+            ),
+          );
+        },
+      );
+    }
+  }
+
+// ... existing code ...
   Widget _buildInfoChip({
     required IconData icon,
     required String label,

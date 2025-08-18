@@ -8,7 +8,7 @@ plugins {
 android {
     namespace = "com.flutterchiaka.fitnessapp.fitness_app"
     compileSdk = flutter.compileSdkVersion
-    ndkVersion = flutter.ndkVersion
+    ndkVersion = "25.1.8937393"
 
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11

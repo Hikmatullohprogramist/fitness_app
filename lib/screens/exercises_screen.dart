@@ -20,11 +20,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
   bool _isLoading = true;
   String? _error;
 
-  // Pagination
-  int _currentPage = 1;
-  int _lastPage = 1;
-  bool _isFetchingMore = false;
-  final int _perPage = 10;
+  // Removed pagination variables since we load all exercises at once
 
   final ScrollController _scrollController = ScrollController();
 
@@ -33,7 +29,6 @@ class _ExercisesScreenState extends State<ExercisesScreen>
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
     _loadExercises(reset: true);
-    _scrollController.addListener(_onScroll);
   }
 
   @override
@@ -43,69 +38,94 @@ class _ExercisesScreenState extends State<ExercisesScreen>
     super.dispose();
   }
 
-  void _onScroll() {
-    if (_scrollController.position.pixels >=
-            _scrollController.position.maxScrollExtent - 200 &&
-        !_isFetchingMore &&
-        _currentPage < _lastPage &&
-        !_isLoading) {
-      _loadExercises();
-    }
-  }
+  // Removed _onScroll method since we load all exercises at once
 
   Future<void> _loadExercises({bool reset = false}) async {
     try {
-      if (reset) {
-        setState(() {
-          _isLoading = true;
-          _error = null;
-          _currentPage = 1;
-          _lastPage = 1;
-          _exercises = [];
-        });
-      } else {
-        setState(() {
-          _isFetchingMore = true;
-        });
-      }
+      setState(() {
+        _isLoading = true;
+        _error = null;
+        _exercises = [];
+      });
+
+      // Load all exercises at once to avoid pagination issues
       final response = await _exercisesService.getExercises(
-          page: _currentPage, perPage: _perPage);
+          page: 1, perPage: 1000); // Load 1000 exercises at once
       final List<Exercise> newExercises =
           List<Exercise>.from(response['exercises']);
+
       setState(() {
-        _exercises.addAll(newExercises);
-        _currentPage = response['currentPage'] + 1;
-        _lastPage = response['lastPage'];
+        _exercises = newExercises; // Replace instead of addAll
         _isLoading = false;
-        _isFetchingMore = false;
       });
+
+      print("Loaded ${newExercises.length} exercises");
+      if (newExercises.isNotEmpty) {
+        print(
+            "First exercise categories: ${newExercises.first.categories.map((c) => '${c.id}:${c.name}').toList()}");
+      }
+
+      // Test individual exercises
+      _testIndividualExercises();
     } catch (e) {
       setState(() {
         _error = e.toString();
         _isLoading = false;
-        _isFetchingMore = false;
       });
     }
   }
 
+  int _roundToDurationBucket(int seconds) {
+    if (seconds >= 40 && seconds < 45) return 40;
+    if (seconds >= 45 && seconds < 50) return 45;
+    if (seconds >= 50 && seconds < 55) return 50;
+    if (seconds >= 55 && seconds <= 60) return 60;
+    return seconds;
+  }
+
   List<Exercise> _getExercisesByCategory(String category) {
-    print("category $category");
+    print("Filtering for category: $category");
+    print("Total exercises loaded: ${_exercises.length}");
+
     return _exercises.where((exercise) {
       final categoryIds = exercise.categories.map((c) {
-        print(c.name);
         return c.id;
       }).toList();
+
+      print("Exercise: ${exercise.name}, Category IDs: $categoryIds");
+
       switch (category) {
-        case 'Individual':
-          return categoryIds.contains(1);
+        case 'individual':
+          final hasIndividual = categoryIds.contains(1);
+          print("Individual check for ${exercise.name}: $hasIndividual");
+          return hasIndividual;
         case 'partner':
           return categoryIds.contains(2);
         case 'team':
           return categoryIds.contains(3);
         default:
+          print("Unknown category: $category");
           return false;
       }
     }).toList();
+  }
+
+  // Test method to debug individual exercises
+  void _testIndividualExercises() {
+    print("=== TESTING INDIVIDUAL EXERCISES ===");
+    print("Total exercises: ${_exercises.length}");
+
+    final individualExercises = _exercises.where((exercise) {
+      final categoryIds = exercise.categories.map((c) => c.id).toList();
+      return categoryIds.contains(1);
+    }).toList();
+
+    print("Individual exercises found: ${individualExercises.length}");
+    for (var exercise in individualExercises) {
+      print(
+          "Individual exercise: ${exercise.name}, Categories: ${exercise.categories.map((c) => '${c.id}:${c.name}').toList()}");
+    }
+    print("=== END TEST ===");
   }
 
   @override
@@ -117,6 +137,13 @@ class _ExercisesScreenState extends State<ExercisesScreen>
         title: const Text('Mashqlar'),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: Colors.white,
+        // actions: [
+        //   IconButton(
+        //     icon: const Icon(Icons.bug_report),
+        //     onPressed: _testIndividualExercises,
+        //     tooltip: 'Debug Individual Exercises',
+        //   ),
+        // ],
         bottom: TabBar(
           controller: _tabController,
           labelColor: Colors.white,
@@ -154,7 +181,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
               : TabBarView(
                   controller: _tabController,
                   children: [
-                    _buildExerciseList('Individual', theme),
+                    _buildExerciseList('individual', theme),
                     _buildExerciseList('partner', theme),
                     _buildExerciseList('team', theme),
                   ],
@@ -182,163 +209,240 @@ class _ExercisesScreenState extends State<ExercisesScreen>
       );
     }
 
-    return ListView.builder(
-      controller: _scrollController,
-      padding: const EdgeInsets.all(16),
-      itemCount: categoryExercises.length +
-          (_isFetchingMore && _currentPage <= _lastPage ? 1 : 0),
-      itemBuilder: (context, index) {
-        if (index == categoryExercises.length) {
-          return const Padding(
-            padding: EdgeInsets.symmetric(vertical: 16),
-            child: Center(child: CircularProgressIndicator()),
-          );
-        }
-        final exercise = categoryExercises[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
+    // Group by subcategory name (exclude only the current main category id)
+    final int mainCategoryId = _mainCategoryIdForTab(category);
+    final Map<String, List<Exercise>> subcategoryToExercises = {};
+    for (final exercise in categoryExercises) {
+      final subcategoryName = _getSubcategoryName(exercise, mainCategoryId);
+      subcategoryToExercises.putIfAbsent(subcategoryName, () => []);
+      subcategoryToExercises[subcategoryName]!.add(exercise);
+    }
+
+    final List<String> sortedSubcategories = subcategoryToExercises.keys
+        .toList()
+      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+
+    final List<Widget> children = [];
+    for (final subcat in sortedSubcategories) {
+      children.add(
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+          child: Text(
+            subcat,
+            style: const TextStyle(
+              fontSize: 20,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-          elevation: 4,
-          child: InkWell(
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => WorkoutInfoScreen(exercise: exercise),
-                ),
-              );
-            },
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                if (exercise.media.isNotEmpty)
-                  Stack(
-                    children: [
-                      ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(16)),
-                        child: _buildMediaWidget(
-                            exercise.media[0].originalUrl, theme,
-                            height: 300, width: double.infinity),
-                      ),
-                      if (exercise.media.length > 1)
-                        Positioned(
-                          top: 0,
-                          right: 0,
-                          child: ClipRRect(
-                            borderRadius: const BorderRadius.only(
-                              topRight: Radius.circular(16),
-                            ),
-                            child: _buildMediaWidget(
-                                exercise.media[1].originalUrl, theme,
-                                height: 100, width: 100),
-                          ),
-                        ),
-                    ],
+        ),
+      );
+
+      final exercisesInSubcat = subcategoryToExercises[subcat]!;
+      for (final exercise in exercisesInSubcat) {
+        children.add(
+          Card(
+            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 4,
+            child: InkWell(
+              onTap: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => WorkoutInfoScreen(exercise: exercise),
                   ),
-                Padding(
-                  padding: const EdgeInsets.all(16),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                );
+              },
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  if (exercise.media.isNotEmpty)
+                    SizedBox(
+                      height: 400,
+                      child: Stack(
                         children: [
-                          Expanded(
-                            child: Text(
-                              exercise.name,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(16)),
+                            child: _buildMediaWidget(
+                                exercise.media[0].originalUrl, theme,
+                                height: 400, width: double.infinity),
+                          ),
+                          if (exercise.media.length > 1)
+                            Positioned(
+                              top: 0,
+                              right: 0,
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.only(
+                                  topRight: Radius.circular(16),
+                                ),
+                                child: _buildMediaWidget(
+                                    exercise.media[1].originalUrl, theme,
+                                    height: 300, width: 100),
                               ),
                             ),
-                          ),
-                          Container(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
-                              vertical: 4,
-                            ),
-                            decoration: BoxDecoration(
-                              color: theme.colorScheme.primary.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(8),
-                            ),
-                            child: Text(
-                              '${(double.parse(exercise.duration) * 60).round()} soniya',
-                              style: TextStyle(
-                                color: theme.colorScheme.primary,
-                                fontWeight: FontWeight.bold,
-                              ),
-                            ),
-                          ),
                         ],
                       ),
-                      const SizedBox(height: 8),
-                      Text(
-                        exercise.description,
-                        style: TextStyle(
-                          color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: Text(
+                                exercise.name,
+                                style: const TextStyle(
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                            Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 8,
+                                vertical: 4,
+                              ),
+                              decoration: BoxDecoration(
+                                color:
+                                    theme.colorScheme.primary.withOpacity(0.1),
+                                borderRadius: BorderRadius.circular(8),
+                              ),
+                              child: Text(
+                                '${_roundToDurationBucket((double.parse(exercise.duration) * 60).round())} soniya',
+                                style: TextStyle(
+                                  color: theme.colorScheme.primary,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
+                            ),
+                          ],
                         ),
-                      ),
-                    ],
+                        const SizedBox(height: 8),
+                        Text(
+                          exercise.description,
+                          style: TextStyle(
+                              color:
+                                  theme.colorScheme.onSurface.withOpacity(0.7),
+                              fontSize: 12),
+                          textAlign: TextAlign.justify,
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-              ],
+                ],
+              ),
             ),
           ),
         );
-      },
+      }
+    }
+
+    return ListView(
+      controller: _scrollController,
+      children: children,
     );
+  }
+
+  String _getSubcategoryName(Exercise exercise, int currentMainCategoryId) {
+    // Exclude only the current tab's main category id and pick the first remaining as subcategory
+    final sub = exercise.categories
+        .where((c) => c.id != currentMainCategoryId)
+        .toList();
+    if (sub.isNotEmpty) {
+      return sub.first.name.trim();
+    }
+    // Fallback: group by exercise name if no subcategory present in API
+    return exercise.name.trim();
+  }
+
+  int _mainCategoryIdForTab(String categoryKey) {
+    switch (categoryKey) {
+      case 'individual':
+        return 1;
+      case 'partner':
+        return 2;
+      case 'team':
+        return 3;
+      default:
+        return -1; // Unknown, don't exclude anything
+    }
   }
 
   Widget _buildMediaWidget(String url, ThemeData theme,
       {double? height, double? width}) {
     final ext = url.split('.').last.toLowerCase();
-    if (ext == 'json') {
-      return Lottie.network(
-        url,
-        height: height,
-        width: width,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
+
+    // Wrap all widgets in a Container with proper constraints
+    Widget buildWidget() {
+      if (ext == 'json') {
+        return Container(
+          height: height,
+          width: width,
+          color: theme.colorScheme.surfaceVariant,
+          alignment: Alignment.center,
+          child: Lottie.network(
+            url,
             height: height,
             width: width,
-            color: theme.colorScheme.surfaceVariant,
-            child: Icon(
-              Icons.fitness_center,
-              size: 48,
-              color: theme.colorScheme.primary,
+            fit: BoxFit.contain,
+            errorBuilder: (context, error, stackTrace) {
+              return Icon(
+                Icons.fitness_center,
+                size: 48,
+                color: theme.colorScheme.primary,
+              );
+            },
+          ),
+        );
+      } else if (['mp4', 'mov', 'webm', 'mkv'].contains(ext)) {
+        return Container(
+          height: height,
+          width: width,
+          color: theme.colorScheme.surfaceVariant,
+          alignment: Alignment.center,
+          child: AspectRatio(
+            aspectRatio: 16 / 9,
+            child: url.toVideoPlayerWidget(
+              aspectRatio: 16 / 9,
+              autoPlay: false,
+              looping: false,
             ),
-          );
-        },
-      );
-    } else if (['mp4', 'mov', 'webm', 'mkv'].contains(ext)) {
-      return url.toVideoPlayerWidget(
-        aspectRatio: 16 / 9,
-        autoPlay: false,
-        looping: false,
-      );
-    } else {
-      return Image.network(
-        url,
-        height: height,
-        width: width,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
+          ),
+        );
+      } else {
+        return Container(
+          height: height,
+          width: width,
+          color: theme.colorScheme.surfaceVariant,
+          alignment: Alignment.center,
+          child: Image.network(
+            url,
             height: height,
             width: width,
-            color: theme.colorScheme.surfaceVariant,
-            child: Icon(
-              Icons.fitness_center,
-              size: 48,
-              color: theme.colorScheme.primary,
-            ),
-          );
-        },
-      );
+            fit: BoxFit.contain,
+            filterQuality: FilterQuality.high,
+            errorBuilder: (context, error, stackTrace) {
+              return Icon(
+                Icons.fitness_center,
+                size: 48,
+                color: theme.colorScheme.primary,
+              );
+            },
+          ),
+        );
+      }
     }
+
+    return SizedBox(
+      height: height,
+      width: width,
+      child: buildWidget(),
+    );
   }
 }

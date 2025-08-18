@@ -2,8 +2,8 @@ import 'package:fitness_app/models/day_subcategory.dart';
 import 'package:fitness_app/models/exercies_model.dart';
 import 'package:fitness_app/models/level_day_response.dart';
 import 'package:fitness_app/services/leve_service.dart';
+import 'package:fitness_app/screens/subcategory_exercises_screen.dart';
 import 'package:flutter/material.dart';
-import 'package:fitness_app/services/exercises_service.dart';
 
 class WorkoutsScreen extends StatefulWidget {
   const WorkoutsScreen({super.key});
@@ -13,10 +13,7 @@ class WorkoutsScreen extends StatefulWidget {
 }
 
 class _WorkoutsScreenState extends State<WorkoutsScreen> {
-  final ExercisesService _exercisesService = ExercisesService();
   final LevelService _levelService = LevelService();
-  bool _isLoading = true;
-  List<Exercise>? _exercisesData;
   String? _error;
 
   final List<Map<String, dynamic>> weekDays = const [
@@ -55,19 +52,28 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       'date': '16',
       'month': 'Aprel',
       'icon': Icons.calendar_today,
-      'totalTime': '0 daqiqa',
+      'totalTime': '20 daqiqa',
       'optimalTime': 25,
       'category': 'Yoga',
       'categoryIcon': Icons.self_improvement,
       'workouts': [
         {
           'title': 'Yoga',
-          'duration': '0 daqiqa',
-          'calories': '0 kal',
+          'duration': '10 daqiqa',
+          'calories': '30 kal',
           'difficulty': 'Oson',
           'image': 'assets/workout.jpg',
           'time': '08:00 - Ertalab',
           'category': 'Yoga',
+        },
+        {
+          'title': 'Tez suratda yurish',
+          'duration': '10 daqiqa',
+          'calories': '50 kal',
+          'difficulty': 'O\'rta',
+          'image': 'assets/workout.jpg',
+          'time': '18:00 - Kechqurun',
+          'category': 'Kardio',
         },
       ],
     },
@@ -76,19 +82,28 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       'date': '17',
       'month': 'Aprel',
       'icon': Icons.calendar_today,
-      'totalTime': '0 daqiqa',
+      'totalTime': '25 daqiqa',
       'optimalTime': 25,
       'category': 'Kuch mashqlari',
       'categoryIcon': Icons.fitness_center,
       'workouts': [
         {
           'title': 'Kuch mashqlari',
-          'duration': '0 daqiqa',
-          'calories': '0 kal',
+          'duration': '15 daqiqa',
+          'calories': '75 kal',
           'difficulty': 'Murakkab',
           'image': 'assets/workout.jpg',
           'time': '17:00 - Kechqurun',
           'category': 'Kuch',
+        },
+        {
+          'title': 'Piyoda yurish',
+          'duration': '10 daqiqa',
+          'calories': '40 kal',
+          'difficulty': 'Oson',
+          'image': 'assets/workout.jpg',
+          'time': '19:00 - Kechqurun',
+          'category': 'Kardio',
         },
       ],
     },
@@ -97,19 +112,28 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       'date': '18',
       'month': 'Aprel',
       'icon': Icons.calendar_today,
-      'totalTime': '0 daqiqa',
+      'totalTime': '15 daqiqa',
       'optimalTime': 25,
       'category': 'Stretching',
       'categoryIcon': Icons.accessibility_new,
       'workouts': [
         {
           'title': 'Stretching',
-          'duration': '0 daqiqa',
-          'calories': '0 kal',
+          'duration': '10 daqiqa',
+          'calories': '25 kal',
           'difficulty': 'Oson',
           'image': 'assets/workout.jpg',
           'time': '07:30 - Ertalab',
           'category': 'Stretching',
+        },
+        {
+          'title': 'Yurish',
+          'duration': '5 daqiqa',
+          'calories': '20 kal',
+          'difficulty': 'Oson',
+          'image': 'assets/workout.jpg',
+          'time': '20:00 - Kechqurun',
+          'category': 'Kardio',
         },
       ],
     },
@@ -118,18 +142,27 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       'date': '19',
       'month': 'Aprel',
       'icon': Icons.calendar_today,
-      'totalTime': '0 daqiqa',
+      'totalTime': '30 daqiqa',
       'optimalTime': 25,
       'category': 'Kardio',
       'categoryIcon': Icons.directions_run,
       'workouts': [
         {
           'title': 'Kardio',
-          'duration': '0 daqiqa',
-          'calories': '0 kal',
+          'duration': '20 daqiqa',
+          'calories': '100 kal',
           'difficulty': 'O\'rta',
           'image': 'assets/workout.jpg',
           'time': '18:30 - Kechqurun',
+          'category': 'Kardio',
+        },
+        {
+          'title': 'Tez suratda yurish',
+          'duration': '10 daqiqa',
+          'calories': '50 kal',
+          'difficulty': 'O\'rta',
+          'image': 'assets/workout.jpg',
+          'time': '21:00 - Kechqurun',
           'category': 'Kardio',
         },
       ],
@@ -139,19 +172,28 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
       'date': '20',
       'month': 'Aprel',
       'icon': Icons.calendar_today,
-      'totalTime': '0 daqiqa',
+      'totalTime': '25 daqiqa',
       'optimalTime': 25,
       'category': 'Kuch mashqlari',
       'categoryIcon': Icons.fitness_center,
       'workouts': [
         {
           'title': 'Kuch mashqlari',
-          'duration': '0 daqiqa',
-          'calories': '0 kal',
+          'duration': '15 daqiqa',
+          'calories': '75 kal',
           'difficulty': 'Murakkab',
           'image': 'assets/workout.jpg',
           'time': '09:00 - Ertalab',
           'category': 'Kuch',
+        },
+        {
+          'title': 'Yurish',
+          'duration': '10 daqiqa',
+          'calories': '40 kal',
+          'difficulty': 'Oson',
+          'image': 'assets/workout.jpg',
+          'time': '17:00 - Kechqurun',
+          'category': 'Kardio',
         },
       ],
     },
@@ -197,6 +239,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
   String? _selectedMonth;
   String? _selectedMinute;
   String? _selectedLevel;
+  int _selectedSubCategoryIndex = 0;
 
   final List<Map<String, dynamic>> levels = [
     {"id": 2, 'label': 'Minimal', 'minutes': 210},
@@ -217,33 +260,47 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
 
   // Step counter variables
   int _currentSteps = 0;
-  int _dailyGoal = 10000;
+  int _weeklyGoal = 0; // Will be calculated from exercises
   bool _isStepCounterActive = false;
 
   @override
   void initState() {
     super.initState();
-    _loadExercises();
+    // Calculate initial steps from weekDays data
+    _updateStepsFromExercises();
   }
 
   Future<void> _loadExercises() async {
-    try {
-      setState(() {
-        _isLoading = true;
-        _error = null;
-      });
+    // This method is called when exercises need to be loaded for a specific subcategory
+    if (_subCategories != null &&
+        _selectedSubCategoryIndex < _subCategories!.length) {
+      try {
+        setState(() {
+          _isLoadingExercises = true;
+        });
 
-      final data = await _exercisesService.getExercises();
+        final response = await _levelService.getSubCategoryExercises(
+          _subCategories![_selectedSubCategoryIndex].id,
+          _selectedLevelId!,
+          _levelDays![_selectedDayIndex].id,
+        );
 
-      setState(() {
-        _exercisesData = List<Exercise>.from(data['exercises']);
-        _isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        _error = e.toString();
-        _isLoading = false;
-      });
+        setState(() {
+          _exercises = response.data.exercises;
+          _isLoadingExercises = false;
+        });
+
+        // Update steps when exercises are loaded
+        _updateStepsFromExercises();
+      } catch (e) {
+        setState(() {
+          _error = e.toString();
+          _isLoadingExercises = false;
+        });
+      }
+    } else {
+      // Just update steps from existing data
+      _updateStepsFromExercises();
     }
   }
 
@@ -265,21 +322,96 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
 
   // Step counter methods
   void _startStepCounter() {
-    // Simulate step counting - in a real app, this would use device sensors
-    Future.delayed(const Duration(seconds: 2), () {
-      if (mounted && _isStepCounterActive) {
-        setState(() {
-          _currentSteps += 10; // Simulate 10 steps every 2 seconds
-        });
-        _startStepCounter(); // Continue counting
-      }
-    });
+    // Calculate steps from actual exercises instead of simulation
+    _updateStepsFromExercises();
   }
 
   void _stopStepCounter() {
-    // Stop the step counter
+    // Keep the calculated steps, just stop the counter
     setState(() {
       _isStepCounterActive = false;
+    });
+  }
+
+  // Calculate steps from walking/running exercises in current week
+  int _calculateWeeklyStepsFromExercises() {
+    int totalSteps = 0;
+
+    // Calculate from weekDays data which contains workout information
+    for (final day in weekDays) {
+      final workouts = day['workouts'] as List;
+      for (final workout in workouts) {
+        final title = workout['title'].toString().toLowerCase();
+        final duration = workout['duration'].toString();
+
+        // Check if workout is walking or running related
+        if (title.contains('yurish') ||
+            title.contains('yugurish') ||
+            title.contains('tez suratda') ||
+            title.contains('piyoda')) {
+          // Extract duration value (e.g., "3 daqiqa" -> 3)
+          final durationMatch = RegExp(r'(\d+)').firstMatch(duration);
+          if (durationMatch != null) {
+            final durationMinutes =
+                int.tryParse(durationMatch.group(1) ?? '0') ?? 0;
+            if (durationMinutes > 0) {
+              // Rough estimate: 1 minute of walking/running = ~100 steps
+              totalSteps += durationMinutes * 100;
+            }
+          }
+        }
+      }
+    }
+
+    return totalSteps;
+  }
+
+  // Calculate weekly goal from walking/running exercises
+  int _calculateWeeklyGoal() {
+    int totalGoal = 0;
+
+    // Calculate from weekDays data which contains workout information
+    for (final day in weekDays) {
+      final workouts = day['workouts'] as List;
+      for (final workout in workouts) {
+        final title = workout['title'].toString().toLowerCase();
+        final duration = workout['duration'].toString();
+
+        // Check if workout is walking or running related
+        if (title.contains('yurish') ||
+            title.contains('yugurish') ||
+            title.contains('tez suratda') ||
+            title.contains('piyoda')) {
+          // Extract duration value (e.g., "3 daqiqa" -> 3)
+          final durationMatch = RegExp(r'(\d+)').firstMatch(duration);
+          if (durationMatch != null) {
+            final durationMinutes =
+                int.tryParse(durationMatch.group(1) ?? '0') ?? 0;
+            if (durationMinutes > 0) {
+              // Weekly goal: 1 minute of walking/running = ~120 steps (slightly higher than actual)
+              totalGoal += durationMinutes * 120;
+            }
+          }
+        }
+      }
+    }
+
+    // If no walking/running exercises found, set a default goal
+    if (totalGoal == 0) {
+      totalGoal = 50000; // Default 50K if no walking exercises
+    }
+
+    return totalGoal;
+  }
+
+  void _updateStepsFromExercises() {
+    // Calculate steps from weekDays data which is always available
+    final calculatedSteps = _calculateWeeklyStepsFromExercises();
+    final calculatedGoal = _calculateWeeklyGoal();
+
+    setState(() {
+      _currentSteps = calculatedSteps;
+      _weeklyGoal = calculatedGoal;
     });
   }
 
@@ -287,22 +419,28 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(_selectedMonth == null
-            ? 'Oylar'
-            : _selectedLevel == null
-                ? _selectedMonth!
-                : '$_selectedMonth - $_selectedLevel'),
+        title: Text(
+          _selectedLevel == null
+              ? 'Darajalar'
+              : _selectedMonth == null
+                  ? _selectedLevel!
+                  : '$_selectedLevel - $_selectedMonth',
+        ),
         centerTitle: true,
-        leading: _selectedMonth != null
+        leading: _selectedLevel != null
             ? IconButton(
                 icon: const Icon(Icons.arrow_back),
                 onPressed: () {
                   setState(() {
-                    if (_selectedLevel != null) {
-                      _selectedLevel = null;
-                    } else {
+                    if (_selectedMonth != null) {
                       _selectedMonth = null;
                       _selectedDayIndex = 0;
+                    } else if (_selectedLevel != null) {
+                      _selectedLevel = null;
+                      _selectedLevelId = null;
+                      _levelDays = null;
+                      _subCategories = null;
+                      _exercises = null;
                     }
                   });
                 },
@@ -316,38 +454,38 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
         ],
       ),
       backgroundColor: Colors.grey[50],
-      body: _isLoading
-          ? const Center(child: CircularProgressIndicator.adaptive())
-          : _error != null
-              ? Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'Xatolik yuz berdi',
-                        style: TextStyle(
-                          color: Colors.grey[800],
-                          fontSize: 16,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                      const SizedBox(height: 8),
-                      Text(
-                        _error!,
-                        style: TextStyle(
-                          color: Colors.grey[600],
-                          fontSize: 14,
-                        ),
-                        textAlign: TextAlign.center,
-                      ),
-                      const SizedBox(height: 16),
-                      ElevatedButton(
-                        onPressed: _loadExercises,
-                        child: const Text('Qayta urinish'),
-                      ),
-                    ],
+      body: _error != null
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Text(
+                    'Xatolik yuz berdi',
+                    style: TextStyle(
+                      color: Colors.grey[800],
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
-                )
+                  const SizedBox(height: 8),
+                  Text(
+                    _error!,
+                    style: TextStyle(
+                      color: Colors.grey[600],
+                      fontSize: 14,
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  ElevatedButton(
+                    onPressed: _loadExercises,
+                    child: const Text('Qayta urinish'),
+                  ),
+                ],
+              ),
+            )
+          : _selectedLevel == null
+              ? _buildLevelSelection(context)
               : _selectedMonth == null
                   ? Padding(
                       padding: const EdgeInsets.all(16),
@@ -365,7 +503,6 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                             onTap: () {
                               setState(() {
                                 _selectedMonth = months[index];
-
                                 _selectedDayIndex = 0;
                               });
                             },
@@ -391,12 +528,10 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                         },
                       ),
                     )
-                  : _selectedLevel == null
-                      ? _buildLevelSelection(context)
-                      : _buildWeeklyWorkouts(
-                          context,
-                          _selectedMinute.toString(),
-                        ),
+                  : _buildWeeklyWorkouts(
+                      context,
+                      _selectedMinute.toString(),
+                    ),
     );
   }
 
@@ -609,7 +744,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                                 ),
                               ),
                               Text(
-                                "${(int.parse(day.duration) / _levelDays!.length).round()} daq",
+                                "${day.subCategories?.fold<int>(0, (sum, sub) => sum + (int.tryParse(sub.pivot.duration ?? '0') ?? 0)) ?? 0} daq",
                                 style: TextStyle(
                                   color: isSelected
                                       ? Colors.white
@@ -739,136 +874,6 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
           ),
           if (_isLoadingSubCategories)
             const Expanded(child: Center(child: CircularProgressIndicator())),
-          // Step Counter Widget
-          Container(
-            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  Theme.of(context).primaryColor,
-                  Theme.of(context).primaryColor.withOpacity(0.8),
-                ],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-              borderRadius: BorderRadius.circular(16),
-              boxShadow: [
-                BoxShadow(
-                  color: Colors.black.withOpacity(0.1),
-                  blurRadius: 10,
-                  offset: const Offset(0, 4),
-                ),
-              ],
-            ),
-            child: Column(
-              children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Row(
-                      children: [
-                        Icon(
-                          Icons.directions_walk,
-                          color: Colors.white,
-                          size: 24,
-                        ),
-                        const SizedBox(width: 8),
-                        Text(
-                          'Kunlik qadamlar',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Switch(
-                      value: _isStepCounterActive,
-                      onChanged: (value) {
-                        setState(() {
-                          _isStepCounterActive = value;
-                          if (value) {
-                            _startStepCounter();
-                          } else {
-                            _stopStepCounter();
-                          }
-                        });
-                      },
-                      activeColor: Colors.white,
-                      activeTrackColor: Colors.white.withOpacity(0.3),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          '$_currentSteps',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 32,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'qadam',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Column(
-                      crossAxisAlignment: CrossAxisAlignment.end,
-                      children: [
-                        Text(
-                          '$_dailyGoal',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 24,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                        Text(
-                          'maqsad',
-                          style: TextStyle(
-                            color: Colors.white.withOpacity(0.8),
-                            fontSize: 14,
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                ClipRRect(
-                  borderRadius: BorderRadius.circular(8),
-                  child: LinearProgressIndicator(
-                    value: _currentSteps / _dailyGoal,
-                    backgroundColor: Colors.white.withOpacity(0.3),
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
-                    minHeight: 8,
-                  ),
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  '${((_currentSteps / _dailyGoal) * 100).round()}% bajarildi',
-                  style: TextStyle(
-                    color: Colors.white.withOpacity(0.9),
-                    fontSize: 12,
-                    fontWeight: FontWeight.w500,
-                  ),
-                ),
-              ],
-            ),
-          ),
           if (_isLoadingExercises)
             const Expanded(
               child: Center(
@@ -1123,48 +1128,19 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                             trailing: const Icon(Icons.arrow_forward_ios,
                                 size: 18, color: Colors.grey),
                             onTap: () async {
-                              setState(() {
-                                _isLoadingExercises = true;
-                                // Don't hide subcategories immediately
-                              });
-                              try {
-                                final resp =
-                                    await _levelService.getSubCategoryExercises(
-                                  sub.id,
-                                  _selectedLevelId!,
-                                  _levelDays![_selectedDayIndex].id,
-                                );
-
-                                setState(() {
-                                  _exercises = resp.data.exercises;
-                                  _subCategories =
-                                      null; // Hide subcategories when exercises are loaded
-                                  _isLoadingExercises = false;
-                                });
-                              } catch (e) {
-                                // Reload subcategories on error
-                                try {
-                                  final resp =
-                                      await _levelService.getDaySubCategories(
-                                          _levelDays![_selectedDayIndex].id,
-                                          _selectedLevelId!);
-                                  setState(() {
-                                    _subCategories = resp.data.subCategories;
-                                    _isLoadingExercises = false;
-                                  });
-                                } catch (subError) {
-                                  setState(() {
-                                    _isLoadingExercises = false;
-                                  });
-                                }
-                                if (mounted) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(
-                                        content: Text(
-                                            "Mashqlarni yuklashda xatolik: $e")),
-                                  );
-                                }
-                              }
+                              final dayId = _levelDays![_selectedDayIndex].id;
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) =>
+                                      SubCategoryExercisesScreen(
+                                    subCategoryId: sub.id,
+                                    levelId: _selectedLevelId!,
+                                    dayId: dayId,
+                                    title: sub.name,
+                                  ),
+                                ),
+                              );
                             },
                           ),
                         );

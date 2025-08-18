@@ -1,7 +1,7 @@
 import 'package:fitness_app/screens/workout_info_screen.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/models/exercies_model.dart';
-import 'package:lottie/lottie.dart';
+import '../widgets/media_widget.dart';
 
 class SubCategoryExercisesScreen extends StatelessWidget {
   final String subCategoryName;
@@ -94,6 +94,22 @@ class SubCategoryExercisesScreen extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+
+
+                                      if (exercise.media.isNotEmpty) ...[
+                                      const SizedBox(height: 12),
+                                      ClipRRect(
+                                        borderRadius: BorderRadius.circular(8),
+                                        child: MediaWidget(
+                                          url: exercise.media[0].originalUrl,
+                                          height: 200,
+                                          width: double.infinity,
+                                        ),
+                                      ),
+                                    ],
+
+
+                                    
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
@@ -142,18 +158,7 @@ class SubCategoryExercisesScreen extends StatelessWidget {
                                             .withOpacity(0.7),
                                       ),
                                     ),
-                                    if (exercise.media.isNotEmpty) ...[
-                                      const SizedBox(height: 12),
-                                      ClipRRect(
-                                        borderRadius: BorderRadius.circular(8),
-                                        child: _buildMediaWidget(
-                                          exercise.media[0].originalUrl,
-                                          Theme.of(context),
-                                          height: 200,
-                                          width: double.infinity,
-                                        ),
-                                      ),
-                                    ],
+                                  
                                   ],
                                 ),
                               ),
@@ -165,50 +170,5 @@ class SubCategoryExercisesScreen extends StatelessWidget {
                   ],
                 ),
     );
-  }
-
-  Widget _buildMediaWidget(String url, ThemeData theme,
-      {double? height, double? width}) {
-    print('Building media widget for URL: $url'); // Debug
-    final ext = url.split('.').last.toLowerCase();
-    if (ext == 'json') {
-      return Lottie.network(
-        url,
-        height: height,
-        width: width,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            height: height,
-            width: width,
-            color: theme.colorScheme.surfaceVariant,
-            child: Icon(
-              Icons.fitness_center,
-              size: 48,
-              color: theme.colorScheme.primary,
-            ),
-          );
-        },
-      );
-    } else {
-      return Image.network(
-        url,
-        height: height,
-        width: width,
-        fit: BoxFit.cover,
-        errorBuilder: (context, error, stackTrace) {
-          return Container(
-            height: height,
-            width: width,
-            color: theme.colorScheme.surfaceVariant,
-            child: Icon(
-              Icons.fitness_center,
-              size: 48,
-              color: theme.colorScheme.primary,
-            ),
-          );
-        },
-      );
-    }
   }
 }

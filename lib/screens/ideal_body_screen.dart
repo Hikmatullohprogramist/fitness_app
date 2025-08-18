@@ -88,7 +88,7 @@ class _IdealBodyScreenState extends State<IdealBodyScreen>
           children: [
             Icon(Icons.monitor_weight, color: Colors.white),
             SizedBox(width: 8),
-            Text('J. rivojlanish ko\'rsatgichlari'),
+            Text('Jismoniy rivojlanish ko\'rsatkichlari'),
           ],
         ),
         backgroundColor: Theme.of(context).colorScheme.primary,

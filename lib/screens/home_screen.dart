@@ -65,35 +65,7 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
-  Future<void> _updateUserLevel(int newLevel) async {
-    if (user == null) return;
-
-    try {
-      setState(() {
-        user = user!.copyWith(fitnessLevel: newLevel);
-      });
-
-      await authService.updateUser(user!);
-
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Daraja muvaffaqiyatli yangilandi'),
-            backgroundColor: Colors.green,
-          ),
-        );
-      }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Xatolik yuz berdi: $e'),
-            backgroundColor: Colors.red,
-          ),
-        );
-      }
-    }
-  }
+  // Removed unused _updateUserLevel
 
   @override
   Widget build(BuildContext context) {
@@ -114,6 +86,8 @@ class _HomeScreenState extends State<HomeScreen> {
           '/exercises'),
       _MenuItem('Mening mashqlarim', "assets/animations/speed_run-2.json",
           '/my_exercises'),
+      _MenuItem('Kaloriya Kalkulyatori', "assets/animations/clock.json",
+          '/calorie_calculator'),
     ];
 
     return Scaffold(
@@ -167,6 +141,13 @@ class _HomeScreenState extends State<HomeScreen> {
                 'Yakunlangan mashg\'ulotlar',
                 dailyStats!['completed_exercises']?.toString() ?? '0',
                 Icons.check_circle,
+              ), 
+              
+              
+               _buildStatRow(
+                'MET',
+                dailyStats!['MET']?.toString() ?? '0',
+                Icons.check_circle,
               ),
             ],
           ],
@@ -175,28 +156,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  Widget _buildInfoRow(String label, String value) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 4),
-      child: Row(
-        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-        children: [
-          Text(
-            label,
-            style: TextStyle(
-              color: Colors.grey[600],
-            ),
-          ),
-          Text(
-            value,
-            style: const TextStyle(
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+  // Removed unused _buildInfoRow
 
   Widget _buildStatRow(String label, String value, IconData icon) {
     return Padding(
@@ -222,17 +182,22 @@ class _HomeScreenState extends State<HomeScreen> {
     List<_MenuItem> items,
   ) {
     final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+    // final screenHeight = MediaQuery.of(context).size.height; // unused
 
     // Responsive grid configuration with more conservative aspect ratios
     int crossAxisCount;
     double childAspectRatio;
     double spacing;
 
-    if (screenWidth < 600) {
+    if (screenWidth < 360) {
+      // Very small phones
+      crossAxisCount = 2;
+      childAspectRatio = 0.65; // Taller cards to fit text
+      spacing = 10;
+    } else if (screenWidth < 600) {
       // Mobile phones (portrait and small landscape)
       crossAxisCount = 2;
-      childAspectRatio = 0.85; // Fixed aspect ratio for mobile
+      childAspectRatio = 0.75; // Taller cards to prevent text clipping
       spacing = 12;
     } else if (screenWidth < 900) {
       // Tablets and large phones
@@ -263,33 +228,7 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _showEditLevelDialog(BuildContext context) async {
-    final levels = [1, 2, 3];
-    int? selected = user?.fitnessLevel;
-
-    await showDialog(
-      context: context,
-      builder: (context) {
-        return AlertDialog(
-          title: const Text('Darajani o\'gartirish'),
-          content: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: levels.map((level) {
-              return RadioListTile<int>(
-                value: level,
-                groupValue: selected,
-                title: Text(level.toString()),
-                onChanged: (value) {
-                  Navigator.of(context).pop();
-                  _updateUserLevel(value!);
-                },
-              );
-            }).toList(),
-          ),
-        );
-      },
-    );
-  }
+  // Removed unused _showEditLevelDialog
 }
 
 class _MenuItem {
@@ -311,64 +250,73 @@ class _MenuCardState extends State<_MenuCard> {
   @override
   Widget build(BuildContext context) {
     final Color accent = Theme.of(context).colorScheme.primary;
-    return InkWell(
-      onTap: () {
-        Navigator.of(context).pushNamed(widget.item.route);
-      },
-      borderRadius: BorderRadius.circular(24),
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final double cardWidth = constraints.maxWidth;
+        final double iconSize = cardWidth.clamp(120, 180) * 0.5; // responsive icon
+        final double titleFontSize = cardWidth < 160 ? 12 : 14;
+        final double circlePadding = cardWidth < 160 ? 12 : 16;
+
+        return InkWell(
+          onTap: () {
+            Navigator.of(context).pushNamed(widget.item.route);
+          },
           borderRadius: BorderRadius.circular(24),
-          boxShadow: [
-            BoxShadow(
-              color: accent.withOpacity(0.18),
-              blurRadius: 18,
-              offset: const Offset(0, 6),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(24),
+              boxShadow: [
+                BoxShadow(
+                  color: accent.withOpacity(0.18),
+                  blurRadius: 18,
+                  offset: const Offset(0, 6),
+                ),
+              ],
+              border: Border.all(color: accent.withOpacity(0.35), width: 1.6),
             ),
-          ],
-          border: Border.all(color: accent.withOpacity(0.35), width: 1.6),
-        ),
-        child: ClipRect(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  color: accent.withOpacity(0.13),
-                ),
-                padding: const EdgeInsets.all(16),
-                child: widget.item.icon is IconData
-                    ? Icon(widget.item.icon, size: 36, color: accent)
-                    : Lottie.asset(
-                        widget.item.icon,
-                        width: 120,
-                        repeat: false,
-                        height: 120,
-                      ),
-              ),
-              const SizedBox(height: 12),
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 8.0),
-                  child: Text(
-                    widget.item.title,
-                    textAlign: TextAlign.center,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+            child: ClipRect(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: accent.withOpacity(0.13),
                     ),
-                    overflow: TextOverflow.ellipsis,
-                    maxLines: 2,
+                    padding: EdgeInsets.all(circlePadding),
+                    child: widget.item.icon is IconData
+                        ? Icon(widget.item.icon, size: iconSize * 0.6, color: accent)
+                        : Lottie.asset(
+                            widget.item.icon,
+                            width: iconSize,
+                            height: iconSize,
+                            repeat: false,
+                            fit: BoxFit.contain,
+                          ),
                   ),
-                ),
+                  const SizedBox(height: 10),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                    child: Text(
+                      widget.item.title,
+                      textAlign: TextAlign.center,
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: titleFontSize,
+                      ),
+                      overflow: TextOverflow.ellipsis,
+                      maxLines: 3,
+                      softWrap: true,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                ],
               ),
-              const SizedBox(height: 8),
-            ],
+            ),
           ),
-        ),
-      ),
+        );
+      },
     );
   }
 }

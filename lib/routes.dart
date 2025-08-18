@@ -1,3 +1,4 @@
+import 'package:fitness_app/met_calculator_screen.dart';
 import 'package:fitness_app/screens/main_screen.dart';
 import 'package:fitness_app/screens/professiogramma_screen.dart';
 import 'package:fitness_app/screens/pysical_development.dart';
@@ -5,6 +6,7 @@ import 'package:fitness_app/screens/splash_screen.dart';
 import 'package:fitness_app/screens/upload_exercises_screen.dart';
 import 'package:fitness_app/screens/physical_development_level_screen.dart';
 import 'package:fitness_app/screens/workouts_screen.dart';
+import 'package:fitness_app/screens/calorie_calculator_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/profile_screen.dart';
@@ -31,6 +33,7 @@ class AppRoutes {
   static const String physicalDevelopmentLevel = '/physical_development_level';
   static const String myExercises = '/my_exercises';
   static const String splash = "/splash_screen";
+  static const String calorieCalculator = '/calorie_calculator';
 
   static Map<String, WidgetBuilder> get routes => {
         login: (context) => const LoginScreen(),
@@ -48,6 +51,7 @@ class AppRoutes {
         physicalDevelopmentLevel: (context) =>
             const PhysicalDevelopmentLevelScreen(),
         myExercises: (context) => const WorkoutsScreen(),
+        calorieCalculator: (context) => MetCalculatorScreen(),
         splash: (context) => const SplashScreen(),
       };
 }

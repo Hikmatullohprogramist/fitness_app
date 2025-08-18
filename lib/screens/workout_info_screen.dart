@@ -66,6 +66,14 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
     }
   }
 
+  int _roundToDurationBucket(int seconds) {
+    if (seconds >= 40 && seconds < 45) return 40;
+    if (seconds >= 45 && seconds < 50) return 45;
+    if (seconds >= 50 && seconds < 55) return 50;
+    if (seconds >= 55 && seconds <= 60) return 60;
+    return seconds;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -98,12 +106,17 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
                     children: [
                       const Icon(Icons.timer_outlined),
                       const SizedBox(width: 8),
-                      Text(
-                        ((double.tryParse(widget.exercise.duration) ?? 0) * 60)
-                            .round()
-                            .toString(),
-                        style: Theme.of(context).textTheme.bodyLarge,
-                      ),
+                      widget.exercise.name.contains("Yengil yugurish") ||
+                              widget.exercise.name
+                                  .contains("Tez sur'atda yurish")
+                          ? Container()
+                          : Text(
+                              '${_roundToDurationBucket((double.parse(widget.exercise.duration) * 60).round())} soniya',
+                              style: TextStyle(
+                                color: Theme.of(context).colorScheme.primary,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
                     ],
                   ),
                   const SizedBox(height: 16),
