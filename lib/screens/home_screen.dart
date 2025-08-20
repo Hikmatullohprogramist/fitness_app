@@ -1,6 +1,7 @@
 import 'package:fitness_app/models/user_model.dart';
 import 'package:fitness_app/services/auth_service.dart';
 import 'package:fitness_app/services/exercise_stats_service.dart';
+import 'package:fitness_app/step_counter.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
 
@@ -141,15 +142,14 @@ class _HomeScreenState extends State<HomeScreen> {
                 'Yakunlangan mashg\'ulotlar',
                 dailyStats!['completed_exercises']?.toString() ?? '0',
                 Icons.check_circle,
-              ), 
-              
-              
-               _buildStatRow(
+              ),
+              _buildStatRow(
                 'MET',
                 dailyStats!['MET']?.toString() ?? '0',
                 Icons.check_circle,
               ),
             ],
+            ModernStepCounter()
           ],
         ),
       ),
@@ -253,7 +253,8 @@ class _MenuCardState extends State<_MenuCard> {
     return LayoutBuilder(
       builder: (context, constraints) {
         final double cardWidth = constraints.maxWidth;
-        final double iconSize = cardWidth.clamp(120, 180) * 0.5; // responsive icon
+        final double iconSize =
+            cardWidth.clamp(120, 180) * 0.5; // responsive icon
         final double titleFontSize = cardWidth < 160 ? 12 : 14;
         final double circlePadding = cardWidth < 160 ? 12 : 16;
 
@@ -286,7 +287,8 @@ class _MenuCardState extends State<_MenuCard> {
                     ),
                     padding: EdgeInsets.all(circlePadding),
                     child: widget.item.icon is IconData
-                        ? Icon(widget.item.icon, size: iconSize * 0.6, color: accent)
+                        ? Icon(widget.item.icon,
+                            size: iconSize * 0.6, color: accent)
                         : Lottie.asset(
                             widget.item.icon,
                             width: iconSize,
