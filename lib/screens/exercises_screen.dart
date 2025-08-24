@@ -1,5 +1,7 @@
 import 'package:fitness_app/models/exercies_model.dart';
 import 'package:fitness_app/screens/workout_info_screen.dart';
+import 'package:fitness_app/widgets/dam_olish_timer.dart';
+import 'package:fitness_app/widgets/timer_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:fitness_app/services/exercises_service.dart';
 import 'package:lottie/lottie.dart';
@@ -75,12 +77,26 @@ class _ExercisesScreenState extends State<ExercisesScreen>
     }
   }
 
-  int _roundToDurationBucket(int seconds) {
-    if (seconds >= 40 && seconds < 45) return 40;
-    if (seconds >= 45 && seconds < 50) return 45;
-    if (seconds >= 50 && seconds < 55) return 50;
-    if (seconds >= 55 && seconds <= 60) return 60;
-    return seconds;
+  String _roundToDurationBucket(int seconds) {
+    if (seconds >= 40 && seconds < 45) return "40 soniya";
+    if (seconds >= 45 && seconds < 50) return "45 soniya";
+    if (seconds >= 50 && seconds < 55) return "50 soniya";
+
+    // 55 dan 60 gacha -> 1 daqiqa
+    if (seconds >= 55 && seconds <= 60) return "1 daqiqa";
+
+    if (seconds > 60) {
+      final minutes = seconds ~/ 60;
+      final remainingSeconds = seconds % 60;
+
+      if (remainingSeconds == 0) {
+        return "$minutes daqiqa"; // ✅ faqat daqiqa yoziladi
+      } else {
+        return "$minutes daqiqa $remainingSeconds soniya";
+      }
+    }
+
+    return "$seconds soniya";
   }
 
   List<Exercise> _getExercisesByCategory(String category) {
@@ -218,9 +234,34 @@ class _ExercisesScreenState extends State<ExercisesScreen>
       subcategoryToExercises[subcategoryName]!.add(exercise);
     }
 
-    final List<String> sortedSubcategories = subcategoryToExercises.keys
-        .toList()
-      ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    // Custom order for "Individual" category
+    final List<String> customOrder = [
+      "Tez sur'atda yurish",
+      "Yengil yugurish",
+      "Arqonda sakrash",
+      "Jismoniy tarbiya daqiqalari",
+      "Qo'l va yelka muskullari uchun mashqlar",
+      "Qorin muskullari uchun mashqlar",
+      "Bel va orqa muskullari uchun mashqlar",
+      "Butun tana muskullari uchun mashqlar",
+      "Oyoq muskullari uchun mashqlar",
+      "Aerobika mashqlari",
+      "Kardio mashqlari",
+      "Yuqori intensivlikdagi mashqlar",
+      "Cho'zilish mashqlari",
+      "Yoga mashqlari",
+    ];
+
+    // Sort subcategories
+    List<String> sortedSubcategories;
+    if (category == "individual") {
+      sortedSubcategories = customOrder
+          .where((sub) => subcategoryToExercises.keys.contains(sub))
+          .toList();
+    } else {
+      sortedSubcategories = subcategoryToExercises.keys.toList()
+        ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
+    }
 
     final List<Widget> children = [];
     for (final subcat in sortedSubcategories) {
@@ -238,6 +279,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
       );
 
       final exercisesInSubcat = subcategoryToExercises[subcat]!;
+
       for (final exercise in exercisesInSubcat) {
         children.add(
           Card(
@@ -261,29 +303,28 @@ class _ExercisesScreenState extends State<ExercisesScreen>
                   if (exercise.media.isNotEmpty)
                     SizedBox(
                       height: 400,
-                      child: Stack(
-                        children: [
-                          ClipRRect(
-                            borderRadius: const BorderRadius.vertical(
-                                top: Radius.circular(16)),
-                            child: _buildMediaWidget(
-                                exercise.media[0].originalUrl, theme,
-                                height: 400, width: double.infinity),
-                          ),
-                          if (exercise.media.length > 1)
-                            Positioned(
-                              top: 0,
-                              right: 0,
-                              child: ClipRRect(
-                                borderRadius: const BorderRadius.only(
-                                  topRight: Radius.circular(16),
-                                ),
-                                child: _buildMediaWidget(
-                                    exercise.media[1].originalUrl, theme,
-                                    height: 300, width: 100),
+                      child: ClipRRect(
+                        borderRadius: const BorderRadius.vertical(
+                            top: Radius.circular(16)),
+                        child: exercise.media.length > 1
+                            ? ListView.builder(
+                                scrollDirection: Axis.horizontal,
+                                itemCount: exercise.media.length,
+                                itemBuilder: (context, index) {
+                                  return _buildMediaWidget(
+                                    exercise.media[index].originalUrl,
+                                    theme,
+                                    height: 400,
+                                    width: MediaQuery.of(context).size.width,
+                                  );
+                                },
+                              )
+                            : _buildMediaWidget(
+                                exercise.media[0].originalUrl,
+                                theme,
+                                height: 400,
+                                width: double.infinity,
                               ),
-                            ),
-                        ],
                       ),
                     ),
                   Padding(
@@ -303,24 +344,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
                                 ),
                               ),
                             ),
-                            Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 8,
-                                vertical: 4,
-                              ),
-                              decoration: BoxDecoration(
-                                color:
-                                    theme.colorScheme.primary.withOpacity(0.1),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              child: Text(
-                                '${_roundToDurationBucket((double.parse(exercise.duration) * 60).round())} soniya',
-                                style: TextStyle(
-                                  color: theme.colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
+                            TimerWidget(exercise: exercise),
                           ],
                         ),
                         const SizedBox(height: 8),
@@ -332,6 +356,8 @@ class _ExercisesScreenState extends State<ExercisesScreen>
                               fontSize: 12),
                           textAlign: TextAlign.justify,
                         ),
+                        const SizedBox(height: 8),
+                        DamOlishTimer(exercise: exercise),
                       ],
                     ),
                   ),

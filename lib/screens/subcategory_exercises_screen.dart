@@ -1,5 +1,7 @@
 import 'package:fitness_app/services/exercises_service.dart';
+import 'package:fitness_app/widgets/dam_olish_timer.dart';
 import 'package:fitness_app/widgets/media_widget.dart';
+import 'package:fitness_app/widgets/timer_widget.dart';
 import 'package:flutter/material.dart';
 
 import 'package:fitness_app/models/exercies_model.dart';
@@ -204,29 +206,7 @@ class _SubCategoryExercisesScreenState
                           ),
                         ),
                       ),
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .primary
-                              .withOpacity(0.1),
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        child: exercise.name.contains("Yengil yugurish") ||
-                                exercise.name.contains("Tez sur'atda yurish")
-                            ? Container()
-                            : Text(
-                                '${_roundToDurationBucket((double.parse(exercise.duration) * 60).round())} soniya',
-                                style: TextStyle(
-                                  color: Theme.of(context).colorScheme.primary,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                      ),
+                      TimerWidget(exercise: exercise),
                     ],
                   ),
                   const SizedBox(height: 8),
@@ -241,6 +221,8 @@ class _SubCategoryExercisesScreenState
                     ),
                     textAlign: TextAlign.justify,
                   ),
+                  const SizedBox(height: 8),
+                  DamOlishTimer(exercise: exercise)
                 ],
               ),
             ),

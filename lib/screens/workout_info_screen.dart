@@ -24,7 +24,7 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
         url,
         height: height,
         width: width,
-        fit: BoxFit.cover,
+        fit: BoxFit.contain,
         errorBuilder: (context, error, stackTrace) {
           return Container(
             height: height,
@@ -82,14 +82,31 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
           SliverAppBar(
             expandedHeight: 400,
             flexibleSpace: FlexibleSpaceBar(
-              background: _buildMediaWidget(
-                  widget.exercise.media.first.originalUrl, Theme.of(context)),
+              background: widget.exercise.media.length > 1
+                  ? ListView.builder(
+                      scrollDirection: Axis.horizontal,
+                      itemCount: widget.exercise.media.length,
+                      itemBuilder: (context, index) {
+                        return _buildMediaWidget(
+                          widget.exercise.media[index].originalUrl,
+                          Theme.of(context),
+                        );
+                      },
+                    )
+                  : _buildMediaWidget(
+                      widget.exercise.media.first.originalUrl,
+                      Theme.of(context),
+                    ),
             ),
             leading: IconButton(
               icon: const Icon(Icons.arrow_back),
               onPressed: () => Navigator.pop(context),
             ),
-            title: Text(widget.exercise.name),
+            title: Text(
+              widget.exercise.name.contains("Jismoniy tarbiya daqiqalari")
+                  ? "Chigalyozdi mashqlari"
+                  : widget.exercise.name,
+            ),
           ),
           SliverToBoxAdapter(
             child: Padding(
@@ -98,7 +115,9 @@ class _WorkoutInfoScreenState extends State<WorkoutInfoScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.exercise.name,
+                    widget.exercise.name.contains("Jismoniy tarbiya daqiqalari")
+                        ? "Chigalyozdi mashqlari"
+                        : widget.exercise.name,
                     style: Theme.of(context).textTheme.headlineSmall,
                   ),
                   const SizedBox(height: 8),

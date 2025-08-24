@@ -3,6 +3,8 @@ import 'package:fitness_app/models/exercies_model.dart';
 import 'package:fitness_app/models/level_day_response.dart';
 import 'package:fitness_app/services/leve_service.dart';
 import 'package:fitness_app/screens/subcategory_exercises_screen.dart';
+import 'package:fitness_app/widgets/dam_olish_timer.dart';
+import 'package:fitness_app/widgets/timer_widget.dart';
 import 'package:flutter/material.dart';
 
 class WorkoutsScreen extends StatefulWidget {
@@ -984,30 +986,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                                                 ),
                                               ),
                                             ),
-                                            Container(
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                horizontal: 8,
-                                                vertical: 4,
-                                              ),
-                                              decoration: BoxDecoration(
-                                                color: Theme.of(context)
-                                                    .colorScheme
-                                                    .primary
-                                                    .withOpacity(0.1),
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              child: Text(
-                                                '${(double.parse(exercise.duration) * 60).round()} soniya',
-                                                style: TextStyle(
-                                                  color: Theme.of(context)
-                                                      .colorScheme
-                                                      .primary,
-                                                  fontWeight: FontWeight.bold,
-                                                ),
-                                              ),
-                                            ),
+                                            TimerWidget(exercise: exercise)
                                           ],
                                         ),
                                         const SizedBox(height: 8),
