@@ -85,7 +85,7 @@ class _SplashScreenState extends State<SplashScreen>
                 Icon(Icons.fitness_center, size: 100, color: Colors.white),
                 SizedBox(height: 20),
                 Text(
-                  'Fitness App',
+                  'OptiForma',
                   style: TextStyle(
                     fontSize: 32,
                     fontWeight: FontWeight.bold,
@@ -93,9 +93,13 @@ class _SplashScreenState extends State<SplashScreen>
                   ),
                 ),
                 SizedBox(height: 10),
-                Text(
-                  'Jismoniy tayyorgarlik uchun ilova',
-                  style: TextStyle(fontSize: 16, color: Colors.white70),
+                Padding(
+                  padding: EdgeInsets.all(8.0),
+                  child: Text(
+                    'Kasbiy-amaliy jismoniy tayyorgarlikni optimallashtirish uchun ilova',
+                    style: TextStyle(fontSize: 16, color: Colors.white70),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ],
             ),

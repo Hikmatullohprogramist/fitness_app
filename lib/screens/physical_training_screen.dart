@@ -1,6 +1,13 @@
+import 'package:fitness_app/screens/exercises_screen.dart';
+import 'package:fitness_app/screens/workout_info_screen.dart';
 import 'package:fitness_app/utils/video_extensions.dart';
+import 'package:fitness_app/utils/video_extensions.dart';
+import 'package:fitness_app/widgets/media_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:lottie/lottie.dart';
+
+import '../models/exercies_model.dart';
+import '../services/exercises_service.dart';
 
 import '../models/exercies_model.dart';
 import '../services/exercises_service.dart';
@@ -137,85 +144,93 @@ class _PhysicalTrainingScreenState extends State<PhysicalTrainingScreen>
       itemCount: categoryExercises.reversed.toList().length,
       itemBuilder: (context, index) {
         final exercise = categoryExercises[index];
-        return Card(
-          margin: const EdgeInsets.only(bottom: 16),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(16),
-          ),
-          elevation: 4,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              if (exercise.media.isNotEmpty)
-                Stack(
-                  children: [
-                    ClipRRect(
-                      borderRadius:
-                          const BorderRadius.vertical(top: Radius.circular(16)),
-                      child: _buildMediaWidget(
-                          exercise.media[0].originalUrl, theme,
-                          height: 400, width: double.infinity),
-                    ),
-                    if (exercise.media.length > 1)
-                      Positioned(
-                        top: 0,
-                        right: 0,
-                        child: ClipRRect(
-                          borderRadius: const BorderRadius.only(
-                            topRight: Radius.circular(16),
-                          ),
-                          child: _buildMediaWidget(
-                              exercise.media[1].originalUrl, theme,
-                              height: 300, width: 100),
+        return InkWell(
+          onTap: () {
+            Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => WorkoutInfoScreen(exercise: exercise),
+                ));
+          },
+          child: Card(
+            margin: const EdgeInsets.only(bottom: 16),
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(16),
+            ),
+            elevation: 4,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                exercise.media.length > 1
+                    ? Container(
+                        height: 250,
+                        child: ListView.builder(
+                          scrollDirection: Axis.horizontal,
+                          itemCount: exercise.media.length,
+                          itemBuilder: (context, indexx) {
+                            return MediaWidget(
+                              width: MediaQuery.of(context).size.width -
+                                  64, // Card margin va padding hisobga olinadi
+
+                              url: exercise.media[indexx].originalUrl,
+                              height: 250,
+                            );
+                          },
+                        ),
+                      )
+                    : Center(
+                        child: MediaWidget(
+                          url: exercise.media.first.originalUrl,
+                          height: 250,
                         ),
                       ),
-                  ],
-                ),
-              Padding(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      exercise.name,
-                      style: const TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
+                Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        exercise.name,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
                       ),
-                    ),
-                    const SizedBox(height: 8),
-                    Text(
-                      exercise.description,
-                      style: TextStyle(
-                          color: theme.colorScheme.onSurface.withOpacity(0.7),
-                          fontSize: 12),
-                      textAlign: TextAlign.justify,
-                    ),
-                    const SizedBox(height: 16),
-                    SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceAround,
-                        children: [
-                          _buildInfoChip(
-                            icon: Icons.timer,
-                            label:
-                                '${_roundToDurationBucket((double.parse(exercise.duration) * 60).round())} soniya',
-                            theme: theme,
-                          ),
-                          const SizedBox(width: 8),
-                          _buildInfoChip(
-                            icon: Icons.repeat,
-                            label: "${exercise.count - 2} ~ ${exercise.count}",
-                            theme: theme,
-                          ),
-                        ],
+                      const SizedBox(height: 8),
+                      Text(
+                        exercise.description,
+                        style: TextStyle(
+                            color: theme.colorScheme.onSurface.withOpacity(0.7),
+                            fontSize: 12),
+                        textAlign: TextAlign.justify,
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 16),
+                      SingleChildScrollView(
+                        scrollDirection: Axis.horizontal,
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceAround,
+                          children: [
+                            _buildInfoChip(
+                              icon: Icons.timer,
+                              label:
+                                  '${_roundToDurationBucket((double.parse(exercise.duration) * 60).round())} soniya',
+                              theme: theme,
+                            ),
+                            const SizedBox(width: 8),
+                            _buildInfoChip(
+                              icon: Icons.repeat,
+                              label:
+                                  "${exercise.count - 2} ~ ${exercise.count}",
+                              theme: theme,
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         );
       },
@@ -246,7 +261,7 @@ class _PhysicalTrainingScreenState extends State<PhysicalTrainingScreen>
         url,
         height: height,
         width: width,
-        fit: BoxFit.cover,
+        fit: BoxFit.fitHeight,
         errorBuilder: (context, error, stackTrace) {
           return Container(
             height: height,

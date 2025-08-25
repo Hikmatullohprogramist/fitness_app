@@ -12,7 +12,7 @@ class QRExercisesScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('QR Kodli Mashqlar'),
+        title: const Text('Jismoniy tarbiya daqiqalari'),
         backgroundColor: theme.colorScheme.primary,
         foregroundColor: Colors.white,
       ),

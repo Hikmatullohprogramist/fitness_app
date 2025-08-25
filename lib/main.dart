@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Fitness App',
       theme: optiFormaTheme,
-
+      debugShowCheckedModeBanner: false,
       //optiFormaTheme,
       initialRoute: AppRoutes.splash,
       routes: AppRoutes.routes,

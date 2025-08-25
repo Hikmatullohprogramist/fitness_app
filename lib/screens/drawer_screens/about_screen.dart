@@ -16,34 +16,45 @@ class AboutScreen extends StatelessWidget {
         ),
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 32),
-          const CircleAvatar(
-            radius: 50,
-            backgroundImage: AssetImage('assets/images/app_icon.png'),
+          const Center(
+            child: CircleAvatar(
+              radius: 50,
+              backgroundImage: AssetImage('assets/icon/icon.jpg'),
+            ),
           ),
           const SizedBox(height: 16),
-          Text(
-            'Fitness App',
-            style: Theme.of(context).textTheme.headlineMedium,
+          Center(
+            child: Text(
+              'OptiForma',
+              style: Theme.of(context).textTheme.headlineMedium,
+              // textAlign: TextAlign.center,
+            ),
           ),
           const SizedBox(height: 8),
-          const Text('Versiya 1.0.0'),
+          const Center(child: Text('Versiya 1.0.0')),
           const SizedBox(height: 32),
           _buildAboutSection(
             context,
             'Ilova haqida',
-            'Bu ilova sizning jismoniy tayyorgarligingizni kuzatish va yaxshilash uchun yaratilgan. Unda turli xil mashqlar, statistikalar va yutuqlar mavjud.',
+            'Bu ilova oliy ta\'lim muassasalari talabalarining jismoniy tayyorgarlik darajasiga ko\'ra mashg\'ulotlarini individuallashtirish va kasbiy-amaliy jismoniy tayyorgarligini optimallashtirish maqsadida yaratilgan ',
+          ),
+          _buildAboutSection(
+            context,
+            'Dastur asoschisi',
+            'Qodirova Shahlo Shavkatjon qizi',
           ),
           _buildAboutSection(
             context,
             'Dasturchilar',
-            'Fitness App jamoasi',
+            'OptiForma jamoasi',
           ),
           _buildAboutSection(
             context,
             'Mualliflik huquqi',
-            '© 2024 Fitness App. Barcha huquqlar himoyalangan.',
+            '© 2025 OptiForma. Barcha huquqlar himoyalangan.',
           ),
         ],
       ),

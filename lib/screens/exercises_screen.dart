@@ -77,28 +77,6 @@ class _ExercisesScreenState extends State<ExercisesScreen>
     }
   }
 
-  String _roundToDurationBucket(int seconds) {
-    if (seconds >= 40 && seconds < 45) return "40 soniya";
-    if (seconds >= 45 && seconds < 50) return "45 soniya";
-    if (seconds >= 50 && seconds < 55) return "50 soniya";
-
-    // 55 dan 60 gacha -> 1 daqiqa
-    if (seconds >= 55 && seconds <= 60) return "1 daqiqa";
-
-    if (seconds > 60) {
-      final minutes = seconds ~/ 60;
-      final remainingSeconds = seconds % 60;
-
-      if (remainingSeconds == 0) {
-        return "$minutes daqiqa"; // ✅ faqat daqiqa yoziladi
-      } else {
-        return "$minutes daqiqa $remainingSeconds soniya";
-      }
-    }
-
-    return "$seconds soniya";
-  }
-
   List<Exercise> _getExercisesByCategory(String category) {
     print("Filtering for category: $category");
     print("Total exercises loaded: ${_exercises.length}");
@@ -240,7 +218,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
       "Yengil yugurish",
       "Arqonda sakrash",
       "Jismoniy tarbiya daqiqalari",
-      "Qo'l va yelka muskullari uchun mashqlar",
+      "Qo‘l va yelka muskullari uchun mashqlar",
       "Qorin muskullari uchun mashqlar",
       "Bel va orqa muskullari uchun mashqlar",
       "Butun tana muskullari uchun mashqlar",
@@ -248,7 +226,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
       "Aerobika mashqlari",
       "Kardio mashqlari",
       "Yuqori intensivlikdagi mashqlar",
-      "Cho'zilish mashqlari",
+      "Cho‘zilish mashqlari ",
       "Yoga mashqlari",
     ];
 
@@ -337,7 +315,10 @@ class _ExercisesScreenState extends State<ExercisesScreen>
                           children: [
                             Expanded(
                               child: Text(
-                                exercise.name,
+                                exercise.name
+                                        .contains("Jismoniy tarbiya daqiqalari")
+                                    ? "Chigalyozdi mashqlari"
+                                    : exercise.name,
                                 style: const TextStyle(
                                   fontSize: 18,
                                   fontWeight: FontWeight.bold,
@@ -349,7 +330,12 @@ class _ExercisesScreenState extends State<ExercisesScreen>
                         ),
                         const SizedBox(height: 8),
                         Text(
-                          exercise.description,
+                          exercise.name.contains(
+                                      "Jamoaviy o'yin tipidagi mashqlar") ||
+                                  exercise.name.contains(
+                                      "Juftlikda bajariladigan mashqlar")
+                              ? ""
+                              : exercise.description,
                           style: TextStyle(
                               color:
                                   theme.colorScheme.onSurface.withOpacity(0.7),

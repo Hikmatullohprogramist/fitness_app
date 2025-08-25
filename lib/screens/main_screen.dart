@@ -3,7 +3,6 @@ import 'package:fitness_app/screens/home_screen.dart';
 import 'package:fitness_app/screens/profile_screen.dart';
 import 'package:fitness_app/widgets/app_drawer.dart';
 
-
 class MainScreen extends StatefulWidget {
   const MainScreen({super.key});
 
@@ -29,7 +28,7 @@ class _MainScreenState extends State<MainScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Fitness App"),
+        title: const Text("OptiForma"),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
         actions: [

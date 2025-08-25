@@ -56,28 +56,28 @@ class AppDrawer extends StatelessWidget {
               _navigateToProfile(context);
             },
           ),
-          ListTile(
-            leading: const Icon(Icons.timer),
-            title: const Text('Vaqt reglamenti'),
-            onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => const TimeRegulationScreen()),
-              );
-            },
-          ),
-          ListTile(
-            leading: const Icon(Icons.assessment),
-            title: const Text('O\'z-o\'zini baholash'),
-            onTap: () {
-              Navigator.pop(context);
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => SelfAssessmentScreen()),
-              );
-            },
-          ),
+          // ListTile(
+          //   leading: const Icon(Icons.timer),
+          //   title: const Text('Vaqt reglamenti'),
+          //   onTap: () {
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(
+          //           builder: (context) => const TimeRegulationScreen()),
+          //     );
+          //   },
+          // ),
+          // ListTile(
+          //   leading: const Icon(Icons.assessment),
+          //   title: const Text('O\'z-o\'zini baholash'),
+          //   onTap: () {
+          //     Navigator.pop(context);
+          //     Navigator.push(
+          //       context,
+          //       MaterialPageRoute(builder: (context) => SelfAssessmentScreen()),
+          //     );
+          //   },
+          // ),
           ListTile(
             leading: const Icon(Icons.book_online),
             title: const Text('Mening jurnalim'),

@@ -24,7 +24,7 @@ class _MetCalculatorScreenState extends State<MetCalculatorScreen> {
   Future<void> _fetchExercises() async {
     setState(() => isLoading = true);
     try {
-      final data = await service.getExercises(page: 1, perPage: 50);
+      final data = await service.getExercises(page: 1, perPage: 1000);
       final List exList = data['exercises'];
 
       // nomlarni normalize qilib olish
@@ -82,7 +82,7 @@ class _MetCalculatorScreenState extends State<MetCalculatorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("MET Kalkulyator"),
+        title: Text("MET kalkulyator"),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
       ),

@@ -9,6 +9,9 @@ class DamOlishTimer extends StatelessWidget {
   Widget build(BuildContext context) {
     return exercise.name.contains("Juftlikda ") ||
             exercise.name.contains("Jamoaviy") ||
+            exercise.name.contains("Tez sur'atda yurish") ||
+            exercise.name.contains("Yengil yugurish") ||
+            exercise.name.contains("Arqonda sakrash") ||
             exercise.vacationTime == 0
         ? Container()
         : Container(
