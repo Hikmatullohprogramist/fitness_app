@@ -101,8 +101,8 @@ class _PhysicalDevelopmentScreenState extends State<PhysicalDevelopmentScreen>
                 fontWeight: FontWeight.normal,
               ),
               tabs: const [
-                Tab(text: 'Majburiy mashqlar'),
-                Tab(text: 'Ixtiyoriy mashqlar'),
+                Tab(text: 'Majburiy sinovlar'),
+                Tab(text: 'Ixtiyoriy sinovlar'),
               ],
             ),
           ),

@@ -32,23 +32,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Profil'),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.edit),
-            onPressed: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text(
-                      'Profil tahrirlash funksiyasi tez orada qo\'shiladi'),
-                  backgroundColor: Colors.blue,
-                ),
-              );
-            },
-          ),
-        ],
-      ),
       body: SingleChildScrollView(
         child: Column(
           children: [
@@ -64,7 +47,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Widget _buildProfileHeader() {
     return Container(
       padding: const EdgeInsets.all(16),
-      color: Colors.blue.withOpacity(0.1),
       child: Column(
         children: [
           const CircleAvatar(
@@ -149,48 +131,6 @@ class _ProfileScreenState extends State<ProfileScreen> {
       margin: const EdgeInsets.all(16),
       child: Column(
         children: [
-          ListTile(
-            leading: const Icon(Icons.settings),
-            title: const Text('Sozlamalar'),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Sozlamalar sahifasi tez orada qo\'shiladi'),
-                  backgroundColor: Colors.blue,
-                ),
-              );
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.help_outline),
-            title: const Text('Yordam va qo\'llab-quvvatlash'),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Yordam sahifasi tez orada qo\'shiladi'),
-                  backgroundColor: Colors.blue,
-                ),
-              );
-            },
-          ),
-          const Divider(),
-          ListTile(
-            leading: const Icon(Icons.info_outline),
-            title: const Text('Ilova haqida'),
-            trailing: const Icon(Icons.arrow_forward_ios),
-            onTap: () {
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Ilova haqida sahifasi tez orada qo\'shiladi'),
-                  backgroundColor: Colors.blue,
-                ),
-              );
-            },
-          ),
-          const Divider(),
           ListTile(
             leading: const Icon(Icons.logout, color: Colors.red),
             title: const Text('Chiqish', style: TextStyle(color: Colors.red)),

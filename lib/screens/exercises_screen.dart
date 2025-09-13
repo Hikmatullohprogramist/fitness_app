@@ -343,6 +343,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
                           textAlign: TextAlign.justify,
                         ),
                         const SizedBox(height: 8),
+                        Text(exercise.id.toString()),
                         DamOlishTimer(exercise: exercise),
                       ],
                     ),
