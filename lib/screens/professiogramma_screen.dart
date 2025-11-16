@@ -22,7 +22,7 @@ class _ProfessiogrammaScreenState extends State<ProfessiogrammaScreen> {
 
   void _initializeWebView() {
     const documentUrl =
-        'https://fitnes.bizsoft.uz/storage/theory-materials/01K3GSTS9BA5HQPRHFBVKZYGBC.docx';
+        'https://fitnes.bizsoft.uz/storage/theory-materials/01K9RTX9NYJFEY8TN58G3N5ED9.docx';
     final googleDocsUrl =
         'https://docs.google.com/viewer?url=${Uri.encodeComponent(documentUrl)}&embedded=true';
 

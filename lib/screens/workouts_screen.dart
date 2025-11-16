@@ -241,7 +241,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
   String? _selectedMonth;
   String? _selectedMinute;
   String? _selectedLevel;
-  int _selectedSubCategoryIndex = 0;
+  final int _selectedSubCategoryIndex = 0;
 
   final List<Map<String, dynamic>> levels = [
     {"id": 2, 'label': 'Minimal', 'minutes': 210},
@@ -746,7 +746,7 @@ class _WorkoutsScreenState extends State<WorkoutsScreen> {
                                 ),
                               ),
                               Text(
-                                "${day.subCategories?.fold<int>(0, (sum, sub) => sum + (int.tryParse(sub.pivot.duration ?? '0') ?? 0)) ?? 0} daq",
+                                "${day.subCategories.fold<int>(0, (sum, sub) => sum + (int.tryParse(sub.pivot.duration ?? '0') ?? 0)) ?? 0} daq",
                                 style: TextStyle(
                                   color: isSelected
                                       ? Colors.white

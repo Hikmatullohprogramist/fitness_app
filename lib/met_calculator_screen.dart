@@ -3,6 +3,8 @@ import 'package:fitness_app/services/exercises_service.dart';
 import 'package:flutter/material.dart';
 
 class MetCalculatorScreen extends StatefulWidget {
+  const MetCalculatorScreen({super.key});
+
   @override
   _MetCalculatorScreenState createState() => _MetCalculatorScreenState();
 }
@@ -82,7 +84,7 @@ class _MetCalculatorScreenState extends State<MetCalculatorScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("MET kalkulyator"),
+        title: const Text("MET kalkulyator"),
         backgroundColor: Theme.of(context).colorScheme.primary,
         foregroundColor: Colors.white,
       ),

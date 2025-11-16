@@ -26,10 +26,20 @@ class _ExercisesScreenState extends State<ExercisesScreen>
 
   final ScrollController _scrollController = ScrollController();
 
+  // Selected subcategory for filtering
+  String? _selectedSubcategory;
+
   @override
   void initState() {
     super.initState();
     _tabController = TabController(length: 3, vsync: this);
+    _tabController.addListener(() {
+      if (mounted) {
+        setState(() {
+          _selectedSubcategory = null; // Reset filter when changing tabs
+        });
+      }
+    });
     _loadExercises(reset: true);
   }
 
@@ -226,7 +236,7 @@ class _ExercisesScreenState extends State<ExercisesScreen>
       "Aerobika mashqlari",
       "Kardio mashqlari",
       "Yuqori intensivlikdagi mashqlar",
-      "Cho‘zilish mashqlari ",
+      "Cho‘zilish mashqlari",
       "Yoga mashqlari",
     ];
 
@@ -241,124 +251,196 @@ class _ExercisesScreenState extends State<ExercisesScreen>
         ..sort((a, b) => a.toLowerCase().compareTo(b.toLowerCase()));
     }
 
-    final List<Widget> children = [];
-    for (final subcat in sortedSubcategories) {
-      children.add(
-        Padding(
-          padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-          child: Text(
-            subcat,
-            style: const TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
-        ),
-      );
-
-      final exercisesInSubcat = subcategoryToExercises[subcat]!;
-
-      for (final exercise in exercisesInSubcat) {
-        children.add(
-          Card(
-            margin: const EdgeInsets.fromLTRB(16, 0, 16, 16),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(16),
-            ),
-            elevation: 4,
-            child: InkWell(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => WorkoutInfoScreen(exercise: exercise),
-                  ),
-                );
-              },
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (exercise.media.isNotEmpty)
-                    SizedBox(
-                      height: 400,
-                      child: ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(16)),
-                        child: exercise.media.length > 1
-                            ? ListView.builder(
-                                scrollDirection: Axis.horizontal,
-                                itemCount: exercise.media.length,
-                                itemBuilder: (context, index) {
-                                  return _buildMediaWidget(
-                                    exercise.media[index].originalUrl,
-                                    theme,
-                                    height: 400,
-                                    width: MediaQuery.of(context).size.width,
-                                  );
-                                },
-                              )
-                            : _buildMediaWidget(
-                                exercise.media[0].originalUrl,
-                                theme,
-                                height: 400,
-                                width: double.infinity,
-                              ),
-                      ),
-                    ),
-                  Padding(
-                    padding: const EdgeInsets.all(16),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: Text(
-                                exercise.name
-                                        .contains("Jismoniy tarbiya daqiqalari")
-                                    ? "Chigalyozdi mashqlari"
-                                    : exercise.name,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                            ),
-                            TimerWidget(exercise: exercise),
-                          ],
-                        ),
-                        const SizedBox(height: 8),
-                        Text(
-                          exercise.name.contains(
-                                      "Jamoaviy o'yin tipidagi mashqlar") ||
-                                  exercise.name.contains(
-                                      "Juftlikda bajariladigan mashqlar")
-                              ? ""
-                              : exercise.description,
-                          style: TextStyle(
-                              color:
-                                  theme.colorScheme.onSurface.withOpacity(0.7),
-                              fontSize: 12),
-                          textAlign: TextAlign.justify,
-                        ),
-                        const SizedBox(height: 8),
-                        Text(exercise.id.toString()),
-                        DamOlishTimer(exercise: exercise),
-                      ],
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-        );
+    // Get exercises to display (filtered by selected subcategory or all)
+    List<Exercise> exercisesToDisplay = [];
+    if (_selectedSubcategory != null) {
+      exercisesToDisplay = subcategoryToExercises[_selectedSubcategory] ?? [];
+    } else {
+      // Show all exercises
+      for (final subcat in sortedSubcategories) {
+        exercisesToDisplay.addAll(subcategoryToExercises[subcat]!);
       }
     }
 
-    return ListView(
-      controller: _scrollController,
-      children: children,
+    return Column(
+      children: [
+        // Horizontal subcategory filter
+        Container(
+          height: 60,
+          padding: const EdgeInsets.symmetric(vertical: 8),
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            itemCount: sortedSubcategories.length,
+            itemBuilder: (context, index) {
+              final subcat = sortedSubcategories[index];
+              // Replace "Jismoniy tarbiya daqiqalari" with "Chigalyozdi mashqlari" for individual category
+              String displaySubcat = subcat;
+              if (category == "individual" &&
+                  subcat == "Jismoniy tarbiya daqiqalari") {
+                displaySubcat = "Chigalyozdi mashqlari";
+              }
+
+              final isSelected = _selectedSubcategory == subcat;
+
+              return Padding(
+                padding: EdgeInsets.only(
+                  left: index == 0 ? 16 : 8,
+                  right: index == sortedSubcategories.length - 1 ? 16 : 0,
+                ),
+                child: FilterChip(
+                  label: Text(displaySubcat),
+                  selected: isSelected,
+                  onSelected: (selected) {
+                    setState(() {
+                      if (isSelected) {
+                        _selectedSubcategory =
+                            null; // Deselect if already selected
+                      } else {
+                        _selectedSubcategory = subcat; // Select new subcategory
+                      }
+                    });
+                  },
+                  selectedColor: const Color(0xFF9F5F91),
+                  checkmarkColor: Colors.white,
+                  labelStyle: TextStyle(
+                    fontSize: 13,
+                    fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+                    color: isSelected ? Colors.white : const Color(0xFF572C57),
+                  ),
+                  backgroundColor: Colors.white,
+                  elevation: isSelected ? 4 : 1,
+                  shadowColor: const Color(0xFF9F5F91).withOpacity(0.3),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                  side: BorderSide(
+                    color: isSelected
+                        ? const Color(0xFF9F5F91)
+                        : const Color(0xFF9F5F91).withOpacity(0.3),
+                    width: isSelected ? 2 : 1,
+                  ),
+                ),
+              );
+            },
+          ),
+        ),
+
+        // Exercise list
+        Expanded(
+          child: exercisesToDisplay.isEmpty
+              ? Center(
+                  child: Text(
+                    'Bu sub-kategoriyada mashqlar topilmadi',
+                    style: TextStyle(
+                      color: theme.colorScheme.onSurface.withOpacity(0.7),
+                    ),
+                  ),
+                )
+              : ListView.builder(
+                  controller: _scrollController,
+                  itemCount: exercisesToDisplay.length,
+                  itemBuilder: (context, index) {
+                    final exercise = exercisesToDisplay[index];
+                    return Card(
+                      margin: const EdgeInsets.fromLTRB(16, 8, 16, 8),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      elevation: 4,
+                      child: InkWell(
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (context) =>
+                                  WorkoutInfoScreen(exercise: exercise),
+                            ),
+                          );
+                        },
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            if (exercise.media.isNotEmpty)
+                              SizedBox(
+                                height: 400,
+                                child: ClipRRect(
+                                  borderRadius: const BorderRadius.vertical(
+                                      top: Radius.circular(16)),
+                                  child: exercise.media.length > 1
+                                      ? ListView.builder(
+                                          scrollDirection: Axis.horizontal,
+                                          itemCount: exercise.media.length,
+                                          itemBuilder: (context, mediaIndex) {
+                                            return _buildMediaWidget(
+                                              exercise.media[mediaIndex]
+                                                  .originalUrl,
+                                              theme,
+                                              height: 400,
+                                              width: MediaQuery.of(context)
+                                                  .size
+                                                  .width,
+                                            );
+                                          },
+                                        )
+                                      : _buildMediaWidget(
+                                          exercise.media[0].originalUrl,
+                                          theme,
+                                          height: 400,
+                                          width: double.infinity,
+                                        ),
+                                ),
+                              ),
+                            Padding(
+                              padding: const EdgeInsets.all(16),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Expanded(
+                                        child: Text(
+                                          exercise.name.contains(
+                                                  "Jismoniy tarbiya daqiqalari")
+                                              ? "Chigalyozdi mashqlari"
+                                              : exercise.name,
+                                          style: const TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                        ),
+                                      ),
+                                      TimerWidget(exercise: exercise),
+                                    ],
+                                  ),
+                                  const SizedBox(height: 8),
+                                  Text(
+                                    exercise.name.contains(
+                                                "Jamoaviy o'yin tipidagi mashqlar") ||
+                                            exercise.name.contains(
+                                                "Juftlikda bajariladigan mashqlar")
+                                        ? ""
+                                        : exercise.description,
+                                    style: TextStyle(
+                                        color: theme.colorScheme.onSurface
+                                            .withOpacity(0.7),
+                                        fontSize: 12),
+                                    textAlign: TextAlign.justify,
+                                  ),
+                                  const SizedBox(height: 8),
+                                  // Text(exercise.id.toString()),
+                                  DamOlishTimer(exercise: exercise),
+                                ],
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    );
+                  },
+                ),
+        ),
+      ],
     );
   }
 

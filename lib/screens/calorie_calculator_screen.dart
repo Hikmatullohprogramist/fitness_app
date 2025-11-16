@@ -13,8 +13,8 @@ class _CalorieCalculatorScreenState extends State<CalorieCalculatorScreen> {
   final _formKey = GlobalKey<FormState>();
   final _calorieService = CalorieService();
 
-  List<ExerciseInput> _exercises = [];
-  List<Map<String, dynamic>> _exerciseDetails = [];
+  final List<ExerciseInput> _exercises = [];
+  final List<Map<String, dynamic>> _exerciseDetails = [];
 
   @override
   Widget build(BuildContext context) {

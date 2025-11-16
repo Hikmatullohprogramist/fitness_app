@@ -6,7 +6,6 @@ import 'package:fitness_app/screens/splash_screen.dart';
 import 'package:fitness_app/screens/upload_exercises_screen.dart';
 import 'package:fitness_app/screens/physical_development_level_screen.dart';
 import 'package:fitness_app/screens/workouts_screen.dart';
-import 'package:fitness_app/screens/calorie_calculator_screen.dart';
 import 'package:flutter/material.dart';
 import 'screens/home_screen.dart';
 import 'screens/profile_screen.dart';

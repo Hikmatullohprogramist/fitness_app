@@ -151,7 +151,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 Icons.check_circle,
               ),
             ],
-            ModernStepCounter()
+            const ModernStepCounter()
           ],
         ),
       ),

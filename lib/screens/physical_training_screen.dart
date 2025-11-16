@@ -162,7 +162,7 @@ class _PhysicalTrainingScreenState extends State<PhysicalTrainingScreen>
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
                 exercise.media.length > 1
-                    ? Container(
+                    ? SizedBox(
                         height: 250,
                         child: ListView.builder(
                           scrollDirection: Axis.horizontal,

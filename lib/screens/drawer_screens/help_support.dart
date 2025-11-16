@@ -44,17 +44,17 @@ class HelpSupportScreen extends StatelessWidget {
             [
               _buildHelpTile(
                 context,
-                'Telefon: +998 90 123 45 67',
+                'Telefon: +998 90 560 56 02',
                 Icons.phone,
               ),
               _buildHelpTile(
                 context,
-                'Email: support@fitnessapp.uz',
+                'Email: shkodirova1997@gmail.com',
                 Icons.email,
               ),
               _buildHelpTile(
                 context,
-                'Telegram: @fitnessapp_support',
+                'Telegram: @Kad1r0va',
                 Icons.telegram,
               ),
             ],

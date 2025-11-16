@@ -40,7 +40,9 @@ class _ModernStepCounterState extends State<ModernStepCounter> {
     _notifications = FlutterLocalNotificationsPlugin();
 
     const androidInit = AndroidInitializationSettings('@mipmap/ic_launcher');
-    const initSettings = InitializationSettings(android: androidInit);
+    const iosInit = DarwinInitializationSettings();
+    const initSettings =
+        InitializationSettings(android: androidInit, iOS: iosInit);
 
     await _notifications.initialize(initSettings);
 
